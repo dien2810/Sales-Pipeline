@@ -1,3 +1,5 @@
+{* Added by Minh Hoang on 2021-02-10 *}
+
 {strip}
 <div class="modal-dialog modal-content modal-width-1300">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_SEND_EMAIL', $MODULE_NAME)}" }

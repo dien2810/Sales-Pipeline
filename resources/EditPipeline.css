@@ -4,6 +4,22 @@
     Date: 22/1/2025
     Purpose: Provide styles for Pipeline Edit interface
 */
+
+/* Add by Minh Hoang on 2025-01-23 */
+:root {
+  --brand1-color: #1b74e4;
+  --primary1-color: #008ecf;
+  --primary2-color: #33a5d9;
+  --primary3-color: #66bbe2;
+  --primary4-color: #b3ddf1;
+  --primary6-color: #f3fafd;
+  --text-color: #ccc;
+  --black1-color: #333333;
+  --black2-color: #5a5a5a;
+}
+/* End Minh Hoang */
+
+
 .fieldBlockContainer .fieldLabel {
   background-color: #f3fafd !important;
 }
@@ -385,8 +401,9 @@ i.icon {
   opacity: 0.7;
 }
 /* End */
-/* Modal */
 
+
+/* Add by Minh Hoang on 2025-01-23 */
 .w10 {
   width: 10% !important;
 }
@@ -464,7 +481,6 @@ i.icon {
 }
 
 /* AddZNSModal */
-
 .form-modal {
   margin-top: 20px;
   margin-bottom: 0;
@@ -481,12 +497,12 @@ i.icon {
 }
 
 .form-content::-webkit-scrollbar-thumb {
-  background-color: #abb0b4; /* Màu của thanh cuộn */
-  border-radius: 10px; /* Bo góc thanh cuộn */
+  background-color: #abb0b4;
+  border-radius: 10px;
 }
 
 .form-content::-webkit-scrollbar-track {
-  background-color: #f8f9fa; /* Màu nền của track thanh cuộn */
+  background-color: #f8f9fa;
 }
 
 .align-item {
@@ -544,12 +560,12 @@ i.icon {
 }
 
 .message-form::-webkit-scrollbar-thumb {
-  background-color: #abb0b4; /* Màu của thanh cuộn */
-  border-radius: 10px; /* Bo góc thanh cuộn */
+  background-color: #abb0b4;
+  border-radius: 10px;
 }
 
 .message-form::-webkit-scrollbar-track {
-  background-color: #f8f9fa; /* Màu nền của track thanh cuộn */
+  background-color: #f8f9fa;
 }
 
 .message-form img {
@@ -609,14 +625,7 @@ i.icon {
   margin-right: 10px;
 }
 
-/* AddSMSModal */
-
-
-/* DataFieldUpdateModal */
-
-
 /* AddCallModal & AddMeetingModal */
-
 .resize-vertical {
   resize: vertical;
 }
@@ -627,12 +636,6 @@ i.icon {
   gap: 5px;
   font-weight: 500;
 }
-
-/* CreateNewTaskModal & CreateNewProjectModal */
-
-
-/* CreateNewRecordModal */
-
 
 /* SetValuePopup */
 .box-text {
@@ -649,6 +652,4 @@ i.icon {
 .box-text p {
   color: var(--primary1-color);
 }
-
-
-/* SendEmail */
+/* End Minh Hoang */

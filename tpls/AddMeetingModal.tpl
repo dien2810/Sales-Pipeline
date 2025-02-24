@@ -1,3 +1,5 @@
+{* Added by Minh Hoang on 2021-02-03 *}
+
 {strip}
 <div class="modal-dialog modal-content modal-width-1100">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_ADD_MEETING', $MODULE_NAME)}" }

@@ -165,6 +165,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->display('modules/Settings/PipelineConfig/tpls/ActionSettingModal.tpl');
 	}
 
+	// Add by Minh Hoang on 2025-02-14
 	function getAddCallModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
@@ -381,23 +382,23 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
-	
+
 		$allFieldOptions = '';
 		$phoneFieldOptions = '';
 
 		foreach ($recordStructure as $block => $fields) {
 			foreach ($fields as $fieldName => $fieldModel) {
 				if ($fieldModel->getName() != 'assigned_user_id') {
-					$allFieldOptions .= '<option value="$' . $fieldModel->get('name') . '">' . $fieldModel->get('label') . '</option>';
+					$allFieldOptions .= '<option value="$' . $fieldModel->get('name') . '">' . vtranslate($fieldModel->get('label'), $moduleName) . '</option>';
 				}
 				if ($fieldModel->getFieldDataType() === 'phone') {
-					$phoneFieldOptions .= '<option value="$' . $fieldName . '">' . $fieldModel->get('label') . '</option>';
+					$phoneFieldOptions .= '<option value="$' . $fieldName . '">' . vtranslate($fieldModel->get('label'), $moduleName) . '</option>';
 				}
 			}
 		}
-	
+
 		$taskObject = $request->get('taskObject');
-	
+
 		$viewer = $this->getViewer($request);
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('ALL_FIELD_OPTIONS', $allFieldOptions);
@@ -425,8 +426,8 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		foreach ($recordStructure as $block => $fields) {
 			foreach ($fields as $fieldName => $fieldModel) {
 				if ($fieldModel->getFieldDataType() === 'email') {
-					$emailFieldOptions .= '<option value="$' . $fieldName . '">' . $fieldModel->get('label') . '</option>';
-					$fromEmailFieldOptions .= '<option value="$' . $fieldName . '">' . $fieldModel->get('label') . '</option>';
+					$emailFieldOptions .= '<option value="$' . $fieldName . '">' . vtranslate($fieldModel->get('label'), $moduleName) . '</option>';
+					$fromEmailFieldOptions .= '<option value="$' . $fieldName . '">' . vtranslate($fieldModel->get('label'), $moduleName) . '</option>';
 				}
 			}
 		}
@@ -437,7 +438,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 			foreach ($fields as $fieldModel) {
 				if ($fieldModel->getName() == 'assigned_user_id') continue;
 				$allFieldOptions .= '<option value="$' . $fieldModel->get('name') . '">' .
-									$fieldModel->get('label') . '</option>';
+									vtranslate($fieldModel->get('label'), $moduleName) . '</option>';
 			}
 		}
 
@@ -478,7 +479,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer = $this->getViewer($request);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddNotificationModal.tpl');
 	}
-
+	// End Minh Hoang
 	function getConditionModal(Vtiger_Request $request) {
 		$viewer = $this->getViewer ($request);
 		$moduleName = $request->get('source_module');
@@ -552,9 +553,5 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 
 		$viewer->display('modules/Settings/PipelineConfig/tpls/ConditionModal.tpl');
 	}
-
-
-
-
 	//End Tran Dien
 }

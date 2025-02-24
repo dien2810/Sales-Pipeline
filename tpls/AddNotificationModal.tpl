@@ -1,5 +1,7 @@
+{* Added by Minh Hoang on 2021-02-10 *}
+
 {*
-	Name: AddNotificationModalAddNotificationModal.tpl
+	Name: AddNotificationModal.tpl
 	Author: Dien Nguyen
 	Date: 2025-01-13
 	Purpose: Modal add notification

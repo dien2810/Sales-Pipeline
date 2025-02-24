@@ -2487,7 +2487,115 @@ CustomView_BaseController_Js(
       return values;
     },
 
-    // Added by Minh Hoàng
+    // Add by Minh Hoang on 2025-02-17 to add function show modal
+
+    /**
+    * Function to get ckEditorInstance
+    */
+    getckEditorInstance: function () {
+      if (this.ckEditorInstance == false) {
+         this.ckEditorInstance = new Vtiger_CkEditor_Js();
+      }
+      return this.ckEditorInstance;
+    },
+
+    preSaveVTEmailTask: function (tasktype) {
+      var textAreaElement = jQuery('#content');
+      //To keep the plain text value to the textarea which need to be
+      //sent to server
+      textAreaElement.val(CKEDITOR.instances['content'].getData());
+    },
+
+    /**
+    * Function to fill the values ​​into the input box when selecting the options of Select
+    */
+    registerFillTaskFromEmailFieldEvent: function () {
+      jQuery('#form-send-email').on('change', '#fromEmailOption', function (e) {
+         var currentElement = jQuery(e.currentTarget);
+         var inputElement = currentElement.closest('.row').find('.fields');
+         inputElement.val(currentElement.val());
+      })
+    },
+
+    registerFillTaskFieldsEvent: function () {
+      jQuery('#form-send-email').on('change', '.task-fields', function (e) {
+         var currentElement = jQuery(e.currentTarget);
+         var inputElement = currentElement.closest('.row').find('.fields');
+         if (currentElement.hasClass('overwriteSelection')) {
+            inputElement.val(currentElement.val());
+         } else {
+            var oldValue = inputElement.val();
+            var newValue = oldValue + currentElement.val();
+            inputElement.val(newValue);
+         }
+      });
+    },
+    
+    registerFillMailContentEvent: function () {
+      jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
+         var textarea = CKEDITOR.instances.content;
+         var value = jQuery(e.currentTarget).val();
+         if (textarea != undefined) {
+            textarea.insertHtml(value);
+         } else if (jQuery('textarea[name="content"]')) {
+            var textArea = jQuery('textarea[name="content"]');
+            textArea.insertAtCaret(value);
+         }
+      });
+    },
+
+    registerFillSMSTaskFieldsEvent: function () {
+      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var input = jQuery('input[name="sms_recepient"]');
+              var currentValue = input.val();
+              input.val(currentValue + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerFillSMSContentEvent: function () {
+      jQuery('#task-fieldnames').change(function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var textarea = jQuery('textarea[name="content"]');
+              var currentContent = textarea.val();
+              textarea.val(currentContent + '{' + selectedField + '}');
+          }
+      });
+    },
+    
+    registerFillSMSTaskFieldsEvent: function () {
+      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var input = jQuery('input[name="sms_recepient"]');
+              var currentValue = input.val();
+              input.val(currentValue + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerFillSMSContentEvent: function () {
+      jQuery('#task-fieldnames').change(function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var textarea = jQuery('textarea[name="content"]');
+              var currentContent = textarea.val();
+              textarea.val(currentContent + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerTooltipEventForSignatureField: function () {
+      jQuery("#signaturePopover").on('mouseover', function (e) {
+         jQuery('#signaturePopover').popover({
+            'html': true
+         });
+      });
+    },
+
     registerToggleCheckboxEvent: function (form) {
       form.find("#toggleCheckbox").on("change", function () {
         if ($(this).is(":checked")) {
@@ -2498,6 +2606,52 @@ CustomView_BaseController_Js(
       });
     },
 
+    // Add by Minh Hoang on 2025-01-23 to set validation rules for SMS content field
+    validateContentSMSModal: function () {
+      let contentInput = jQuery('[name="content"]');
+  
+      contentInput.closest('div').prev('div').append('<span class="redColor">*</span>');
+      contentInput.attr('data-rule-required', 'true');
+
+      if (typeof _PROVIDER_INFO !== 'undefined' && !_PROVIDER_INFO['unicode_sms_supported']) {
+        contentInput.attr('data-rule-asciiOnly', 'true');
+      }
+    },
+
+    /**
+    * Function to get values from modals
+    */
+    getValuesFromSendSMSModal: function () {
+      var values = {};
+      var modal = jQuery('#form-send-sms');
+  
+      values.titleSMS = modal.find('input[name="titleSMS"]').val();
+      values.sms_recepient = modal.find('input[name="sms_recepient"]').val();
+      values.content = modal.find('textarea[name="content"]').val();
+  
+      return values;
+    },
+    
+    getValuesFromSendEmailModal: function () {
+      var values = {};
+      var modal = jQuery('#form-send-email');
+  
+      values.titleEmail = modal.find('input[name="titleEmail"]').val();
+      values.fromEmail = modal.find('input[name="fromEmail"]').val();
+      values.replyTo = modal.find('input[name="replyTo"]').val();
+      values.recepient = modal.find('input[name="recepient"]').val();
+      values.emailcc = modal.find('input[name="emailcc"]').val();
+      values.emailbcc = modal.find('input[name="emailbcc"]').val();
+      values.subject = modal.find('input[name="subject"]').val();
+      values.safe_content = modal.find('input[name="safe_content"]').is(':checked') ? 1 : 0;
+      values.content = modal.find('textarea[name="content"]').val();
+  
+      return values;
+    },
+
+    /**
+    * Function to show modals
+    */
     showAddCallModal: function (targetBtn) {
       var self = this;
       app.helper.showProgress();
@@ -2522,12 +2676,12 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             const form = modal.find("form#form-add-call");
-            vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
-            self.registerToggleCheckboxEvent(form);
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
+            vtUtils.initDatePickerFields(form);
+
+            self.registerToggleCheckboxEvent(form);
 
             // Form validation
             var params = {
@@ -2572,12 +2726,13 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             const form = modal.find("form#form-add-meeting");
-            vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
-            self.registerToggleCheckboxEvent(form);
+            
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
+            vtUtils.initDatePickerFields(form);
+            
+            self.registerToggleCheckboxEvent(form);
 
             // Form validation
             var params = {
@@ -2775,11 +2930,10 @@ CustomView_BaseController_Js(
               setTimeout(function () {
                 newRowElement.addClass("fadeInx");
               }, 100);
-              //change in to chosen elements
 
               newRowElement.find("select.select2").select2();
             });
-            // Xóa phần tử khi nhấn vào icon thùng rác
+
             form.on("click", ".removeField", function () {
               $(this).closest(".form-group").remove();
             });
@@ -2818,53 +2972,6 @@ CustomView_BaseController_Js(
           },
         });
       });
-    },
-
-    // Begin Modal Send SMS
-    registerFillSMSTaskFieldsEvent: function () {
-      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var input = jQuery('input[name="sms_recepient"]');
-              var currentValue = input.val();
-              input.val(currentValue + '{' + selectedField + '}');
-          }
-      });
-    },
-
-    registerFillSMSContentEvent: function () {
-      jQuery('#task-fieldnames').change(function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var textarea = jQuery('textarea[name="content"]');
-              var currentContent = textarea.val();
-              textarea.val(currentContent + '{' + selectedField + '}');
-          }
-      });
-    },
-
-    getValuesFromSendSMSModal: function () {
-      var values = {};
-      var modal = jQuery('#form-send-sms');
-  
-      values.titleSMS = modal.find('input[name="titleSMS"]').val();
-      values.sms_recepient = modal.find('input[name="sms_recepient"]').val();
-      values.content = modal.find('textarea[name="content"]').val();
-  
-      return values;
-    },
-
-    validateContentSMSModal: function () {
-      let contentInput = jQuery('[name="content"]');
-  
-      // Set content to required
-      contentInput.closest('div').prev('div').append('<span class="redColor">*</span>');
-      contentInput.attr('data-rule-required', 'true');
-  
-      // Validate ascii content when the provider does not support unicode SMS
-      if (typeof _PROVIDER_INFO !== 'undefined' && !_PROVIDER_INFO['unicode_sms_supported']) {
-        contentInput.attr('data-rule-asciiOnly', 'true');
-      }
     },
 
     showSendSMSModal: function (targetBtn) {
@@ -2920,9 +3027,7 @@ CustomView_BaseController_Js(
         });
       });
     },
-    // End Modal Send SMS
 
-    // Begin Modal Send ZNS
     showSendZNSModal: function (targetBtn) {
       app.helper.showProgress();
       // Request modal content
@@ -2967,82 +3072,6 @@ CustomView_BaseController_Js(
           },
         });
       });
-    },
-    // End Modal Send ZNS
-
-    // Begin Modal Send Email
-    getckEditorInstance: function () {
-      if (this.ckEditorInstance == false) {
-         this.ckEditorInstance = new Vtiger_CkEditor_Js();
-      }
-      return this.ckEditorInstance;
-    },
-
-    preSaveVTEmailTask: function (tasktype) {
-      var textAreaElement = jQuery('#content');
-      //To keep the plain text value to the textarea which need to be
-      //sent to server
-      textAreaElement.val(CKEDITOR.instances['content'].getData());
-    },
-
-    registerFillTaskFromEmailFieldEvent: function () {
-      jQuery('#form-send-email').on('change', '#fromEmailOption', function (e) {
-         var currentElement = jQuery(e.currentTarget);
-         var inputElement = currentElement.closest('.row').find('.fields');
-         inputElement.val(currentElement.val());
-      })
-    },
-
-    registerFillTaskFieldsEvent: function () {
-      jQuery('#form-send-email').on('change', '.task-fields', function (e) {
-         var currentElement = jQuery(e.currentTarget);
-         var inputElement = currentElement.closest('.row').find('.fields');
-         if (currentElement.hasClass('overwriteSelection')) {
-            inputElement.val(currentElement.val());
-         } else {
-            var oldValue = inputElement.val();
-            var newValue = oldValue + currentElement.val();
-            inputElement.val(newValue);
-         }
-      });
-    },
-    
-    registerFillMailContentEvent: function () {
-      jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
-         var textarea = CKEDITOR.instances.content;
-         var value = jQuery(e.currentTarget).val();
-         if (textarea != undefined) {
-            textarea.insertHtml(value);
-         } else if (jQuery('textarea[name="content"]')) {
-            var textArea = jQuery('textarea[name="content"]');
-            textArea.insertAtCaret(value);
-         }
-      });
-    },
-    
-    registerTooltipEventForSignatureField: function () {
-      jQuery("#signaturePopover").on('mouseover', function (e) {
-         jQuery('#signaturePopover').popover({
-            'html': true
-         });
-      });
-    },
-
-    getValuesFromSendEmailModal: function () {
-      var values = {};
-      var modal = jQuery('#form-send-email');
-  
-      values.titleEmail = modal.find('input[name="titleEmail"]').val();
-      values.fromEmail = modal.find('input[name="fromEmail"]').val();
-      values.replyTo = modal.find('input[name="replyTo"]').val();
-      values.recepient = modal.find('input[name="recepient"]').val();
-      values.emailcc = modal.find('input[name="emailcc"]').val();
-      values.emailbcc = modal.find('input[name="emailbcc"]').val();
-      values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal.find('input[name="safe_content"]').is(':checked') ? 1 : 0;
-      values.content = modal.find('textarea[name="content"]').val();
-  
-      return values;
     },
 
     showSendEmailModal: function (targetBtn) {
@@ -3119,7 +3148,6 @@ CustomView_BaseController_Js(
         });
       });
     },
-    // End Modal Send Email
 
     showNotificationModal: function (targetBtn) {
       app.helper.showProgress();

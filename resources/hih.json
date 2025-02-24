@@ -1,0 +1,140 @@
+[
+    {
+        "stageId": 3484283,
+        "frequency": "onceAction",
+        "action_time_type": "immediate",
+        "time": null,
+        "time_unit": "minutes",
+        "updateDataFields": {
+            "0": {
+                "column_name": "vtiger_potential:potentialname:potentialname:Potentials_Potential_Name:V",
+                "value": "HiHi"
+            }
+        },
+        "action_name": "Chăm sóc khách hàng 1 1 lần cập nhật",
+        "action_type": "updateDataField"
+    },
+    {
+        "stageId": 3484283,
+        "frequency": "onceAction",
+        "action_time_type": "immediate",
+        "time": null,
+        "time_unit": "minutes",
+        "action_name": "Chăm sóc khách hàng 1 1 lần email",
+        "action_type": "sendEmail",
+        "sendEmailData": {
+            "titleEmail": "Chăm sóc khách hàng 1 1 lần email",
+            "fromEmail": "$(general : (__VtigerMeta__) supportName)",
+            "replyTo": "$(related_to ; (Accounts) bill_email)",
+            "recepient": "$(related_to ; (Accounts) bill_email)",
+            "emailcc": "",
+            "emailbcc": "",
+            "subject": "$potentialname",
+            "safe_content": 1,
+            "content": "\n\n\t\n\n$potentialname của $(general : (__VtigerMeta__) supportName) có địa chỉ email hỗ trợ là $(general : (__VtigerMeta__) supportEmailid)\n\n"
+        }
+    },
+    {
+        "stageId": 3484283,
+        "frequency": "actionWithCondition",
+        "action_time_type": "scheduled",
+        "time": 5,
+        "time_unit": "days",
+        "action_name": "Chăm sóc khách hàng 1 thỏa điều kiện 5 ngày",
+        "action_type": "sendEmail",
+        "sendEmailData": {
+            "titleEmail": "Chăm sóc khách hàng 1 thỏa điều kiện 5 ngày",
+            "fromEmail": "$(related_to ; (Accounts) email1)",
+            "replyTo": "$(related_to ; (Accounts) bill_email)",
+            "recepient": "$(related_to ; (Accounts) bill_email)",
+            "emailcc": "",
+            "emailbcc": "",
+            "subject": "$related_to",
+            "safe_content": 0,
+            "content": "\n\n\t\n\n$potentialname có địa chỉ email hỗ trợ là $(general : (__VtigerMeta__) supportEmailid)\n\n"
+        }
+    },
+    {
+        "stageId": 3484283,
+        "frequency": "actionWithCondition",
+        "action_time_type": "scheduled",
+        "time": 5,
+        "time_unit": "days",
+        "updateDataFields": {
+            "0": {
+                "column_name": "vtiger_potential:contact_id:contact_id:Potentials_Contact_Name:V",
+                "value": "Haha"
+            }
+        },
+        "action_name": "Chăm sóc khách hàng 1 thỏa điều kiện 5 ngày",
+        "action_type": "updateDataField"
+    }
+]
+
+
+
+
+
+
+
+
+
+
+
+[
+    {
+        "stageId": 5425304,
+        "frequency": "onceAction",
+        "action_time_type": "immediate",
+        "time": null,
+        "time_unit": "minutes",
+        "action_name": "Chăm sóc khách hàng 2",
+        "action_type": "sendEmail",
+        "sendEmailData": {
+            "titleEmail": "Chăm sóc khách hàng 2",
+            "fromEmail": "$(linktoaccountscontacts ; (Accounts) email1)",
+            "replyTo": "$(linktoaccountscontacts ; (Contacts) secondaryemail)",
+            "recepient": "$(linktoaccountscontacts ; (Contacts) email)",
+            "emailcc": "",
+            "emailbcc": "",
+            "subject": "$project_no",
+            "safe_content": 0,
+            "content": "\n\n\t\n\n$projecttype $(general : (__VtigerMeta__) usertimezone) (general : (__VtigerMeta__) portaldetailviewurl)\n\n"
+        }
+    },
+    {
+        "stageId": 5425304,
+        "frequency": "onceAction",
+        "action_time_type": "immediate",
+        "time": null,
+        "time_unit": "minutes",
+        "updateDataFields": {
+            "0": {
+                "column_name": "vtiger_project:project_no:project_no:Project_Project_No:V",
+                "value": "Lala"
+            }
+        },
+        "action_name": "Chăm sóc khách hàng 2 Cập nhật",
+        "action_type": "updateDataField"
+    },
+    {
+        "stageId": 5425304,
+        "frequency": "actionWithCondition",
+        "action_time_type": "scheduled",
+        "time": 5,
+        "time_unit": "days",
+        "action_name": "Chăm sóc khách hàng 2 Send Email",
+        "action_type": "sendEmail",
+        "sendEmailData": {
+            "titleEmail": "Chăm sóc khách hàng 2 Send Email",
+            "fromEmail": "$(general : (__VtigerMeta__) supportName)",
+            "replyTo": "$(linktoaccountscontacts ; (Contacts) secondaryemail)",
+            "recepient": "$(linktoaccountscontacts ; (Contacts) email)",
+            "emailcc": "",
+            "emailbcc": "",
+            "subject": "$linktoaccountscontacts",
+            "safe_content": 1,
+            "content": "\n\n\t\n\n$linktoaccountscontacts $(general : (__VtigerMeta__) supportEmailid) $isconvertedfrompotential\n\n"
+        }
+    }
+]

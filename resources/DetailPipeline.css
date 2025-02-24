@@ -1,0 +1,41 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.listViewHeaders span {
+  color: #000;
+}
+/* --------------------------- */
+.row-one {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+  padding: 8px 12px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  width: 280px;
+}
+
+.row-one .edit-icon {
+  cursor: pointer;
+  color: #999;
+  margin-left: auto;
+}
+
+i.icon {
+  font-size: 20px;
+}
+
+.col-center {
+  display: flex;
+  justify-content: center;
+}
+
+.tr-height {
+  height: 50px;
+}

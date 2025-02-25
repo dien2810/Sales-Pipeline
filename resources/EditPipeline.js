@@ -2532,6 +2532,42 @@ CustomView_BaseController_Js(
             vtUtils.initDatePickerFields(form);
             // Gọi hàm đăng ký toggle checkbox
             self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide(); // Ẩn nút "Toàn bộ thông tin"
+            });
+            function calculateEndTime() {
+              let startTime = $("input[name='startTime']").val();
+              let duration = parseInt($("input[name='duration']").val());
+              let durationUnit = $("select[name='durationUnit']").val();
+              let endTimeInput = $("input[name='endTime']");
+
+              if (startTime && !isNaN(duration)) {
+                let timeFormat =
+                  startTime.includes("AM") || startTime.includes("PM")
+                    ? "hh:mm A"
+                    : "HH:mm";
+                let momentStartTime = moment(startTime, timeFormat);
+
+                if (durationUnit === "hours") {
+                  momentStartTime.add(duration, "hours");
+                } else {
+                  momentStartTime.add(duration, "minutes");
+                }
+
+                let newEndTime = momentStartTime.format(timeFormat);
+                endTimeInput.val(newEndTime);
+              }
+            }
+
+            // Gọi hàm khi nhập thời gian bắt đầu hoặc thời lượng
+            $(
+              "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
+            ).on("change keyup", calculateEndTime);
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -2539,8 +2575,39 @@ CustomView_BaseController_Js(
             // Form validation
             var params = {
               submitHandler: function (form) {
+                console.log("SUBMIT ADD CALL");
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
+                let callInfo = {
+                  assigned_user_id: params.assigned_user_id,
+                  description: params.description,
+                  duration: parseInt(params.duration),
+                  durationUnit: params.durationunit,
+
+                  endTime: params.endTime,
+                  eventName: params.eventName,
+                  events_call_direction: params.events_call_direction,
+                  inputDate: params.inputDate,
+                  recurringCheck: params.recurringcheck,
+                  recurringtype: params.recurringtype,
+                  repeat_frequency: params.repeat_frequency
+                    ? parseInt(params.repeat_frequency)
+                    : null,
+                  startDate: parseInt(params.startDate),
+                  startDateField: params.startDateField,
+                  startDirection: params.startDirection,
+                  startTime: params.startTime,
+                  status: params.status,
+                };
+                self.action["callInfo"] = callInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "addCall";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };
@@ -2553,6 +2620,40 @@ CustomView_BaseController_Js(
           },
         });
       });
+    },
+
+    // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
+    registerOwnerFieldEvent: function (container) {
+      var assignedUsersInput = container.find('input[name="assigned_user_id"]');
+      var assignParentRecordOwnersInput = container.find(
+        'input[name="assign_parent_record_owners"]'
+      );
+
+      // Init at form load
+      displayOnwerFieldStatus();
+
+      // Init when checkbox change
+      assignParentRecordOwnersInput.on("change", function () {
+        displayOnwerFieldStatus();
+      });
+
+      function displayOnwerFieldStatus() {
+        if (assignParentRecordOwnersInput.is(":checked")) {
+          console.log(true);
+          assignedUsersInput.select2("data", null).trigger("change");
+          assignedUsersInput.select2("enable", false);
+          assignedUsersInput.removeAttr("data-rule-required");
+          vtUtils.hideValidationMessage(assignedUsersInput);
+          assignedUsersInput
+            .closest(".fieldValue")
+            .find(".input-error")
+            .removeClass("input-error");
+        } else {
+          console.log(false);
+          assignedUsersInput.select2("enable", true);
+          assignedUsersInput.attr("data-rule-required", "true");
+        }
+      }
     },
 
     showAddMeetingModal: function (targetBtn) {
@@ -3287,7 +3388,9 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 let notificationInfo = {
-                  userList: params.userList,
+                  userList: params.userList
+                    .split(",")
+                    .map((item) => parseInt(item.split(":")[1])),
                   repetition: params.repetition,
                   description: params.description,
                 };
@@ -3302,6 +3405,9 @@ CustomView_BaseController_Js(
                 return false;
               },
             };
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="userList"]')
+            );
             form.vtValidate(params);
             form.find(".select2").each(function () {
               if (!jQuery(this).data("select2")) {

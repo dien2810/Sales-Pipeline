@@ -22,7 +22,7 @@
                             <span class="redColor">*</span>
                         </td>
                         <td class="fieldValue w60">
-                            <select name="userList" multiple class="inputElement select2" data-rule-required="true">
+                            {* <select name="userList" multiple class="inputElement select2" data-rule-required="true">
                                 <option value="value1">Option 1</option>
                                 <option value="value2">Option 2</option>
                                 <option value="value3">Option 1</option>
@@ -31,7 +31,16 @@
                                 <option value="value6">Option 2</option>
                                 <option value="value7">Option 1</option>
                                 <option value="value8">Option 2</option>
-                            </select>
+                            </select> *}
+                            <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%" data-rule-required="true" data-rule-main-owner="true"
+                                data-fieldtype="owner" data-fieldname="assigned_user_id" data-name="assigned_user_id" name="userList"
+                                {if $FOR_EVENT}
+                                    data-assignable-users-only="true" data-user-only="true" data-single-selection="true"
+                                {/if}
+                                {if $FIELD_VALUE}
+                                    data-selected-tags='{ZEND_JSON::encode(Vtiger_Owner_UIType::getCurrentOwners($FIELD_VALUE))}'
+                                {/if}
+                            />
                         </td>
                     </tr>
                     <tr>

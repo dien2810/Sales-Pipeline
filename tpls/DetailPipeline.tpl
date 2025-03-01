@@ -8,11 +8,12 @@
             <div class="contents tabbable" style="margin-top: 40px;">
                 <ul class="nav nav-tabs marginBottom10px">
                     <li class="tab1 active">
-                        <a data-toggle="tab" href="#tab1"><strong>Thông tin pipeline
-                            </strong></a>
+                        <a data-toggle="tab" href="#tab1"><strong>{vtranslate('LBL_PIPELINE_INFO',
+                                $MODULE_NAME)}</strong></a>
                     </li>
                     <li class="tab2">
-                        <a data-toggle="tab" href="#tab2"><strong>Tự động hóa</strong></a>
+                        <a data-toggle="tab" href="#tab2"><strong>{vtranslate('LBL_AUTOMATION',
+                                $MODULE_NAME)}</strong></a>
                     </li>
                 </ul>
                 <div class="tab-content overflowVisible">
@@ -22,17 +23,19 @@
                                 <!-- Dòng 1 -->
                                 <tr>
                                     <td class="fieldLabel name alignMiddle">
-                                        Tên pipeline&nbsp;<span class="redColor">*</span>
+                                        {vtranslate('LBL_PIPELINE_NAME', $MODULE_NAME)}&nbsp;<span
+                                            class="redColor">*</span>
                                     </td>
                                     <td class="fieldValue name">
                                         <span>{$PIPELINE_DETAIL.name}</span>
                                     </td>
-                                    <td class="fieldLabel time alignMiddle">Thời gian pipeline&nbsp;</td>
+                                    <td class="fieldLabel time alignMiddle">{vtranslate('LBL_PIPELINE_TIME',
+                                        $MODULE_NAME)}&nbsp;</td>
                                     <td class="fieldValue time">
                                         <div class="input-group d-flex align-item-center justify-content-center">
                                             <span>{$PIPELINE_DETAIL.time} {$PIPELINE_DETAIL.timetype}</span>
                                             <span data-toggle="tooltip" style="margin-top:7px; margin-left: 20px;"
-                                                data-tippy-content="Tổng thời gian thực hiện tất cả các bước">
+                                                data-tippy-content="{vtranslate('LBL_TOTAL_EXECUTION_TIME', $MODULE_NAME)}">
                                                 <i class="far fa-info-circle"></i>
                                             </span>
                                         </div>
@@ -41,22 +44,22 @@
                                 <!-- Dòng 2 -->
                                 <tr>
                                     <td class="fieldLabel module alignMiddle">
-                                        Module&nbsp;<span class="redColor">*</span>
+                                        {vtranslate('LBL_MODULE', $MODULE_NAME)}&nbsp;<span class="redColor">*</span>
                                     </td>
                                     <td class="fieldValue module">
-                                        <span>
-                                            {vtranslate($PIPELINE_DETAIL.module, $MODULE_NAME)}
-                                        </span>
+                                        <span>{vtranslate($PIPELINE_DETAIL.module, $MODULE_NAME)}</span>
                                     </td>
-                                    <td class="fieldLabel auto alignMiddle">Tự động chuyển bước&nbsp;</td>
+                                    <td class="fieldLabel auto alignMiddle">{vtranslate('LBL_AUTO_TRANSITION',
+                                        $MODULE_NAME)}&nbsp;</td>
                                     <td class="fieldValue donotcall" style="width:25%">
-                                        <span>{if $PIPELINE_DETAIL.autoTransition}Có{else}Không{/if}</span>
+                                        <span>{if $PIPELINE_DETAIL.autoTransition}{vtranslate('LBL_YES',
+                                            $MODULE_NAME)}{else}{vtranslate('LBL_NO', $MODULE_NAME)}{/if}</span>
                                     </td>
                                 </tr>
                                 <!-- Dòng 3 -->
                                 <tr>
                                     <td class="fieldLabel grant alignMiddle">
-                                        Phân quyền&nbsp;
+                                        {vtranslate('LBL_PERMISSIONS', $MODULE_NAME)}&nbsp;
                                     </td>
                                     <td class="fieldValue grant">
                                         <span>
@@ -66,12 +69,12 @@
                                             {if not $smarty.foreach.roles.last} {/if}
                                             {/foreach}
                                             {else}
-                                            Tất cả
+                                            {vtranslate('LBL_ALL', $MODULE_NAME)}
                                             {/if}
                                         </span>
                                     </td>
-
-                                    <td class="fieldLabel description alignMiddle">Mô tả&nbsp;</td>
+                                    <td class="fieldLabel description alignMiddle">{vtranslate('LBL_DESCRIPTION',
+                                        $MODULE_NAME)}&nbsp;</td>
                                     <td class="fieldValue" style="width:25%">
                                         <span>{$PIPELINE_DETAIL.description}</span>
                                     </td>
@@ -79,11 +82,11 @@
                                 <!-- Dòng 4 -->
                                 <tr>
                                     <td class="fieldLabel status alignMiddle">
-                                        Trạng thái&nbsp;<span class="redColor">*</span>
+                                        {vtranslate('LBL_STATUS', $MODULE_NAME)}&nbsp;<span class="redColor">*</span>
                                     </td>
                                     <td class="fieldValue status">
-                                        <span>{if $PIPELINE_DETAIL.status == "1"}Kích hoạt{else}Không kích
-                                            &nbsp;hoạt{/if}</span>
+                                        <span>{if $PIPELINE_DETAIL.status == "1"}{vtranslate('LBL_ACTIVE',
+                                            $MODULE_NAME)}{else}{vtranslate('LBL_INACTIVE', $MODULE_NAME)}{/if}</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -94,22 +97,22 @@
                                 <thead>
                                     <tr class="listViewHeaders">
                                         <th style="width:20%" class="text-left">
-                                            <span>Tên bước</span>
+                                            <span>{vtranslate('LBL_STAGE_NAME', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:15%" class="text-center">
-                                            <span>Tỉ lệ thành công</span>
+                                            <span>{vtranslate('LBL_SUCCESS_RATE', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:15%" class="text-center">
-                                            <span>Thời gian thực hiện</span>
+                                            <span>{vtranslate('LBL_EXECUTION_TIME', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:10%" class="text-center">
-                                            <span>Bước bắt buộc</span>
+                                            <span>{vtranslate('LBL_MANDATORY_STEP', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:25%" class="text-center">
-                                            <span>Bước chuyển đến cho phép</span>
+                                            <span>{vtranslate('LBL_ALLOWED_TRANSITIONS', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:20%" class="text-center">
-                                            <span>Phân quyền</span>
+                                            <span>{vtranslate('LBL_ROLE_PERMISSIONS', $MODULE_NAME)}</span>
                                         </th>
                                     </tr>
                                 </thead>
@@ -155,7 +158,7 @@
                                                     $smarty.foreach.perms.last}, {/if}</span>
                                                 {/foreach}
                                                 {else}
-                                                <span>Tất cả</span>
+                                                <span>{vtranslate('LBL_ALL', $MODULE_NAME)}</span>
                                                 {/if}
                                             </div>
                                         </td>
@@ -170,14 +173,8 @@
                         <!-- Nội dung tab Tự động hóa nếu có -->
                     </div>
                 </div>
-                <div class="ps-scrollbar-y" style="height: 50px;"></div>
             </div>
         </div>
     </div>
 </div>
-<!-- Debug: in pipeline vào console -->
-<script>
-    var pipelineData = { $PIPELINE_JSON };
-    console.log('Pipeline Data:', pipelineData);
-</script>
 {/strip}

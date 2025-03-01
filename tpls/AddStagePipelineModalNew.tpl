@@ -1,12 +1,12 @@
 {strip}
 <div class="modal-dialog modal-content">
-    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="Thêm bước" }
+    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_ADD_STEP', $MODULE_NAME)}" }
     <form id="add-stage-pipeline-new" class="form-horizontal add-stage-pipeline-new" method="POST"
         style="margin-top: 20px;">
         <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Nhãn hiển thị (Tiếng việt)</span>
+                <span>{vtranslate('LBL_DISPLAY_LABEL_VN', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -15,7 +15,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Nhãn hiển thị (Tiếng Anh)</span>
+                <span>{vtranslate('LBL_DISPLAY_LABEL_EN', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -24,7 +24,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Giá trị</span>
+                <span>{vtranslate('LBL_VALUE', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -33,7 +33,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Chọn màu</span>
+                <span>{vtranslate('LBL_CHOOSE_COLOR', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -41,8 +41,6 @@
             </div>
         </div>
         {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'}
-
     </form>
 </div>
-
 {/strip}

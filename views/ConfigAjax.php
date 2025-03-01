@@ -41,21 +41,29 @@ class Settings_PipelineConfig_ConfigAjax_View extends CustomView_Base_View {
 	}
 	function getDeletePipelineModal(Vtiger_Request $request) {
 		$pipelineId = $request->get('pipelineId');
-        $moduleName = $request->get('moduleName');
-        $checkPipelineEmpty = false;
+        $moduleNamePipeline = $request->get('moduleName');
+		$moduleName = $request->getModule(false);
+		
+		
+	
 
-		if($checkPipelineEmpty){
+
+        $checkPipelineEmpty = Settings_PipelineConfig_Config_Model::isPipelineRecordExist($pipelineId);
+
+		if(!$checkPipelineEmpty){
 			$viewer = $this->getViewer($request);
 			$viewer->assign('PIPELINE_ID', $pipelineId);
+			$viewer->assign('MODULE_NAME', $moduleName);
 			$result = $viewer->fetch('modules/Settings/PipelineConfig/tpls/DeletePipelineEmptyModal.tpl');
 			echo $result;
 		}else{
-			$pipelineListReplace =  Settings_PipelineConfig_Config_Model::getPipelineListExcluding($moduleName, null, $pipelineId);
+			$pipelineListReplace =  Settings_PipelineConfig_Config_Model::getPipelineListExcluding($moduleNamePipeline, null, $pipelineId);
             $stageCurrentList =  Settings_PipelineConfig_Config_Model::getStageList($pipelineId);
 			$viewer = $this->getViewer($request);
 			$viewer->assign('PIPELINE_ID', $pipelineId);
 			$viewer->assign('PIPELINE_REPLACE_LIST', $pipelineListReplace);
 			$viewer->assign('STAGE_CURRENT_LIST', $stageCurrentList);
+			$viewer->assign('MODULE_NAME', $moduleName);
 			$result = $viewer->fetch('modules/Settings/PipelineConfig/tpls/DeletePipelineModal.tpl');
 			echo $result;
 		}

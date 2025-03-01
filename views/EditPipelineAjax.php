@@ -44,16 +44,23 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
         
 	}
 	function getStagePipelineModal(Vtiger_Request $request) {
+
+		
 		$sourceModule = $request->get('source_module');
 		$pickFieldId = Settings_PipelineConfig_Util_Helper::getModuleIdByName($sourceModule);;
-        if (empty($sourceModule) || empty($pickFieldId)) return; 
+        
+		if (empty($sourceModule) || empty($pickFieldId)) return; 
+
         $fieldModel = Settings_Picklist_Field_Model::getInstance($pickFieldId);
-		$moduleName = $request->getModule();
+		$moduleName = $request->getModule(false);
         $qualifiedName = $request->getModule(false);
         $selectedFieldAllPickListValues = Vtiger_Util_Helper::getPickListValues($fieldModel->getName());
+		
 		require_once('include/utils/LangUtils.php');
+
 		$modStringsEn = LangUtils::readModStrings($sourceModule, 'en_us');
 		$modStringsVn = LangUtils::readModStrings($sourceModule, 'vn_vn');
+		
 		foreach ($selectedFieldAllPickListValues as $key => $value) {
 			$selectedFieldAllPickListValues[$key] = [
 				'pickFieldId' => $pickFieldId,
@@ -73,12 +80,13 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
         $viewer = $this->getViewer($request);
         $viewer->assign('SELECTED_PICKLIST_FIELDMODEL',$fieldModel);
 		$viewer->assign('SELECTED_MODULE_NAME',$sourceModule);
-		$viewer->assign('MODULE',$moduleName);
+		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('FIELD_MODEL',$fieldModel);
 		$viewer->assign('FIELD_VALUE_ID',$pickFieldId);
 		$viewer->assign('QUALIFIED_MODULE',$qualifiedName);
         $viewer->assign('ROLES_LIST', Settings_Roles_Record_Model::getAll());
         $viewer->assign('SELECTED_PICKLISTFIELD_ALL_VALUES',$selectedFieldAllPickListValues);
+		
 		$viewer = $this->getViewer($request);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModal.tpl');
 	}
@@ -92,11 +100,13 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getDeleteStageModal(Vtiger_Request $request) {
     
 		$idPipeline = $request->get('idPipeline');
+		$moduleName = $request->getModule(false);
 		// Respond
 		$listStage = Settings_PipelineConfig_Config_Model::getStageList($idPipeline);
 		$viewer = $this->getViewer($request);
         $viewer->assign('PIPELINE_ID', $idPipeline);
 		$viewer->assign('STAGE_LIST', $listStage);
+		$viewer->assign('MODULE_NAME', $moduleName);
 		// echo '<pre>' . json_encode($listStage, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
 		$viewer->display('modules/Settings/PipelineConfig/tpls/DeleteStageModal.tpl');
 	}
@@ -106,7 +116,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		
 		// Respond
 		$viewer = $this->getViewer($request);
-
+		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModalNew.tpl');
 	}
 	//Begin Tran Dien

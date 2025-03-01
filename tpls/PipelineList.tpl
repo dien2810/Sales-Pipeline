@@ -4,12 +4,10 @@
 <tr class="listViewEntries" data-id="{$PIPELINE.pipelineid}">
     <td>
         <span class="fieldValue">
-            <span class="fieldValue">
-                <a href="index.php?parent=Settings&module=PipelineConfig&view=Detail&record={$PIPELINE.pipelineid}&block=9&fieldid=67"
-                    class="pipeline-name textOverflowEllipsis">
-                    {$PIPELINE.name}
-                </a>
-            </span>
+            <a href="index.php?parent=Settings&module=PipelineConfig&view=Detail&record={$PIPELINE.pipelineid}&block=9&fieldid=67"
+                class="pipeline-name textOverflowEllipsis">
+                {$PIPELINE.name}
+            </a>
         </span>
     </td>
     <td>
@@ -18,7 +16,7 @@
                 {$PIPELINE.stage}
             </span>
         </span>
-    </td>zzz
+    </td>
     <td>
         <span class="fieldValue">
             <div class="toggle-switch {if $PIPELINE.status}active{/if} pipeline-status"></div>
@@ -27,14 +25,17 @@
     <td>
         <span class="fieldValue">
             <span class="value textOverflowEllipsis pipeline-permission">
-                {$PIPELINE.permissions|default:"Tất cả"}
+                {if !empty($PIPELINE.permissions)}
+                {$PIPELINE.permissions}
+                {else}
+                {vtranslate('LBL_ALL', $MODULE_NAME)}
+                {/if}
             </span>
         </span>
     </td>
     <td>
         <span class="fieldValue">
             <span class="value textOverflowEllipsis pipeline-permission">
-                <!-- {$PIPELINE.module} -->
                 {vtranslate($PIPELINE.module, $MODULE_NAME)}
             </span>
         </span>
@@ -49,8 +50,7 @@
     <td>
         <span class="fieldValue">
             <span class="value textOverflowEllipsis pipeline-creator">
-                <!-- {$PIPELINE.created_by} -->
-                Administrator
+                {vtranslate('LBL_ROLE', $MODULE_NAME)}
             </span>
         </span>
     </td>
@@ -59,18 +59,17 @@
             <div class="action-buttons">
                 <a href="index.php?parent=Settings&module=PipelineConfig&view=EditPipeline&record={$PIPELINE.pipelineid}&block=9&fieldid=67"
                     class="action-icon">
-                    <i class="far fa-pen icon" title="Sửa"></i>
+                    <i class="far fa-pen icon" title="{vtranslate('LBL_EDIT', $MODULE_NAME)}"></i>
                 </a>
-                <span><i class="far fa-clone icon" onclick="app.controller().clonePipeline('{$PIPELINE_ID}')"
-                        title="Nhân bản"></i></span>
+                <span>
+                    <i class="far fa-clone icon" onclick="app.controller().clonePipeline('{$PIPELINE_ID}')"
+                        title="{vtranslate('LBL_CLONE', $MODULE_NAME)}"></i>
+                </span>
                 <button type="button" class="btn btn-outline-danger"
                     onclick="app.controller().showDeletePipelineModal('{$PIPELINE.pipelineid}', '{$PIPELINE.module}')"
-                    title="Xóa">
+                    title="{vtranslate('LBL_DELETE', $MODULE_NAME)}">
                     <i class="far fa-trash-alt icon"></i>
                 </button>
-
-                <!-- <span><i id="deletePipeline" class="far fa-trash-alt icon"
-                        onclick="app.controller().deletePipeline('{$PIPELINE_ID}')" title="Xóa"></i></span> -->
             </div>
         </span>
     </td>
@@ -78,8 +77,8 @@
 {/foreach}
 {else}
 <tr>
-    <td colspan="7" class="text-center">
-        <div>Không tìm thấy Pipeline nào {$TEST_PIPELINE}</div>
+    <td colspan="8" class="text-center">
+        <div>{vtranslate('LBL_NO_PIPELINE_FOUND', $MODULE_NAME)}</div>
     </td>
 </tr>
 {/if}

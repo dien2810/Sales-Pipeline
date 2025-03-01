@@ -1,19 +1,19 @@
 {strip}
 <div class="modal-dialog modal-content">
-    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="Thêm bước" }
+    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_ADD_STEP', $MODULE_NAME)}" }
     <form id="add-stage-pipeline" class="form-horizontal addStepPipelineModal" method="POST" style="margin-top: 20px;">
         <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />
         <div class="form-group">
             <!-- <di>{$FIELD_VALUE_ID}</di> -->
             <label class="control-label fieldLabel col-sm-5">
-                <span>Nhãn hiển thị (Tiếng việt)</span>
+                <span>{vtranslate('LBL_DISPLAY_LABEL_VN', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
                 <div class="referencefield-wrapper">
                     <select name="vn_label_select" class="inputElement text-left select2" data-rule-required="true"
                         id="vn_label_select">
-                        <option value="">Chọn một giá trị</option>
+                        <option value="">{vtranslate('LBL_CHOOSE_A_VALUE', $MODULE_NAME)}</option>
                         {foreach from=$SELECTED_PICKLISTFIELD_ALL_VALUES key=key item=PICKLIST_VALUE}
                         <option data-en="{$PICKLIST_VALUE.LABEL_DISPLAY_EN}" data-value="{$PICKLIST_VALUE.value}"
                             data-color="{$PICKLIST_VALUE.color|default:'#ffffff'}">
@@ -21,8 +21,8 @@
                         </option>
                         {/foreach}
                     </select>
-                    <button type="button" class="btn-add-new-stage-modal cursorPointer clearfix" title="Thêm mới"
-                        style="margin-left: 7px">
+                    <button type="button" class="btn-add-new-stage-modal cursorPointer clearfix"
+                        title="{vtranslate('LBL_ADD_NEW', $MODULE_NAME)}" style="margin-left: 7px">
                         <i class="far fa-plus"></i>
                     </button>
                 </div>
@@ -30,7 +30,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Nhãn hiển thị (Tiếng Anh)</span>
+                <span>{vtranslate('LBL_DISPLAY_LABEL_EN', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -40,7 +40,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Giá trị</span>
+                <span>{vtranslate('LBL_VALUE', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -50,7 +50,7 @@
         </div>
         <div class="form-group">
             <label class="control-label fieldLabel col-sm-5">
-                <span>Chọn màu</span>
+                <span>{vtranslate('LBL_CHOOSE_COLOR', $MODULE_NAME)}</span>
                 <span class="redColor">*</span>
             </label>
             <div class="controls col-sm-6">
@@ -62,21 +62,17 @@
 </div>
 <script type="text/javascript">
     jQuery(document).ready(function () {
-
         jQuery('#vn_label_select').on('change', function () {
-
             var selectedOption = jQuery(this).find('option:selected');
             var enLabel = selectedOption.data('en');
             var value = selectedOption.data('value');
             var color = selectedOption.data('color');
 
-            console.log();
             jQuery('#en_label').val(enLabel);
             jQuery('#value_field').val(value);
             jQuery('#color_field').val(color || '#ffffff');
             var select2Chosen = jQuery('#select2-chosen-7');
             select2Chosen.css('background-color', color);
-
         });
     });
 </script>

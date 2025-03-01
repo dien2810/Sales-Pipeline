@@ -129,32 +129,91 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
             ];
         }
     }
+
+     //Begin By The Vi 28-2-2025
+     public static function deletePipelineRecordExist($idPipeline, $stageReplace) {
+        $db = PearDatabase::getInstance();
+       
+
+
+    
+
+
+
+
+
+
+
+    }
+    
+     //End By The Vi 28-2-2025
+
+
+    //Begin By The Vi 28-2-2025
     public static function deletePipelineById($id) {
         $db = PearDatabase::getInstance();
-    
         if (empty($id)) {
             throw new Exception("ID không được để trống");
         }
-        $params = [$id];
-        $deleteQuery = 'DELETE FROM vtiger_pipeline WHERE pipelineid = ?';
-        $deleteResult = $db->pquery($deleteQuery, $params);
-        // if ($deleteResult === false) {
-        //     throw new Exception("Lỗi thực thi câu lệnh SQL");
-        // }
-        // $affectedRows = $db->getAffectedRowCount($deleteResult);
-        // return [
-        //     'success' => $affectedRows > 0,
-        //     'message' => $affectedRows > 0 ? 'Xóa thành công' : 'Không có bản ghi nào bị xóa',
-        //     'affectedRows' => $affectedRows,
-        //     'data' => $id
-        // ];
-        return $deleteResult;
+        try {
+            $db->startTransaction();
+                $queryStages = "SELECT stageid FROM vtiger_stage WHERE pipelineid = ?";
+            $resultStages = $db->pquery($queryStages, [$id]);
+            $stageIds = [];
+            while ($row = $db->fetch_array($resultStages)) {
+                $stageIds[] = $row['stageid'];
+            }
+            if (!empty($stageIds)) {
+                $stageIdsPlaceholder = implode(',', array_fill(0, count($stageIds), '?'));
+    
+                $queryDeleteRoleStage = "DELETE FROM vtiger_rolestage WHERE stageid IN ($stageIdsPlaceholder)";
+                $db->pquery($queryDeleteRoleStage, $stageIds);
+    
+                $queryDeleteAllowedMove = "DELETE FROM vtiger_allowedmoveto WHERE stageid IN ($stageIdsPlaceholder) OR allowedstageid IN ($stageIdsPlaceholder)";
+                $db->pquery($queryDeleteAllowedMove, array_merge($stageIds, $stageIds));
+    
+                $queryDeleteStages = "DELETE FROM vtiger_stage WHERE pipelineid = ?";
+                $db->pquery($queryDeleteStages, [$id]);
+    
+                $queryUpdatePotential = "UPDATE vtiger_potential SET pipelineid = NULL, stageid = NULL WHERE pipelineid = ?";
+                $db->pquery($queryUpdatePotential, [$id]);
+            }
+            $queryDeleteRolePipeline = "DELETE FROM vtiger_rolepipeline WHERE pipelineid = ?";
+            $db->pquery($queryDeleteRolePipeline, [$id]);
+            $queryDeletePipeline = "DELETE FROM vtiger_pipeline WHERE pipelineid = ?";
+            $db->pquery($queryDeletePipeline, [$id]);
+            $db->completeTransaction();
+            return [
+                'success' => true,
+                'message' => 'Xóa Pipeline thành công',
+                'deletedPipelineId' => $id
+            ];
+        } catch (Exception $e) {
+            $db->rollbackTransaction();
+            return [
+                'success' => false,
+                'message' => 'Lỗi khi xóa Pipeline: ' . $e->getMessage()
+            ];
+        }
     }
     
+     //End By The Vi 28-2-2025
 
-    
 
-
-    
-    
+    //Begin The Vi 28/2/2025
+    public static function isPipelineRecordExist($pipelineId) {
+        $db = PearDatabase::getInstance();
+        
+        if (empty($pipelineId)) {
+            throw new Exception("Pipeline ID không được để trống");
+        }
+        $query = "SELECT 1 FROM vtiger_potential WHERE pipelineid = ? LIMIT 1";
+        $params = [$pipelineId];
+        $result = $db->pquery($query, $params);
+                if ($result && $db->num_rows($result) > 0) {
+            return true;
+        }
+        return false;
+    } 
+    //End The Vi 28/2/2025
 }

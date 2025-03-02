@@ -44,10 +44,6 @@ class Settings_PipelineConfig_ConfigAjax_View extends CustomView_Base_View {
         $moduleNamePipeline = $request->get('moduleName');
 		$moduleName = $request->getModule(false);
 		
-		
-	
-
-
         $checkPipelineEmpty = Settings_PipelineConfig_Config_Model::isPipelineRecordExist($pipelineId);
 
 		if(!$checkPipelineEmpty){

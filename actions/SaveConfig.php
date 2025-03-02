@@ -35,8 +35,10 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	function updateStatusPipeline(Vtiger_Request $request) {
 		$idPipeline = $request->get('idPipeline');
         $statusPipeline = $request->get('statusPipeline');
+
         $updateStatusPipeline = Settings_PipelineConfig_Config_Model::updatePipelineStatus($idPipeline, $statusPipeline);
-        $response = new Vtiger_Response();
+       
+		$response = new Vtiger_Response();
         if($updateStatusPipeline) {
             $response->setResult(array('success' => $updateStatusPipeline));
         } else {
@@ -46,6 +48,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	}
 	function getStagePipeline(Vtiger_Request $request) {
 		$idPipeline = $request->get('pipelineId');
+
 		$response = new Vtiger_Response();
 		try {
 			$result = Settings_PipelineConfig_Config_Model::getStageList($idPipeline);
@@ -77,9 +80,9 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	}
 	function getListPipeline(Vtiger_Request $request) {
 		$module = $request->get('moduleName');
+
 		$response = new Vtiger_Response();
 		try {
-			// Gọi hàm trong model để lấy dữ liệu pipeline
 			$result = Settings_PipelineConfig_Config_Model::getPipelineList($module);
 			$db = PearDatabase::getInstance();
 			$pipelines = [];
@@ -110,12 +113,16 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	}
     function getListPipelineStatus(Vtiger_Request $request) {
 		$module = $request->get('moduleName');
+
 		$response = new Vtiger_Response();
+
 		try {
 			// Gọi hàm trong model để lấy dữ liệu pipeline
 			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList($module);
 			$db = PearDatabase::getInstance();
+
 			$pipelines = [];
+			
 			while ($row = $db->fetchByAssoc($result)) {
 				$pipelines[] = [
 					'pipelineid' => $row['pipelineid'],
@@ -143,7 +150,9 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	}
 	function deletePipelineEmpty(Vtiger_Request $request) {
 		$idPipeline = $request->get('pipelineId');
+
 		$response = new Vtiger_Response();
+
 		try {
 			$deleteResult = Settings_PipelineConfig_Config_Model::deletePipelineById($idPipeline);
 			
@@ -164,54 +173,19 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$idPipeline = $request->get('pipelineId');
 		$idPipelineReplace = $request->get('pipelineIdReplace');
 		$stageReplace = $request->get('stageReplace');
-		$adb = PearDatabase::getInstance();
-		// Lấy thông tin pipeline thay thế từ bảng vtiger_pipeline
-		$resultPipeline = $adb->pquery("SELECT name FROM vtiger_pipeline WHERE pipelineid = ?", array($idPipelineReplace));
-		if($adb->num_rows($resultPipeline) > 0) {
-			 $pipelineNameReplace = $adb->query_result($resultPipeline, 0, 'name');
-		} else {
-			 throw new Exception("Không tìm thấy pipeline thay thế với id: " . $idPipelineReplace);
-		}
-		// Cập nhật các record trong vtiger_potential có pipelineid = $idPipeline
-		$updatePipelineSQL = "UPDATE vtiger_potential 
-							  SET pipelineid = ?, pipelinename = ? 
-							  WHERE pipelineid = ?";
-		$adb->pquery($updatePipelineSQL, array($idPipelineReplace, $pipelineNameReplace, $idPipeline));
-	
-		// Duyệt qua từng mapping của stageReplace để cập nhật thông tin stage
-		if(is_array($stageReplace) && count($stageReplace) > 0) {
-			 foreach($stageReplace as $map) {
-				  $idCurrently = $map['idCurrently'];
-				  $idReplace = $map['idReplace'];
-	
-				  // Lấy thông tin của stage thay thế từ vtiger_stage
-				  $sqlStage = "SELECT name, value FROM vtiger_stage WHERE stageid = ?";
-				  $resultStage = $adb->pquery($sqlStage, array($idReplace));
-				  if($adb->num_rows($resultStage) > 0) {
-					   $newStageName = $adb->query_result($resultStage, 0, 'name');
-					   $newSalesStage = $adb->query_result($resultStage, 0, 'value');
-	
-					   // Cập nhật các record có stageid bằng idCurrently
-					   $updateStageSQL = "UPDATE vtiger_potential 
-										  SET stageid = ?, stagename = ?, sales_stage = ? 
-										  WHERE stageid = ?";
-					   $adb->pquery($updateStageSQL, array($idReplace, $newStageName, $newSalesStage, $idCurrently));
-				  }
-			 }
-		}
-	      
-		//Cuối cùng là xóa Pipelne
-		$deleteResult = Settings_PipelineConfig_Config_Model::deletePipelineById($idPipeline);
-		// Trả về kết quả thành công
+		
+		$deleteResult = Settings_PipelineConfig_Config_Model::deletePipelineRecordExist($idPipeline, $idPipelineReplace, $stageReplace);
 		$response = new Vtiger_Response();
 		$response->setResult([
-			 'success' => $deleteResult,
-			 'data' => $idPipelineReplace,
+			'success' => $deleteResult['success'],
+			'data' => $idPipelineReplace,
+			'message' => $deleteResult['message']
 		]);
 		$response->emit();
 	}
 
 	//End The Vi 28-02-2025
+
 	// Begin Dien Nguyen
 	public static function clonePipeline($id) {
         $db = PearDatabase::getInstance();

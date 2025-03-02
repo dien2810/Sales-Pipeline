@@ -43,9 +43,9 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		}
         
 	}
+	
 	function getStagePipelineModal(Vtiger_Request $request) {
 
-		
 		$sourceModule = $request->get('source_module');
 		$pickFieldId = Settings_PipelineConfig_Util_Helper::getModuleIdByName($sourceModule);;
         
@@ -70,13 +70,6 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 				'color' => Settings_Picklist_Module_Model::getPicklistColor("leadstatus", $key) 
 			];
 		}
-		echo "<script>";
-		echo "console.log('Source Module:', " . json_encode($sourceModule) . ");";
-		echo "console.log('fieldModel', " . json_encode($fieldModel) . ");";
-		echo "console.log('Picklist Field ID:', " . json_encode($pickFieldId) . ");";
-		echo "console.log('Selected Picklist Values:', " . json_encode($selectedFieldAllPickListValues) . ");";
-		echo "</script>";
-
         $viewer = $this->getViewer($request);
         $viewer->assign('SELECTED_PICKLIST_FIELDMODEL',$fieldModel);
 		$viewer->assign('SELECTED_MODULE_NAME',$sourceModule);
@@ -86,12 +79,10 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('QUALIFIED_MODULE',$qualifiedName);
         $viewer->assign('ROLES_LIST', Settings_Roles_Record_Model::getAll());
         $viewer->assign('SELECTED_PICKLISTFIELD_ALL_VALUES',$selectedFieldAllPickListValues);
-		
-		$viewer = $this->getViewer($request);
+	
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModal.tpl');
 	}
 	function getStagePipelineList(Vtiger_Request $request) {
-		$sourceModule = $request->get('source_module');
 		
         $viewer = $this->getViewer($request);
 		$viewer = $this->getViewer($request);
@@ -101,8 +92,9 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
     
 		$idPipeline = $request->get('idPipeline');
 		$moduleName = $request->getModule(false);
-		// Respond
+	
 		$listStage = Settings_PipelineConfig_Config_Model::getStageList($idPipeline);
+		
 		$viewer = $this->getViewer($request);
         $viewer->assign('PIPELINE_ID', $idPipeline);
 		$viewer->assign('STAGE_LIST', $listStage);
@@ -114,7 +106,6 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
     
 		$moduleName = $request->getModule(false);
 		
-		// Respond
 		$viewer = $this->getViewer($request);
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModalNew.tpl');

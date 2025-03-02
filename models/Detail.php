@@ -1,32 +1,32 @@
 <?php
 /*
-	Config_Model
-	Author: The Vi
-	Date: 22/1/2025
-	Purpose: Provide utility functions for managing pipeline configurations
+    Detail_Model
+    Author: The Vi
+    Date: 22/1/2025
+    Purpose: Provides functions for retrieving detailed pipeline information, including roles, stages, and permissions.
 */
 class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
 
     public static function getDetailPipeline($pipelineId) { 
         $db = PearDatabase::getInstance();
         
-        // Lấy thông tin cơ bản của Pipeline
         $pipelineQuery = "SELECT * 
                           FROM vtiger_pipeline 
                           WHERE pipelineid = ?";
+
         $pipelineResult = $db->pquery($pipelineQuery, array($pipelineId));
+
         $pipelineData = $db->fetchByAssoc($pipelineResult);
-        // if (!$pipelineData) {
-        //     return null;
-        // }
-        
-        // Lấy các Role được chọn
+      
         $rolesQuery = "SELECT rp.roleid, r.rolename 
                        FROM vtiger_rolepipeline rp 
                        JOIN vtiger_role r ON rp.roleid = r.roleid 
                        WHERE rp.pipelineid = ?";
+
         $rolesResult = $db->pquery($rolesQuery, array($pipelineId));
+
         $rolesSelected = array();
+
         while ($roleRow = $db->fetchByAssoc($rolesResult)) {
             $rolesSelected[] = array(
                 'role_id' => $roleRow['roleid'],
@@ -34,26 +34,23 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
             );
         }
     
-        // Lấy danh sách các Stage thuộc Pipeline
-        // $stagesQuery = "SELECT stageid, name, success_rate, time, time_unit, is_mandatory, color_code, sequence 
-        //                 FROM vtiger_stage 
-        //                 WHERE pipelineid = ? 
-        //                 ORDER BY sequence ASC";
         $stagesQuery = "SELECT * FROM vtiger_stage WHERE pipelineid = ? ORDER BY sequence ASC";
         $stagesResult = $db->pquery($stagesQuery, array($pipelineId));
         $stagesList = array();
+
         while ($stageRow = $db->fetchByAssoc($stagesResult)) {
             $stageId = $stageRow['stageid'];
             
-            // Lấy các Stage tiếp theo được phép chuyển đến
             $nextStagesQuery = "SELECT allowedstageid FROM vtiger_allowedmoveto WHERE stageid = ?";
             $nextStagesResult = $db->pquery($nextStagesQuery, array($stageId));
             $nextStages = array();
+
             while ($nextStageRow = $db->fetchByAssoc($nextStagesResult)) {
                 $allowedStageId = $nextStageRow['allowedstageid'];
                 $allowedStageQuery = "SELECT name FROM vtiger_stage WHERE stageid = ?";
                 $allowedStageResult = $db->pquery($allowedStageQuery, array($allowedStageId));
                 $allowedStageData = $db->fetchByAssoc($allowedStageResult);
+                
                 if ($allowedStageData) {
                     $nextStages[] = array(
                         'id' => $allowedStageId,
@@ -62,26 +59,27 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
                 }
             }
             
-            // Lấy quyền (Role) của Stage
             $permissionsQuery = "SELECT r.roleid, r.rolename 
                                  FROM vtiger_rolestage rs 
                                  JOIN vtiger_role r ON rs.roleid = r.roleid 
                                  WHERE rs.stageid = ?";
+
             $permissionsResult = $db->pquery($permissionsQuery, array($stageId));
             $permissions = array();
+
             while ($permRow = $db->fetchByAssoc($permissionsResult)) {
                 $permissions[] = array(
                     'role_id' => $permRow['roleid'],
                     'role_name' => $permRow['rolename']
                 );
             }
-            
+        
             $decodedActions = html_entity_decode($stageRow['actions']);
 			$actions = json_decode($decodedActions, true);
             $decodedConditions = html_entity_decode($stageRow['conditions']);
 			// $conditions = json_decode($decodedConditions, true);
             $conditions = json_decode($decodedConditions, false);
-            // Xây dựng dữ liệu Stage
+        
             $stageData = array(
                 'id' => $stageId,
                 'sequence' => $stageRow['sequence'],
@@ -111,7 +109,6 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
             $stagesList[] = $stageData;
         }
         
-        // Tổng hợp kết quả
         $result = array(
             'id' => $pipelineData['pipelineid'],
             'name' => $pipelineData['name'],
@@ -127,63 +124,4 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
         
         return $result;
     }
-    public static function getPipelineList($nameModule = null, $name = null) {
-        $db = PearDatabase::getInstance();
-        $query = 'SELECT * FROM vtiger_pipeline';
-        $params = [];
-        if (!empty($nameModule)) {
-            $query .= ' WHERE module = ?';
-            $params[] = $nameModule;
-        }
-        if (!empty($name)) {
-            if (!empty($params)) {
-                $query .= ' AND';
-            } else {
-                $query .= ' WHERE';
-            }
-            $query .= ' name LIKE ?';
-            $params[] = '%' . $name . '%'; 
-        }
-        $query .= ' ORDER BY pipelineid ASC';
-        $result = $db->pquery($query, $params);
-        return $result;
-    }
-    public static function getPipelineListExcluding($nameModule = null, $name = null, $idpipeline = null) {
-        $db = PearDatabase::getInstance();
-        $query = 'SELECT * FROM vtiger_pipeline';
-        $params = [];
-        $conditions = [];
-    
-        // Lọc theo module nếu được truyền vào
-        if (!empty($nameModule)) {
-            $conditions[] = 'module = ?';
-            $params[] = $nameModule;
-        }
-    
-        // Lọc theo tên (tìm kiếm dạng LIKE) nếu có giá trị name
-        if (!empty($name)) {
-            $conditions[] = 'name LIKE ?';
-            $params[] = '%' . $name . '%';
-        }
-    
-        // Loại trừ pipeline có pipelineid bằng với idpipeline được truyền vào
-        if (!empty($idpipeline)) {
-            $conditions[] = 'pipelineid <> ?';
-            $params[] = $idpipeline;
-        }
-    
-        // Nếu có điều kiện nào, nối chúng với nhau bằng AND
-        if (!empty($conditions)) {
-            $query .= ' WHERE ' . implode(' AND ', $conditions);
-        }
-    
-        $query .= ' ORDER BY pipelineid ASC';
-    
-        $result = $db->pquery($query, $params);
-        return $result;
-    }
-    
-    
-    
-    
 }

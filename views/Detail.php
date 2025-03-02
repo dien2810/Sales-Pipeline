@@ -14,8 +14,8 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
     public function process(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$recordId = $request->get('record');
-
 		$viewer = $this->getViewer($request);
+		
         $pipeline = Settings_PipelineConfig_Detail_Model::getDetailPipeline($recordId);
     //    var_dump(value: $pipeline);
 	// echo '<pre>' . json_encode($pipeline, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
@@ -34,7 +34,6 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
-		// var_dump($jsScriptInstances);
         $headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
 		return $headerScriptInstances;
 	}

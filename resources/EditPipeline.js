@@ -1979,10 +1979,10 @@ CustomView_BaseController_Js(
         self.registerShowDataUpdateFieldsModalEvents();
       });
       modal.find("#sendZNSMessage").on("click", function () {
-        self.showAddZNSModal(this);
+        self.showSendZNSModal(this);
       });
       modal.find("#sendSMSMessage").on("click", function () {
-        self.showAddSMSModal(this);
+        self.showSendSMSModal(this);
       });
       modal.find("#sendEmail").on("click", function () {
         self.showSendEmailModal(this);
@@ -2476,6 +2476,113 @@ CustomView_BaseController_Js(
     },
 
     // Minh Hoàng
+    /**
+    * Function to get ckEditorInstance
+    */
+    getckEditorInstance: function () {
+      if (this.ckEditorInstance == false) {
+         this.ckEditorInstance = new Vtiger_CkEditor_Js();
+      }
+      return this.ckEditorInstance;
+    },
+
+    preSaveVTEmailTask: function (tasktype) {
+      var textAreaElement = jQuery('#content');
+      //To keep the plain text value to the textarea which need to be
+      //sent to server
+      textAreaElement.val(CKEDITOR.instances['content'].getData());
+    },
+
+    /**
+    * Function to fill the values ​​into the input box when selecting the options of Select
+    */
+    registerFillTaskFromEmailFieldEvent: function () {
+      jQuery('#form-send-email').on('change', '#fromEmailOption', function (e) {
+         var currentElement = jQuery(e.currentTarget);
+         var inputElement = currentElement.closest('.row').find('.fields');
+         inputElement.val(currentElement.val());
+      })
+    },
+
+    registerFillTaskFieldsEvent: function () {
+      jQuery('#form-send-email').on('change', '.task-fields', function (e) {
+         var currentElement = jQuery(e.currentTarget);
+         var inputElement = currentElement.closest('.row').find('.fields');
+         if (currentElement.hasClass('overwriteSelection')) {
+            inputElement.val(currentElement.val());
+         } else {
+            var oldValue = inputElement.val();
+            var newValue = oldValue + currentElement.val();
+            inputElement.val(newValue);
+         }
+      });
+    },
+    
+    registerFillMailContentEvent: function () {
+      jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
+         var textarea = CKEDITOR.instances.content;
+         var value = jQuery(e.currentTarget).val();
+         if (textarea != undefined) {
+            textarea.insertHtml(value);
+         } else if (jQuery('textarea[name="content"]')) {
+            var textArea = jQuery('textarea[name="content"]');
+            textArea.insertAtCaret(value);
+         }
+      });
+    },
+
+    registerFillSMSTaskFieldsEvent: function () {
+      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var input = jQuery('input[name="sms_recepient"]');
+              var currentValue = input.val();
+              input.val(currentValue + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerFillSMSContentEvent: function () {
+      jQuery('#task-fieldnames').change(function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var textarea = jQuery('textarea[name="content"]');
+              var currentContent = textarea.val();
+              textarea.val(currentContent + '{' + selectedField + '}');
+          }
+      });
+    },
+    
+    registerFillSMSTaskFieldsEvent: function () {
+      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var input = jQuery('input[name="sms_recepient"]');
+              var currentValue = input.val();
+              input.val(currentValue + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerFillSMSContentEvent: function () {
+      jQuery('#task-fieldnames').change(function (e) {
+          var selectedField = jQuery(e.currentTarget).val();
+          if (selectedField) {
+              var textarea = jQuery('textarea[name="content"]');
+              var currentContent = textarea.val();
+              textarea.val(currentContent + '{' + selectedField + '}');
+          }
+      });
+    },
+
+    registerTooltipEventForSignatureField: function () {
+      jQuery("#signaturePopover").on('mouseover', function (e) {
+         jQuery('#signaturePopover').popover({
+            'html': true
+         });
+      });
+    },
+
     registerToggleCheckboxEvent: function (form) {
       form.find("#toggleCheckbox").on("change", function () {
         if ($(this).is(":checked")) {
@@ -2486,11 +2593,596 @@ CustomView_BaseController_Js(
       });
     },
 
-    getckEditorInstance: function () {
-      if (this.ckEditorInstance == false) {
-        this.ckEditorInstance = new Vtiger_CkEditor_Js();
+    // Add by Minh Hoang on 2025-01-23 to set validation rules for SMS content field
+    validateContentSMSModal: function () {
+      let contentInput = jQuery('[name="content"]');
+  
+      contentInput.closest('div').prev('div').append('<span class="redColor">*</span>');
+      contentInput.attr('data-rule-required', 'true');
+
+      if (typeof _PROVIDER_INFO !== 'undefined' && !_PROVIDER_INFO['unicode_sms_supported']) {
+        contentInput.attr('data-rule-asciiOnly', 'true');
       }
-      return this.ckEditorInstance;
+    },
+
+    /**
+    * Function to get values from modals
+    */
+    getValuesFromSendSMSModal: function () {
+      var values = {};
+      var modal = jQuery('#form-send-sms');
+  
+      values.titleSMS = modal.find('input[name="titleSMS"]').val();
+      values.sms_recepient = modal.find('input[name="sms_recepient"]').val();
+      values.content = modal.find('textarea[name="content"]').val();
+  
+      return values;
+    },
+    
+    getValuesFromSendEmailModal: function () {
+      var values = {};
+      var modal = jQuery('#form-send-email');
+  
+      values.titleEmail = modal.find('input[name="titleEmail"]').val();
+      values.fromEmail = modal.find('input[name="fromEmail"]').val();
+      values.replyTo = modal.find('input[name="replyTo"]').val();
+      values.recepient = modal.find('input[name="recepient"]').val();
+      values.emailcc = modal.find('input[name="emailcc"]').val();
+      values.emailbcc = modal.find('input[name="emailbcc"]').val();
+      values.subject = modal.find('input[name="subject"]').val();
+      values.safe_content = modal.find('input[name="safe_content"]').is(':checked') ? 1 : 0;
+      values.content = modal.find('textarea[name="content"]').val();
+  
+      return values;
+    },
+
+    /**
+    * Function to show modals
+    */
+    showAddCallModal: function (targetBtn) {
+      var self = this;
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getAddCallModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            const form = modal.find("form#form-add-call");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+            vtUtils.initDatePickerFields(form);
+
+            self.registerToggleCheckboxEvent(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showAddMeetingModal: function (targetBtn) {
+      var self = this;
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getAddMeetingModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            const form = modal.find("form#form-add-meeting");
+            
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+            vtUtils.initDatePickerFields(form);
+            
+            self.registerToggleCheckboxEvent(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showCreateNewTaskModal: function (targetBtn) {
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getCreateNewTaskModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            var form = modal.find(".addNotificationForm");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showCreateNewProjectTaskModal: function (targetBtn) {
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getCreateNewProjectTaskModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            var form = modal.find(".addNotificationForm");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showCreateNewRecordModal: function (targetBtn) {
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getCreateNewRecordModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            var form = modal.find(".addNotificationForm");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showDataFieldUpdateModal: function (targetBtn) {
+      let self = this;
+
+      // Show loading
+      app.helper.showProgress();
+
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getUpdateDataFieldModal",
+        currentNameModule: self.currentNameModule,
+      };
+
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+            const form = modal.find("form#form-update-data-field");
+            let addDataField = form.find("#addDataField");
+            addDataField.on("click", function () {
+              var basicElement = jQuery(".basic");
+              var newRowElement = basicElement
+                .find(".fieldRow")
+                .clone(true, true);
+              jQuery("select", newRowElement).addClass("select2");
+              var newDataField = jQuery(".newDataField");
+              newRowElement.addClass("op0");
+              newRowElement.appendTo(newDataField);
+              setTimeout(function () {
+                newRowElement.addClass("fadeInx");
+              }, 100);
+              //change in to chosen elements
+
+              newRowElement.find("select.select2").select2();
+            });
+            // Xóa phần tử khi nhấn vào icon thùng rác
+            form.on("click", ".removeField", function () {
+              $(this).closest(".form-group").remove();
+            });
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            modal.find("#modal-content").removeClass("hide");
+            var form = modal.find("#form-update-data-field");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                let fieldRows = self.getValuesFromDataFieldUpdateModal();
+                var params = form.serializeFormData();
+                console.log(params);
+                params["updateDataFields"] = fieldRows;
+                self.action["updateDataFields"] = fieldRows;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "updateDataField";
+                self.action["time"] = parseInt(self.action["time"]);
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+            self.initialize();
+          },
+        });
+      });
+    },
+
+    showSendSMSModal: function (targetBtn) {
+      var self = this;
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getSendSMSModal",
+        currentNameModule: self.currentNameModule,
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+            const form = modal.find("form#form-send-sms");
+            // var textAreaElement = modal.find("#content");
+            self.registerFillSMSTaskFieldsEvent();
+            self.registerFillSMSContentEvent();
+            self.validateContentSMSModal();
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            // var form = modal.find(".sendSMSModal");
+            const form = modal.find("form#form-send-sms");
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                console.log(params);
+                var smsValues = self.getValuesFromSendSMSModal();
+                self.action["time"] = parseInt(self.action["time"]);
+                self.action["action_name"] = params.titleSMS;
+                self.action["action_type"] = "sendSMS";
+                self.action.sendSMSData = smsValues;
+                self.targetController.pushAction(self.action);
+                app.helper.hideModal();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+          },
+        });
+      });
+    },
+
+    showSendZNSModal: function (targetBtn) {
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getSendZNSModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            var form = modal.find(".sendZNSModal");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
+    },
+
+    showSendEmailModal: function (targetBtn) {
+      var self = this;
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getSendEmailModal",
+        currentNameModule: self.currentNameModule,
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+            const form = modal.find("form#form-send-email");
+            var textAreaElement = modal.find("#content");
+            var ckEditorInstance = self.getckEditorInstance();
+            ckEditorInstance.loadCkEditor(textAreaElement);
+            self.registerFillMailContentEvent();
+            self.registerTooltipEventForSignatureField();
+            self.registerFillTaskFromEmailFieldEvent();
+            self.registerFillTaskFieldsEvent();
+
+            // Event click CC, BCC in modal
+            var ccLink = modal.find("#ccLink");
+            var bccLink = modal.find("#bccLink");
+            var ccContainer = modal.find("#ccContainer");
+            var bccContainer = modal.find("#bccContainer");
+            
+            if (ccLink.length) {
+              ccLink.on("click", function () {
+                ccContainer.removeClass("hide"); // Show CC container
+                ccLink.addClass("hide"); // Hide CC link
+              });
+            }
+            
+            if (bccLink.length) {
+              bccLink.on("click", function () {
+                bccContainer.removeClass("hide"); // Show BCC container
+                bccLink.addClass("hide"); // Hide BCC link
+              });
+            }
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            const form = modal.find("form#form-send-email");
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                console.log(params);
+                var emailValues = self.getValuesFromSendEmailModal();
+                self.action["time"] = parseInt(self.action["time"]);
+                self.action["action_name"] = params.titleEmail;
+                self.action["action_type"] = "sendEmail";
+                self.action.sendEmailData = emailValues;
+                self.targetController.pushAction(self.action);
+                app.helper.hideModal();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+          },
+        });
+      });
+    },
+
+    showNotificationModal: function (targetBtn) {
+      app.helper.showProgress();
+      // Request modal content
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        view: "EditPipelineAjax",
+        mode: "getAddNotificationModal",
+      };
+      app.request.post({ data: params }).then((err, res) => {
+        app.helper.hideProgress();
+        if (err) {
+          app.helper.showErrorNotification({ message: err.message });
+          return;
+        }
+        // Show modal
+        app.helper.showModal(res, {
+          preShowCb: function (modal) {
+            modal.off("hidden.bs.modal");
+          },
+          cb: function (modal) {
+            modal.css("display", "block");
+            modal.find(".modal-content").removeClass("hide");
+            var form = modal.find("#form-notification");
+            var controller = Vtiger_Edit_Js.getInstance();
+            controller.registerBasicEvents(form);
+            vtUtils.applyFieldElementsView(form);
+
+            // Form validation
+            var params = {
+              submitHandler: function (form) {
+                console.log("Submit add action setting modal");
+                var form = jQuery(form);
+                var params = form.serializeFormData();
+                return false;
+              },
+            };
+            form.vtValidate(params);
+            form.find(".select2").each(function () {
+              if (!jQuery(this).data("select2")) {
+                jQuery(this).select2();
+              }
+            });
+          },
+        });
+      });
     },
 
     showAddCallModal: function (targetBtn) {
@@ -3098,247 +3790,7 @@ CustomView_BaseController_Js(
           },
         });
       });
-    },
-
-    showAddSMSModal: function (targetBtn) {
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getAddSMSModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showAddZNSModal: function (targetBtn) {
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getAddZNSModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showSendEmailModal: function (targetBtn) {
-      var self = this;
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getSendEmailModal",
-        currentNameModule: self.currentNameModule,
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-            const form = modal.find("form#form-send-email");
-            var textAreaElement = modal.find("#content");
-            var ckEditorInstance = self.getckEditorInstance();
-            ckEditorInstance.loadCkEditor(textAreaElement);
-            self.registerFillMailContentEvent();
-            self.registerTooltipEventForSignatureField();
-            self.registerFillTaskFromEmailFieldEvent();
-            self.registerFillTaskFieldsEvent();
-
-            // Event click CC, BCC in modal
-            var ccLink = modal.find("#ccLink");
-            var bccLink = modal.find("#bccLink");
-            var ccContainer = modal.find("#ccContainer");
-            var bccContainer = modal.find("#bccContainer");
-
-            if (ccLink.length) {
-              ccLink.on("click", function () {
-                ccContainer.removeClass("hide"); // Show CC container
-                ccLink.addClass("hide"); // Hide CC link
-              });
-            }
-
-            if (bccLink.length) {
-              bccLink.on("click", function () {
-                bccContainer.removeClass("hide"); // Show BCC container
-                bccLink.addClass("hide"); // Hide BCC link
-              });
-            }
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            const form = modal.find("form#form-send-email");
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                console.log(params);
-                var emailValues = self.getValuesFromSendEmailModal();
-                self.action["time"] = parseInt(self.action["time"]);
-                self.action["action_name"] = params.titleEmail;
-                self.action["action_type"] = "sendEmail";
-                self.action.sendEmailData = emailValues;
-                self.targetController.pushAction(self.action);
-                app.helper.hideModal();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-          },
-        });
-      });
-    },
-
-    preSaveVTEmailTask: function (tasktype) {
-      var textAreaElement = jQuery("#content");
-      //To keep the plain text value to the textarea which need to be
-      //sent to server
-      textAreaElement.val(CKEDITOR.instances["content"].getData());
-    },
-
-    registerFillTaskFromEmailFieldEvent: function () {
-      jQuery("#form-send-email").on("change", "#fromEmailOption", function (e) {
-        var currentElement = jQuery(e.currentTarget);
-        var inputElement = currentElement.closest(".row").find(".fields");
-        inputElement.val(currentElement.val());
-      });
-    },
-
-    registerFillTaskFieldsEvent: function () {
-      jQuery("#form-send-email").on("change", ".task-fields", function (e) {
-        var currentElement = jQuery(e.currentTarget);
-        var inputElement = currentElement.closest(".row").find(".fields");
-        if (currentElement.hasClass("overwriteSelection")) {
-          inputElement.val(currentElement.val());
-        } else {
-          var oldValue = inputElement.val();
-          var newValue = oldValue + currentElement.val();
-          inputElement.val(newValue);
-        }
-      });
-    },
-
-    registerFillMailContentEvent: function () {
-      jQuery(
-        "#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates"
-      ).change(function (e) {
-        var textarea = CKEDITOR.instances.content;
-        var value = jQuery(e.currentTarget).val();
-        if (textarea != undefined) {
-          textarea.insertHtml(value);
-        } else if (jQuery('textarea[name="content"]')) {
-          var textArea = jQuery('textarea[name="content"]');
-          textArea.insertAtCaret(value);
-        }
-      });
-    },
-
-    registerTooltipEventForSignatureField: function () {
-      jQuery("#signaturePopover").on("mouseover", function (e) {
-        jQuery("#signaturePopover").popover({
-          html: true,
-        });
-      });
-    },
-
-    getValuesFromSendEmailModal: function () {
-      var values = {};
-      var modal = jQuery("#form-send-email");
-
-      values.titleEmail = modal.find('input[name="titleEmail"]').val();
-      values.fromEmail = modal.find('input[name="fromEmail"]').val();
-      values.replyTo = modal.find('input[name="replyTo"]').val();
-      values.recepient = modal.find('input[name="recepient"]').val();
-      values.emailcc = modal.find('input[name="emailcc"]').val();
-      values.emailbcc = modal.find('input[name="emailbcc"]').val();
-      values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal
-        .find('input[name="safe_content"]')
-        .is(":checked")
-        ? 1
-        : 0;
-      values.content = modal.find('textarea[name="content"]').val();
-
-      return values;
-    },
+    },    
 
     showNotificationModal: function (targetBtn) {
       var self = this;
@@ -3406,6 +3858,7 @@ CustomView_BaseController_Js(
         });
       });
     },
+    // End Minh Hoang
 
     showActionSettingModal: function (targetBtn, targetController, action) {
       var self = this;
@@ -4294,3 +4747,32 @@ Vtiger_Field_Js(
   }
 );
 //End Tran Dien
+
+
+//http://stackoverflow.com/questions/946534/insert-text-into-textarea-with-jquery
+jQuery.fn.extend({
+	insertAtCaret: function(myValue) {
+		return this.each(function(i) {
+			if (document.selection) {
+				//For browsers like Internet Explorer
+				this.focus();
+				var sel = document.selection.createRange();
+				sel.text = myValue;
+				this.focus();
+			} else if (this.selectionStart || this.selectionStart == '0') {
+				//For browsers like Firefox and Webkit based
+				var startPos = this.selectionStart;
+				var endPos = this.selectionEnd;
+				var scrollTop = this.scrollTop;
+				this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
+				this.focus();
+				this.selectionStart = startPos + myValue.length;
+				this.selectionEnd = startPos + myValue.length;
+				this.scrollTop = scrollTop;
+			} else {
+				this.value += myValue;
+				this.focus();
+			}
+		});
+	}
+});

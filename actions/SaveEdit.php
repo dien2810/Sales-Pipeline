@@ -40,7 +40,9 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $idStageDelete  = $request->get('idStageDelete');
         $idStageReplace = $request->get('idStageReplace');
         $module         = $request->get('current_module');
+
         $response = new Vtiger_Response();
+        
         try {
             $success = Settings_PipelineConfig_Edit_Model::deleteStagePipeline($idStageDelete, $idStageReplace, $module);
             if ($success) {
@@ -119,7 +121,9 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
                 'rolename' => $roleRecord->get('rolename'), 
             ];
         }
+
         $response = new Vtiger_Response();
+
         try {
             $response->setResult($result);
         } catch (Exception $e) {
@@ -149,7 +153,9 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
         $response = new Vtiger_Response();
+
         $result = Settings_PipelineConfig_Edit_Model::updatePipeline($pipelineData, $currentUser);
+      
         if ($result['success']) {
             $response->setResult($result);
         } else {
@@ -161,11 +167,14 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
     // Implemented by The Vi to get detail of pipeline
     public function getDetailPipeline(Vtiger_Request $request) {
         $idPipeline = $request->get('id');
+       
         $response = new Vtiger_Response();
-        $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
-        $result['request_id'] = $idPipeline;
-        $response->setResult($result);
         
+        $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
+       
+        $result['request_id'] = $idPipeline;
+        
+        $response->setResult($result);
         $response->emit();
     
     }

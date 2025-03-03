@@ -386,4 +386,10 @@ stageid, pipelineid, name, success_rate, time, time_unit, is_mandatory, color_co
             ];
         }
     }
+    // Add by Dien Nguyen on 2025-03-03 to get field expressions on create new record modal
+    static function getExpressions() {
+		return array('concat' => 'concat(a,b)', 'time_diffdays(a,b)' => 'time_diffdays(a,b)', 'time_diffdays(a)' => 'time_diffdays(a)', 'time_diff(a,b)' => 'time_diff(a,b)','time_diff(a)' => 'time_diff(a)',
+			'add_days' => 'add_days(datefield, noofdays)', 'sub_days' => 'sub_days(datefield, noofdays)', 'add_time(timefield, minutes)' => 'add_time(timefield, minutes)', 'sub_time(timefield, minutes)' => 'sub_time(timefield, minutes)',
+			'today' => "get_date('today')", 'tomorrow' => "get_date('tomorrow')",  'yesterday' => "get_date('yesterday')", 'power(base,exponential)' => "power(base,exponential)");
+	}
 }

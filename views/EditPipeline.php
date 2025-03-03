@@ -6,7 +6,6 @@
 	Purpose: Display interface for adding new Pipeline and editing existing Pipeline records
 */
 class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConfig_View {
-
     function __construct() {
         parent::__construct();
     }
@@ -28,9 +27,13 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 		$recordId = $request->get('record');
         $pipelineDetail = Settings_PipelineConfig_Detail_Model::getDetailPipeline($recordId);
    
-	    echo '<pre>' . json_encode($pipelineDetail, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+	    // echo '<pre>' . json_encode($pipelineDetail, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
 		
 		$viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('PICKLIST_MODULES', $filteredPickListModules);
 		$viewer->assign('PIPELINE_DETAIL', $pipelineDetail);
 		$viewer->assign('ROLES_LIST', Settings_Roles_Record_Model::getAll());
@@ -39,11 +42,13 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 	public function getPageTitle(Vtiger_Request $request) {
 		return "Pipeline";
 	}
+
     public function getHeaderScripts(Vtiger_Request $request) {
 		$headerScriptInstances = parent::getHeaderScripts($request);
 		$moduleName = $request->getModule();
 		$viewName = $request->get('view');
 		$jsFileNames = array(
+			"~modules/Settings/PipelineConfig/resources/AdvanceFilter.js",
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);

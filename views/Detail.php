@@ -14,6 +14,8 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
     public function process(Vtiger_Request $request) {
        
         $viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
      
         $recordId = $request->get('record');
         

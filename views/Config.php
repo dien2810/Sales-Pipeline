@@ -26,6 +26,8 @@ class Settings_PipelineConfig_Config_View extends Settings_Vtiger_BaseConfig_Vie
         }
         $moduleModel = Settings_Picklist_Module_Model::getInstance($sourceModule);
         $viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
         $qualifiedName = $request->getModule(FALSE);
         $viewer->assign('PICKLIST_MODULES',$pickListSupportedModules);
 		$qualifiedName = $request->getModule(false);

@@ -26,17 +26,22 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$this->exposeMethod('getCreateNewProjectTaskModal');
 		$this->exposeMethod('getCreateNewRecordModal');
 		$this->exposeMethod('getSetValuePopup');
+		$this->exposeMethod('getCreateEntity');
 		$this->exposeMethod('getUpdateDataFieldModal');
+		$this->exposeMethod('getAddNotificationModal');
+		//End Tran Dien
+
+		//Begin Minh Hoang 3/3/2025
 		$this->exposeMethod('getSendSMSModal');
 		$this->exposeMethod('getSendZNSModal');
 		$this->exposeMethod('getSendEmailModal');
-		$this->exposeMethod('getAddNotificationModal');
-
-		//End Tran Dien
+		//End Minh Hoang 3/3/2025
 	}
+
 	function validateRequest(Vtiger_Request $request) {
 		$request->validateWriteAccess(); 
 	}
+
 	function process(Vtiger_Request $request) {
         $mode = $request->getMode();
 
@@ -75,6 +80,8 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 			];
 		}
         $viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('SELECTED_PICKLIST_FIELDMODEL',$fieldModel);
 		$viewer->assign('SELECTED_MODULE_NAME',$sourceModule);
 		$viewer->assign('MODULE_NAME', $moduleName);
@@ -104,6 +111,8 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$listStage = Settings_PipelineConfig_Config_Model::getStageList($idPipeline);
 		
 		$viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('PIPELINE_ID', $idPipeline);
 		$viewer->assign('STAGE_LIST', $listStage);
 		$viewer->assign('MODULE_NAME', $moduleName);
@@ -120,6 +129,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModalNew.tpl');
 	}
+
 	//Begin Tran Dien
     function getAddActionSettingModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
@@ -189,6 +199,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+		$dateTimeFields = $moduleModel->getFieldsByType(array('date', 'datetime'));
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
 		// Render view
@@ -196,6 +207,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
+		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
 		// Modal send Update Data Field
@@ -215,6 +227,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+		$dateTimeFields = $moduleModel->getFieldsByType(array('date', 'datetime'));
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
 		// Render view
@@ -222,6 +235,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
+		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
 		// Modal send Update Data Field
@@ -295,13 +309,20 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
+		$RELATED_MODULES_INFO = $this->getDependentModules();
+		$RELATED_MODULES = array_keys($RELATED_MODULES_INFO);
+		// $RELATED_MODULE_MODEL_NAME = $TASK_OBJECT->entity_type;
+
 		// Render view
 		$viewer = $this->getViewer($request);
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
+		$moduleName = $request->getModule(false);		
+		$viewer->assign('QUALIFIED_MODULE', $moduleName);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+		$viewer->assign('RELATED_MODULES', $RELATED_MODULES);
 		// Modal send Update Data Field
 		$viewer->display('modules/Settings/PipelineConfig/tpls/CreateNewRecordModal.tpl');
 	}
@@ -332,6 +353,82 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->display('modules/Settings/PipelineConfig/tpls/SetValuePopup.tpl');
 	}
 
+	function getCreateEntity(Vtiger_Request $request) {
+		$viewer = $this->getViewer($request);
+		$moduleName = $request->get('module_name');
+		
+		$viewer->assign('SOURCE_MODULE', $moduleName);
+		$viewer->assign('QUALIFIED_MODULE', 'Settings:Workflows');
+		$allModules = getModulesTranslatedSingleLabel();
+		// Chỉ giữ lại các module cụ thể
+        $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
+        foreach ($allModules as $name => $label) {
+            if (!in_array($name, $allowedModules)) {
+                unset($allModules[$name]);
+            }
+        }
+		$currentModuleName = $request->get('currentNameModule');
+		
+		
+		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
+		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
+		$recordStructure = $recordStructureInstance->getStructure();
+		$relatedModule = $request->get('relatedModule');
+
+		$workflowModel = Settings_Workflows_Record_Model::getCleanInstance($relatedModule);
+		$taskType = 'VTCreateEntityTask';
+        $taskModel = Settings_Workflows_TaskRecord_Model::getCleanInstance($workflowModel, $taskType);
+
+		$taskTypeModel = $taskModel->getTaskType();
+		$viewer->assign('TASK_TYPE_MODEL', $taskTypeModel);
+
+		$viewer->assign('TASK_TEMPLATE_PATH', $taskTypeModel->getTemplatePath());
+		$recordStructureInstance = Settings_Workflows_RecordStructure_Model::getInstanceForWorkFlowModule($workflowModel,
+																			Settings_Workflows_RecordStructure_Model::RECORD_STRUCTURE_MODE_EDITTASK);
+        $recordStructureInstance->setTaskRecordModel($taskModel);
+
+		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
+		$viewer->assign('RECORD_STRUCTURE', $recordStructureInstance->getStructure());
+
+		$relatedModule = $request->get('relatedModule');
+		$relatedModuleModel = Vtiger_Module_Model::getInstance($relatedModule);
+
+		$workflowModuleModel = $workflowModel->getModule();
+		$relatedModuleModel = Vtiger_Module_Model::getInstance($relatedModule);
+		$viewer->assign('RELATED_MODULE_MODEL', $relatedModuleModel);
+		// Render view
+		$viewer->assign('MODULE_NAME', $moduleName);
+        $viewer->assign('ALL_MODULES', $allModules);
+		$viewer->assign('MODULE_MODEL',$moduleModel);
+		$viewer->assign('DATE_FILTERS', Vtiger_Field_Model::getDateFilterTypes());
+		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
+		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+		// Modal send Update Data Field
+		$viewer->display('modules/Settings/PipelineConfig/tpls/CreateEntity.tpl');
+	}
+
+	public function getDependentModules() {
+		$modulesList = Settings_LayoutEditor_Module_Model::getEntityModulesList();
+		// $primaryModule = $this->getModule();
+		$primaryModule = Vtiger_Module_Model::getInstance('Potentials');
+
+		if($primaryModule->isCommentEnabled()) {
+			$modulesList['ModComments'] = 'ModComments';
+		}
+		$createModuleModels = array();
+		// List of modules which will not be supported by 'Create Entity' workflow task
+		$filterModules = array('Invoice', 'Quotes', 'SalesOrder', 'PurchaseOrder', 'Emails', 'Calendar', 'Events');
+
+		foreach ($modulesList as $moduleName => $translatedModuleName) {
+			$moduleModel = Vtiger_Module_Model::getInstance($moduleName);
+			if (in_array($moduleName, $filterModules))
+				continue;
+			$createModuleModels[$moduleName] = $moduleModel;
+		}
+		return $createModuleModels;
+	}
+
 	function getUpdateDataFieldModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
@@ -359,43 +456,56 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->display('modules/Settings/PipelineConfig/tpls/DataFieldUpdateModal.tpl');
 	}
 
+	// Implemented by Minh Hoang to show Modal Send ZNS
 	function getSendZNSModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
                 unset($allModules[$name]);
             }
         }
+
+		// Get current module name
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+
+		// Get record structure
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
+
 		// Render view
 		$viewer = $this->getViewer($request);
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
+		$viewer->assign('DATE_FILTERS', Vtiger_Field_Model::getDateFilterTypes());
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
-		// Modal send Update Data Field
+
+		// Display modal Send ZNS
 		$viewer->display('modules/Settings/PipelineConfig/tpls/SendZNSModal.tpl');
 	}
 
+	// Implemented by Minh Hoang to show Modal Send SMS
 	function getSendSMSModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+
+		// Get record structure
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
 
 		$allFieldOptions = '';
 		$phoneFieldOptions = '';
 
+		// Generate options for all fields and phone fields
 		foreach ($recordStructure as $block => $fields) {
 			foreach ($fields as $fieldName => $fieldModel) {
 				if ($fieldModel->getName() != 'assigned_user_id') {
@@ -407,31 +517,39 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 			}
 		}
 
+		// Get task object from request
 		$taskObject = $request->get('taskObject');
 
+		// Render view
 		$viewer = $this->getViewer($request);
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('ALL_FIELD_OPTIONS', $allFieldOptions);
 		$viewer->assign('TASK_OBJECT', $taskObject);
 		$viewer->assign('PHONE_FIELD_OPTIONS', $phoneFieldOptions);
 	
+		// Display modal Send SMS
 		$viewer->display('modules/Settings/PipelineConfig/tpls/SendSMSModal.tpl');
 	}
 
+	// Implemented by Minh Hoang to show Modal Send Email
 	function getSendEmailModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$qualifiedModuleName = $request->getModule(false);
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
+
+		// Get record structure
 		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
 		$recordStructure = $recordStructureInstance->getStructure();
 
-		// Get a list of fields with an email type
 		$emailFieldOptions = '';
+		$allFieldOptions = '';
+
 		$fromEmailFieldOptions = '<option value="">'. vtranslate('ENTER_FROM_EMAIL_ADDRESS', $moduleName) .'</option>';
 		$fromEmailFieldOptions .= '<option value="$(general : (__VtigerMeta__) supportName)<$(general : (__VtigerMeta__) supportEmailId)>">' . vtranslate('LBL_HELPDESK_SUPPORT_EMAILID', $moduleName) . '</option>';
 
+		// Generate options for email fields
 		foreach ($recordStructure as $block => $fields) {
 			foreach ($fields as $fieldName => $fieldModel) {
 				if ($fieldModel->getFieldDataType() === 'email') {
@@ -441,8 +559,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 			}
 		}
 	
-		// Get a list of all field options
-		$allFieldOptions = '';
+		// Generate options for all fields
 		foreach ($recordStructure as $fields) {
 			foreach ($fields as $fieldModel) {
 				if ($fieldModel->getName() == 'assigned_user_id') continue;
@@ -450,22 +567,23 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 			}
 		}
 
-		// Get a list of Meta Variables
+		// Get meta variables
 		$metaVariables = Settings_Workflows_Module_Model::getMetaVariables();
 		if ($moduleModel->getName() == 'Invoice' || $moduleModel->getName() == 'Quotes') {
 			$metaVariables['Portal Pdf Url'] = '(general : (__VtigerMeta__) portalpdfurl)';
 		}
 
+		// Convert URL meta variables to links
 		foreach($metaVariables as $variableName => $variableValue) {
 			if(strpos(strtolower($variableName), 'url') !== false) {
 				$metaVariables[$variableName] = "<a href='$".$variableValue."'>".vtranslate($variableName, $qualifiedModuleName).'</a>';
 			}
 		}
 
-		// Get a list of email templates
+		// Get email templates
 		$emailTemplates = EmailTemplates_Record_Model::getAllForEmailTask($pipelineModule);
 
-		// Get Task Object information from the request
+		// Get task object from request
 		$taskObject = $request->get('taskObject');
 
 		// Render view
@@ -478,6 +596,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('EMAIL_TEMPLATES', $emailTemplates);
 		$viewer->assign('TASK_OBJECT', $taskObject);
 
+		// Display modal Send Email
 		$viewer->display('modules/Settings/PipelineConfig/tpls/SendEmailModal.tpl');
 	}
 
@@ -562,9 +681,5 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 
 		$viewer->display('modules/Settings/PipelineConfig/tpls/ConditionModal.tpl');
 	}
-
-
-
-
 	//End Tran Dien
 }

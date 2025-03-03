@@ -49,6 +49,8 @@ class Settings_PipelineConfig_ConfigAjax_View extends CustomView_Base_View {
 		if(!$checkPipelineEmpty){
 
 			$viewer = $this->getViewer($request);
+			$moduleName = $request->getModule(false);
+			$viewer->assign('MODULE_NAME', $moduleName);
 			$viewer->assign('PIPELINE_ID', $pipelineId);
 			$viewer->assign('MODULE_NAME', $moduleName);
 			$result = $viewer->fetch('modules/Settings/PipelineConfig/tpls/DeletePipelineEmptyModal.tpl');
@@ -59,6 +61,8 @@ class Settings_PipelineConfig_ConfigAjax_View extends CustomView_Base_View {
             $stageCurrentList =  Settings_PipelineConfig_Config_Model::getStageList($pipelineId);
 		
 			$viewer = $this->getViewer($request);
+			$moduleName = $request->getModule(false);
+			$viewer->assign('MODULE_NAME', $moduleName);
 			$viewer->assign('PIPELINE_ID', $pipelineId);
 			$viewer->assign('PIPELINE_REPLACE_LIST', $pipelineListReplace);
 			$viewer->assign('STAGE_CURRENT_LIST', $stageCurrentList);

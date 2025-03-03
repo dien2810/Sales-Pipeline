@@ -31,8 +31,7 @@
                 </div>
                 <div class="controls col-sm-6">
                     <div class="input-group inputElement time w60">
-                        <input type="text" name="startTime" class="timepicker-default form-control" data-format="12"
-                            data-rule-required="true" />
+                        <input type="text" name="startTime" class="timepicker-default form-control" data-format="24" value="00:00" data-rule-required="true"/>
                         <span class="input-group-addon">
                             <i class="fa fa-clock-o"></i>
                         </span>
@@ -74,7 +73,7 @@
                 <div class="controls col-sm-8">
                     <div class="d-flex align-item-center justify-content-center">
                         <input name="duration" type="number" min="0" class="inputElement w10" data-rule-required="true">
-                        <select name="durationUnit" class="inputElement select2 ml-3 w30" tabindex="-1">
+                        <select name="durationUnit" class="inputElement select2 ml-3 w30" tabindex="-1" value="minutes">
                             <option value="minutes">{vtranslate('LBL_MINUTES', $MODULE_NAME)}</option>
                             <option value="hours">{vtranslate('LBL_HOURS', $MODULE_NAME)}</option>
                         </select>
@@ -122,9 +121,9 @@
                     </div>
                     <div class="controls col-sm-8 w3">
                         <select name="status" class="inputElement text-left select2 w40" data-rule-required="true">
-                            <option value="plan">{vtranslate('LBL_PLAN', $MODULE_NAME)}</option>
-                            <option value="ended">{vtranslate('LBL_ENDED', $MODULE_NAME)}</option>
-                            <option value="cancel">{vtranslate('LBL_CANCEL', $MODULE_NAME)}</option>
+                            <option value="Planned">{vtranslate('LBL_PLAN', $MODULE_NAME)}</option>
+                            <option value="Held">{vtranslate('LBL_ENDED', $MODULE_NAME)}</option>
+                            <option value="Not Held">{vtranslate('LBL_CANCEL', $MODULE_NAME)}</option>
                         </select>
                     </div>
                 </div>
@@ -223,16 +222,15 @@
                                     {/for}
                                 </select>
                                 <select name="recurringtype" class="inputElement select2 w20" tabindex="-1">
-                                    <option value="day">{vtranslate('LBL_DAY', $MODULE_NAME)}</option>
-                                    <option value="week">{vtranslate('LBL_WEEK', $MODULE_NAME)}</option>
-                                    <option value="month">{vtranslate('LBL_MONTH', $MODULE_NAME)}</option>
-                                    <option value="update">{vtranslate('LBL_YEAR', $MODULE_NAME)}</option>
+                                    <option value="Daily">{vtranslate('LBL_DAY', $MODULE_NAME)}</option>
+                                    <option value="Weekly">{vtranslate('LBL_WEEK', $MODULE_NAME)}</option>
+                                    <option value="Monthly">{vtranslate('LBL_MONTH', $MODULE_NAME)}</option>
+                                    <option value="Yearly">{vtranslate('LBL_YEAR', $MODULE_NAME)}</option>
                                 </select>
                                 <span class="ml-3 mr-3">{vtranslate('LBL_UNTIL', $MODULE_NAME)}</span>
                                 <div class="input-group inputElement w30" style="margin-bottom: 3px">
-                                    <input id="calendar_repeat_limit_date" type="text" name="inputDate"
-                                        class="form-control datePicker" data-fieldtype="date"
-                                        data-rule-required="true" />
+                                    <input id="calendar_repeat_limit_date" type="text" name="calendar_repeat_limit_date" class="form-control datePicker" 
+                                        data-fieldtype="date" data-rule-required="true" />
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 </div>
                             </div>

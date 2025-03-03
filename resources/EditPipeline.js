@@ -4,7 +4,7 @@
     Date: 22/1/2025
     Purpose: Handle events for EditPipeline interface
 */
-// Get parameters from URL
+// Lấy tham số từ URL trước khi truyền vào object
 const urlParams = new URLSearchParams(window.location.search);
 const record = urlParams.get("record");
 const mode = record ? "Edit" : "Add";
@@ -12,15 +12,32 @@ CustomView_BaseController_Js(
   "Settings_PipelineConfig_EditPipeline_Js",
   {},
   {
+    // Chỉnh sửa Pipeline
     urlParams: urlParams,
     record: record,
     mode: mode,
     stageReplaceMapping: [],
+    //End
     currentNameModule: "Potentials",
     pipelineId: "",
     isFirstOpen: 1,
     stagesList: [],
     rolesList: [],
+    roleMapping: {
+      all: "Tất cả",
+      H1: "Organization",
+      H10: "Sales Admin",
+      H11: "CS Manager",
+      H12: "Support",
+      H2: "CEO",
+      H3: "Vice President",
+      H4: "Sales Manager",
+      H5: "Sales Person",
+      H6: "Marketing Manager",
+      H7: "Marketer",
+      H8: "Chief Accountant",
+      H9: "Accountant",
+    },
     getPicklistname: function () {
       switch (this.currentNameModule) {
         case "Potentials":
@@ -168,7 +185,6 @@ CustomView_BaseController_Js(
       // alert(self.record);
       // alert("Hello");
       //Begin The Vi
-      this.registerGetRoleList();
       this.registerModuleChangeEvent();
       this.registerCancelButtonClick();
       this.registerAddStageNewSaveEvent();
@@ -177,7 +193,7 @@ CustomView_BaseController_Js(
       this.registerTimeUnitChangeEvent();
       this.registerTimeValueChangeEvent();
       this.registerNextButtonClickEvent();
-
+      this.registerGetRoleList();
       this.handleColumnVisibility();
       form.find(".btn-add-stage").on("click", function () {
         self.showStagePipelineModal(this);
@@ -532,15 +548,12 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
-        console.log("Response getRoleList:", res);
+
         self.rolesList = [{ id: "all", name: "Tất cả" }];
-        // Duyệt qua mảng trả về và thêm vào rolesList
-        res.forEach((role) => {
-          self.rolesList.push({
-            id: role.roleid,
-            name: role.rolename,
-          });
-        });
+        for (let id in res) {
+          let roleName = self.roleMapping[id] || id;
+          self.rolesList.push({ id: id, name: roleName });
+        }
         console.log("Updated rolesList:", self.rolesList);
       });
     },
@@ -1931,6 +1944,8 @@ CustomView_BaseController_Js(
   {},
   {
     targetController: null,
+
+    // Initialize CKEditor instance
     ckEditorInstance: false,
     currentNameModule: "Potentials",
     action: {},
@@ -1942,6 +1957,7 @@ CustomView_BaseController_Js(
     fieldModelInstance: false,
     dateConditionInfo: false,
     isEdit: false,
+    fieldValueMap: false,
 
     setCurrentNameModule: function (moduleName) {
       this.currentNameModule = moduleName;
@@ -1951,42 +1967,83 @@ CustomView_BaseController_Js(
       return this.dateConditionInfo;
     },
 
+    getFieldValueMapping: function () {
+      var fieldValueMap = this.fieldValueMap;
+      if (fieldValueMap != false) {
+        return fieldValueMap;
+      } else {
+        return "";
+      }
+    },
+
     registerEvents: function () {
       this._super();
       this.registerEventFormInit();
+
+      this.registerFillContentEvent(
+        "#form-send-email",
+        ".task-fields",
+        ".fields"
+      );
+      this.registerFillContentEvent(
+        "#form-send-email",
+        "#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates",
+        "content",
+        true
+      );
+      this.registerFillContentEvent(
+        "#form-send-sms",
+        ".task-fields",
+        'input[name="sms_recepient"]'
+      );
+      this.registerFillContentEvent(
+        "#form-send-sms",
+        "#task-fieldnames",
+        'textarea[name="content"]'
+      );
     },
 
     registerEventFormInit: function () {
       let self = this;
       let modal = this.getModal();
+
       modal.find("#addCall").on("click", function () {
         self.showAddCallModal(this);
       });
+
       modal.find("#addMeeting").on("click", function () {
         self.showAddMeetingModal(this);
       });
+
       modal.find("#createNewTask").on("click", function () {
         self.showCreateNewTaskModal(this);
       });
+
       modal.find("#createNewProjectTask").on("click", function () {
         self.showCreateNewProjectTaskModal(this);
       });
+
       modal.find("#createNewRecord").on("click", function () {
         self.showCreateNewRecordModal(this);
       });
+
       modal.find("#updateDataField").on("click", function () {
         self.showDataFieldUpdateModal(this);
         self.registerShowDataUpdateFieldsModalEvents();
       });
+
       modal.find("#sendZNSMessage").on("click", function () {
         self.showSendZNSModal(this);
       });
+
       modal.find("#sendSMSMessage").on("click", function () {
         self.showSendSMSModal(this);
       });
+
       modal.find("#sendEmail").on("click", function () {
         self.showSendEmailModal(this);
       });
+
       modal.find("#addNotification").on("click", function () {
         self.showNotificationModal(this);
       });
@@ -2104,7 +2161,6 @@ CustomView_BaseController_Js(
       }
       fieldUiHolder.html(fieldSpecificUi);
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Added by Hieu Nguyen on 2020-12-16 to fix bug multi-select field cause js error
-      console.log(fieldSpecificUi);
       if (fieldSpecificUi.is("input.select2")) {
         var tagElements = fieldSpecificUi.data("tags");
         var params = { tags: tagElements, tokenSeparators: [","] };
@@ -2227,18 +2283,7 @@ CustomView_BaseController_Js(
         html = jQuery(html).val(app.htmlDecode(fieldModel.getValue()));
         return jQuery(html);
       } else {
-        console.log("FIELDMODEL: ");
-        console.log(fieldModel);
-
         const fieldHtml = jQuery(fieldModel.getUiTypeSpecificHtml());
-
-        if (fieldHtml.data("value") !== undefined) {
-          console.log("FIELDMODEL VALUE: ", fieldModel.value);
-          console.log("Có thuộc tính data-value:", fieldHtml.data("value"));
-        } else {
-          console.log("FIELDMODEL VALUE: ", fieldModel.value);
-          console.log("Không có thuộc tính data-value");
-        }
         return jQuery(fieldModel.getUiTypeSpecificHtml());
       }
     },
@@ -2475,7 +2520,7 @@ CustomView_BaseController_Js(
       return values;
     },
 
-    // Minh Hoàng
+    // Add by Minh Hoàng
     /**
      * Function to get ckEditorInstance
      */
@@ -2500,79 +2545,93 @@ CustomView_BaseController_Js(
       jQuery("#form-send-email").on("change", "#fromEmailOption", function (e) {
         var currentElement = jQuery(e.currentTarget);
         var inputElement = currentElement.closest(".row").find(".fields");
+
         inputElement.val(currentElement.val());
       });
     },
+    //      var currentElement = jQuery(e.currentTarget);
+    //      var inputElement = currentElement.closest('.row').find('.fields');
+    //      if (currentElement.hasClass('overwriteSelection')) {
+    //         inputElement.val(currentElement.val());
+    //      } else {
+    //         var oldValue = inputElement.val();
+    //         var newValue = oldValue + currentElement.val();
+    //         inputElement.val(newValue);
+    //      }
+    //   });
+    // },
 
-    registerFillTaskFieldsEvent: function () {
-      jQuery("#form-send-email").on("change", ".task-fields", function (e) {
+    // registerFillMailContentEvent: function () {
+    //   jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
+    //      var textarea = CKEDITOR.instances.content;
+    //      var value = jQuery(e.currentTarget).val();
+    //      if (textarea != undefined) {
+    //         textarea.insertHtml(value);
+    //      } else if (jQuery('textarea[name="content"]')) {
+    //         var textArea = jQuery('textarea[name="content"]');
+    //         textArea.insertAtCaret(value);
+    //      }
+    //   });
+    // },
+
+    // registerFillSMSTaskFieldsEvent: function () {
+    //   jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
+    //       var selectedField = jQuery(e.currentTarget).val();
+    //       if (selectedField) {
+    //           var input = jQuery('input[name="sms_recepient"]');
+    //           var currentValue = input.val();
+    //           input.val(currentValue + '{' + selectedField + '}');
+    //       }
+    //   });
+    // },
+
+    // registerFillSMSContentEvent: function () {
+    //   jQuery('#task-fieldnames').change(function (e) {
+    //       var selectedField = jQuery(e.currentTarget).val();
+    //       if (selectedField) {
+    //           var textarea = jQuery('textarea[name="content"]');
+    //           var currentContent = textarea.val();
+    //           textarea.val(currentContent + '{' + selectedField + '}');
+    //       }
+    //   });
+    // },
+
+    registerFillContentEvent: function (
+      formSelector,
+      fieldSelector,
+      targetSelector,
+      isCKEditor = false
+    ) {
+      // Attach change event to the specified form and field
+      jQuery(formSelector).on("change", fieldSelector, function (e) {
         var currentElement = jQuery(e.currentTarget);
-        var inputElement = currentElement.closest(".row").find(".fields");
-        if (currentElement.hasClass("overwriteSelection")) {
-          inputElement.val(currentElement.val());
+        var value = currentElement.val();
+
+        // If the target is a CKEditor instance
+        if (isCKEditor) {
+          var textarea = CKEDITOR.instances[targetSelector];
+
+          if (textarea != undefined) {
+            textarea.insertHtml(value);
+          } else if (jQuery('textarea[name="' + targetSelector + '"]')) {
+            var textArea = jQuery('textarea[name="' + targetSelector + '"]');
+
+            textArea.insertAtCaret(value);
+          }
         } else {
-          var oldValue = inputElement.val();
-          var newValue = oldValue + currentElement.val();
-          inputElement.val(newValue);
-        }
-      });
-    },
+          // If the target is a regular input element
+          var inputElement = currentElement
+            .closest(".row")
+            .find(targetSelector);
 
-    registerFillMailContentEvent: function () {
-      jQuery(
-        "#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates"
-      ).change(function (e) {
-        var textarea = CKEDITOR.instances.content;
-        var value = jQuery(e.currentTarget).val();
-        if (textarea != undefined) {
-          textarea.insertHtml(value);
-        } else if (jQuery('textarea[name="content"]')) {
-          var textArea = jQuery('textarea[name="content"]');
-          textArea.insertAtCaret(value);
-        }
-      });
-    },
+          if (currentElement.hasClass("overwriteSelection")) {
+            inputElement.val(value);
+          } else {
+            var oldValue = inputElement.val();
+            var newValue = oldValue + value;
 
-    registerFillSMSTaskFieldsEvent: function () {
-      jQuery("#form-send-sms").on("change", ".task-fields", function (e) {
-        var selectedField = jQuery(e.currentTarget).val();
-        if (selectedField) {
-          var input = jQuery('input[name="sms_recepient"]');
-          var currentValue = input.val();
-          input.val(currentValue + "{" + selectedField + "}");
-        }
-      });
-    },
-
-    registerFillSMSContentEvent: function () {
-      jQuery("#task-fieldnames").change(function (e) {
-        var selectedField = jQuery(e.currentTarget).val();
-        if (selectedField) {
-          var textarea = jQuery('textarea[name="content"]');
-          var currentContent = textarea.val();
-          textarea.val(currentContent + "{" + selectedField + "}");
-        }
-      });
-    },
-
-    registerFillSMSTaskFieldsEvent: function () {
-      jQuery("#form-send-sms").on("change", ".task-fields", function (e) {
-        var selectedField = jQuery(e.currentTarget).val();
-        if (selectedField) {
-          var input = jQuery('input[name="sms_recepient"]');
-          var currentValue = input.val();
-          input.val(currentValue + "{" + selectedField + "}");
-        }
-      });
-    },
-
-    registerFillSMSContentEvent: function () {
-      jQuery("#task-fieldnames").change(function (e) {
-        var selectedField = jQuery(e.currentTarget).val();
-        if (selectedField) {
-          var textarea = jQuery('textarea[name="content"]');
-          var currentContent = textarea.val();
-          textarea.val(currentContent + "{" + selectedField + "}");
+            inputElement.val(newValue);
+          }
         }
       });
     },
@@ -2675,18 +2734,87 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             const form = modal.find("form#form-add-call");
+            vtUtils.initDatePickerFields(form);
+            self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide();
+            });
+            function calculateEndTime() {
+              let startTime = $("input[name='startTime']").val();
+              let duration = parseInt($("input[name='duration']").val());
+              let durationUnit = $("select[name='durationUnit']").val();
+              let endTimeInput = $("input[name='endTime']");
+
+              if (startTime && !isNaN(duration)) {
+                let timeFormat =
+                  startTime.includes("AM") || startTime.includes("PM")
+                    ? "hh:mm A"
+                    : "HH:mm";
+                let momentStartTime = moment(startTime, timeFormat);
+
+                if (durationUnit === "hours") {
+                  momentStartTime.add(duration, "hours");
+                } else {
+                  momentStartTime.add(duration, "minutes");
+                }
+
+                let newEndTime = momentStartTime.format(timeFormat);
+                endTimeInput.val(newEndTime);
+              }
+            }
+
+            $(
+              "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
+            ).on("change keyup", calculateEndTime);
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
-            vtUtils.initDatePickerFields(form);
-
-            self.registerToggleCheckboxEvent(form);
 
             // Form validation
             var params = {
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
+                let callInfo = {
+                  assigned_user_id: params.assigned_user_id,
+                  assign_parent_record_owners:
+                    params.assign_parent_record_owners
+                      ? params.assign_parent_record_owners
+                      : null,
+                  description: params.description,
+                  duration: parseInt(params.duration),
+                  durationUnit: params.durationUnit,
+                  endTime: params.endTime,
+                  eventName: params.eventName,
+                  events_call_direction: params.events_call_direction,
+                  calendar_repeat_limit_date: self.convertDateFormat(
+                    params.calendar_repeat_limit_date
+                  ),
+                  recurringCheck: params.recurringcheck,
+                  recurringtype: params.recurringtype,
+                  repeat_frequency: params.repeat_frequency
+                    ? parseInt(params.repeat_frequency)
+                    : null,
+                  startDays: parseInt(params.startDate),
+                  startDatefield: params.startDateField,
+                  startDirection: params.startDirection,
+                  startTime: params.startTime,
+                  status: params.status,
+                };
+                self.action["callInfo"] = callInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "addCall";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };
@@ -2699,6 +2827,48 @@ CustomView_BaseController_Js(
           },
         });
       });
+    },
+
+    convertDateFormat(dateString) {
+      var parts = dateString.split("-");
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; // yyyy-mm-dd
+      }
+      return "Invalid Date Format";
+    },
+
+    // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
+    registerOwnerFieldEvent: function (container) {
+      var assignedUsersInput = container.find('input[name="assigned_user_id"]');
+      var assignParentRecordOwnersInput = container.find(
+        'input[name="assign_parent_record_owners"]'
+      );
+
+      // Init at form load
+      displayOnwerFieldStatus();
+
+      // Init when checkbox change
+      assignParentRecordOwnersInput.on("change", function () {
+        displayOnwerFieldStatus();
+      });
+
+      function displayOnwerFieldStatus() {
+        if (assignParentRecordOwnersInput.is(":checked")) {
+          console.log(true);
+          assignedUsersInput.select2("data", null).trigger("change");
+          assignedUsersInput.select2("enable", false);
+          assignedUsersInput.removeAttr("data-rule-required");
+          vtUtils.hideValidationMessage(assignedUsersInput);
+          assignedUsersInput
+            .closest(".fieldValue")
+            .find(".input-error")
+            .removeClass("input-error");
+        } else {
+          console.log(false);
+          assignedUsersInput.select2("enable", true);
+          assignedUsersInput.attr("data-rule-required", "true");
+        }
+      }
     },
 
     showAddMeetingModal: function (targetBtn) {
@@ -2725,19 +2895,88 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             const form = modal.find("form#form-add-meeting");
+            vtUtils.initDatePickerFields(form);
+            // Gọi hàm đăng ký toggle checkbox
+            self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide(); // Ẩn nút "Toàn bộ thông tin"
+            });
+            function calculateEndTime() {
+              let startTime = $("input[name='startTime']").val();
+              let duration = parseInt($("input[name='duration']").val());
+              let durationUnit = $("select[name='durationUnit']").val();
+              let endTimeInput = $("input[name='endTime']");
 
+              if (startTime && !isNaN(duration)) {
+                let timeFormat =
+                  startTime.includes("AM") || startTime.includes("PM")
+                    ? "hh:mm A"
+                    : "HH:mm";
+                let momentStartTime = moment(startTime, timeFormat);
+
+                if (durationUnit === "hours") {
+                  momentStartTime.add(duration, "hours");
+                } else {
+                  momentStartTime.add(duration, "minutes");
+                }
+
+                let newEndTime = momentStartTime.format(timeFormat);
+                endTimeInput.val(newEndTime);
+              }
+            }
+
+            // Gọi hàm khi nhập thời gian bắt đầu hoặc thời lượng
+            $(
+              "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
+            ).on("change keyup", calculateEndTime);
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
-            vtUtils.initDatePickerFields(form);
-
-            self.registerToggleCheckboxEvent(form);
 
             // Form validation
             var params = {
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
+                let meetingInfo = {
+                  assigned_user_id: params.assigned_user_id,
+                  assign_parent_record_owners:
+                    params.assign_parent_record_owners
+                      ? params.assign_parent_record_owners
+                      : null,
+                  description: params.description,
+                  duration: parseInt(params.duration),
+                  durationUnit: params.durationUnit,
+                  endTime: params.endTime,
+                  eventName: params.eventName,
+                  calendar_repeat_limit_date: self.convertDateFormat(
+                    params.calendar_repeat_limit_date
+                  ),
+                  recurringcheck: params.recurringcheck,
+                  recurringtype: params.recurringtype,
+                  repeat_frequency: params.repeat_frequency
+                    ? parseInt(params.repeat_frequency)
+                    : null,
+                  startDays: parseInt(params.startDays),
+                  startDatefield: params.startDatefield,
+                  startDirection: params.startDirection,
+                  startTime: params.startTime,
+                  status: params.status,
+                };
+                self.action["meetingInfo"] = meetingInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "addMeeting";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };
@@ -2843,8 +3082,9 @@ CustomView_BaseController_Js(
         });
       });
     },
-
+    // Add by Dien Nguyen on 2025-03-03 to show create new record modal
     showCreateNewRecordModal: function (targetBtn) {
+      var self = this;
       app.helper.showProgress();
       // Request modal content
       let params = {
@@ -2859,36 +3099,643 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+        app.helper.hideModal();
         // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
+        let modalInstance = app.helper
+          .loadPageContentOverlay(res)
+          .then(function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
+            var form = modal.find("#form-create-new-record");
+            form.on("change", "#createEntityModule", function (e) {
+              // form
+              //   .find(".initialDataField")
+              //   .toggleClass("hide", !$(this).val());
+              var relatedModule = jQuery(e.currentTarget).val();
+              var module_name = jQuery("#module_name").val();
+              if (relatedModule == module_name) {
+                jQuery(e.currentTarget)
+                  .closest(".taskTypeUi")
+                  .find(".sameModuleError")
+                  .removeClass("hide");
+              } else {
+                jQuery(e.currentTarget)
+                  .closest(".taskTypeUi")
+                  .find(".sameModuleError")
+                  .addClass("hide");
               }
+              var params = {
+                module: app.getModuleName(),
+                parent: app.getParentModuleName(),
+                view: "EditPipelineAjax",
+                mode: "getCreateEntity",
+                relatedModule: jQuery(e.currentTarget).val(),
+                module_name: self.currentNameModule,
+              };
+
+              app.helper.showProgress();
+              app.request.post({ data: params }).then(function (error, data) {
+                if (error) {
+                  console.log(error);
+                }
+                app.helper.hideProgress();
+                var createEntityContainer = jQuery("#addCreateEntityContainer");
+                createEntityContainer.html(data);
+                vtUtils.showSelect2ElementView(
+                  createEntityContainer.find(".select2")
+                );
+
+                self.registerAddFieldEvent();
+                self.fieldValueMap = false;
+                if (jQuery("#fieldValueMapping").val()) {
+                  self.fieldValueReMapping();
+                }
+                var fields = jQuery("#save_fieldvaluemapping").find(
+                  'select[name="fieldname"]'
+                );
+                jQuery.each(fields, function (i, field) {
+                  self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
+                });
+              });
             });
-          },
-        });
+            self.registerVTUpdateFieldsTaskEvents();
+            self.registerSaveTaskSubmitEvent();
+          });
       });
     },
+
+    registerVTUpdateFieldsTaskEvents: function () {
+      var thisInstance = this;
+      this.registerAddFieldEvent();
+      this.registerDeleteConditionEvent();
+      this.registerCreateEntityFieldChange();
+      this.fieldValueMap = false;
+      if (jQuery("#fieldValueMapping").val()) {
+        this.fieldValueReMapping();
+      }
+      var fields = jQuery("#save_fieldvaluemapping").find(
+        'select[name="fieldname"]'
+      );
+      jQuery.each(fields, function (i, field) {
+        thisInstance.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
+      });
+      this.getPopUp(jQuery("#form-create-new-record"));
+    },
+    /**
+     * Add by Dien Nguyen on 2025-03-01
+     * Function which will register row create event
+     */
+    registerAddFieldEvent: function () {
+      jQuery("#addFieldBtn").on("click", function (e) {
+        var newAddFieldContainer = jQuery(".basicAddFieldContainer")
+          .clone(true, true)
+          .removeClass("basicAddFieldContainer hide")
+          .addClass("conditionRow");
+        jQuery("select", newAddFieldContainer).addClass("select2");
+        jQuery("#save_fieldvaluemapping").append(newAddFieldContainer);
+        vtUtils.showSelect2ElementView(newAddFieldContainer.find(".select2"));
+      });
+    },
+    /**
+     * Add by Dien Nguyen on 2025-03-01
+     * Function which will register row delete event
+     */
+    registerDeleteConditionEvent: function () {
+      jQuery("#form-create-new-record").on(
+        "click",
+        ".deleteCondition",
+        function (e) {
+          jQuery(e.currentTarget).closest(".conditionRow").remove();
+        }
+      );
+    },
+
+    /**
+     * Add by Dien Nguyen on 2025-03-01
+     * Function which will register field change event
+     */
+    registerCreateEntityFieldChange: function () {
+      var thisInstance = this;
+      jQuery("#form-create-new-record").on(
+        "change",
+        'select[name="fieldname"]',
+        function (e) {
+          var selectedElement = jQuery(e.currentTarget);
+          if (selectedElement.val() != "none") {
+            var conditionRow = selectedElement.closest(".conditionRow");
+            var moduleNameElement = conditionRow.find('[name="modulename"]');
+            if (moduleNameElement.length > 0) {
+              var selectedOptionFieldInfo = selectedElement
+                .find("option:selected")
+                .data("fieldinfo");
+              var type = selectedOptionFieldInfo.type;
+              if (type == "picklist" || type == "multipicklist") {
+                var moduleName = jQuery("#createEntityModule").val();
+                moduleNameElement
+                  .find('option[value="' + moduleName + '"]')
+                  .attr("selected", true);
+                moduleNameElement.trigger("change");
+                moduleNameElement.select2("disable");
+              }
+            }
+            thisInstance.loadFieldSpecificUi(selectedElement);
+          }
+        }
+      );
+    },
+
+    fieldValueReMapping: function () {
+      var object = JSON.parse(jQuery("#fieldValueMapping").val());
+      var fieldValueReMap = {};
+
+      jQuery.each(object, function (i, array) {
+        fieldValueReMap[array.fieldname] = {};
+        var values = {};
+        jQuery.each(array, function (key, value) {
+          values[key] = value;
+        });
+        fieldValueReMap[array.fieldname] = values;
+      });
+      this.fieldValueMap = fieldValueReMap;
+    },
+
+    getFieldSpecificUi: function (fieldSelectElement) {
+      var fieldModel = this.fieldModelInstance;
+      return jQuery(fieldModel.getUiTypeSpecificHtml());
+    },
+
+    // Add by Dien Nguyen on 2025-03-01 to load UI field
+    loadFieldSpecificUiOnCreateNewRecord: function (fieldSelect) {
+      var selectedOption = fieldSelect.find("option:selected");
+      var row = fieldSelect.closest("div.conditionRow");
+      var fieldUiHolder = row.find(".fieldUiHolder");
+      var fieldInfo = selectedOption.data("fieldinfo");
+      var fieldValueMapping = this.getFieldValueMapping();
+      var fieldValueMappingKey = fieldInfo.name;
+      var taskType = jQuery("#taskType").val();
+      if (taskType == "VTUpdateFieldsTask") {
+        fieldValueMappingKey = fieldInfo.workflow_columnname;
+        if (
+          fieldValueMappingKey === undefined ||
+          fieldValueMappingKey === null
+        ) {
+          fieldValueMappingKey = selectedOption.val();
+        }
+      }
+      if (
+        fieldValueMapping != "" &&
+        typeof fieldValueMapping[fieldValueMappingKey] != "undefined"
+      ) {
+        fieldInfo.value = fieldValueMapping[fieldValueMappingKey]["value"];
+        fieldInfo.workflow_valuetype =
+          fieldValueMapping[fieldValueMappingKey]["valuetype"];
+      } else {
+        fieldInfo.workflow_valuetype = "rawtext";
+      }
+
+      if (fieldInfo.type == "reference" || fieldInfo.type == "multireference") {
+        fieldInfo.referenceLabel = fieldUiHolder
+          .find('[name="referenceValueLabel"]')
+          .val();
+        fieldInfo.type = "string";
+      }
+
+      // var moduleName = this.getModuleName();
+      var moduleName = "Workflows";
+
+      var fieldModel = Workflows_Field_Js.getInstance(fieldInfo, moduleName);
+      this.fieldModelInstance = fieldModel;
+      var fieldSpecificUi = this.getFieldSpecificUi(fieldSelect);
+
+      //remove validation since we dont need validations for all eleements
+      // Both filter and find is used since we dont know whether the element is enclosed in some conainer like currency
+      var fieldName = fieldModel.getName();
+      if (fieldModel.getType() == "multipicklist") {
+        fieldName = fieldName + "[]";
+      }
+      fieldSpecificUi
+        .filter('[name="' + fieldName + '"]')
+        .attr("data-value", "value")
+        .attr("data-workflow_columnname", fieldInfo.workflow_columnname);
+      fieldSpecificUi
+        .find('[name="' + fieldName + '"]')
+        .attr("data-value", "value")
+        .attr("data-workflow_columnname", fieldInfo.workflow_columnname);
+      fieldSpecificUi
+        .filter('[name="valuetype"]')
+        .addClass("ignore-validation");
+      fieldSpecificUi.find('[name="valuetype"]').addClass("ignore-validation");
+
+      //If the workflowValueType is rawtext then only validation should happen
+      var workflowValueType = fieldSpecificUi
+        .filter('[name="valuetype"]')
+        .val();
+      if (
+        workflowValueType != "rawtext" &&
+        typeof workflowValueType != "undefined"
+      ) {
+        fieldSpecificUi
+          .filter('[name="' + fieldName + '"]')
+          .addClass("ignore-validation");
+        fieldSpecificUi
+          .find('[name="' + fieldName + '"]')
+          .addClass("ignore-validation");
+      }
+
+      fieldUiHolder.html(fieldSpecificUi);
+      fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Add by Dien Nguyen on 2025-03-01 to avoid JS error
+
+      if (fieldSpecificUi.is("input.select2")) {
+        var tagElements = fieldSpecificUi.data("tags");
+        var params = { tags: tagElements, tokenSeparators: [","] };
+        vtUtils.showSelect2ElementView(fieldSpecificUi, params);
+      } else if (fieldSpecificUi.is("select")) {
+        if (fieldSpecificUi.hasClass("select2")) {
+          vtUtils.showSelect2ElementView(fieldSpecificUi);
+        } else {
+          vtUtils.showSelect2ElementView(fieldSpecificUi);
+        }
+      } else if (fieldSpecificUi.is("input.dateField")) {
+        var calendarType = fieldSpecificUi.data("calendarType");
+        if (calendarType == "range") {
+          var customParams = {
+            calendars: 3,
+            mode: "range",
+            className: "rangeCalendar",
+            onChange: function (formated) {
+              fieldSpecificUi.val(formated.join(","));
+            },
+          };
+          app.registerEventForDatePickerFields(
+            fieldSpecificUi,
+            false,
+            customParams
+          );
+        } else {
+          app.registerEventForDatePickerFields(fieldSpecificUi);
+        }
+      }
+
+      // Added by Hieu Nguyen on 2019-06-30 to render owner and main owner field
+      var singleOwner = false;
+
+      if (
+        fieldModel.getName() == "assigned_user_id" ||
+        fieldModel.getName() == "main_owner_id"
+      ) {
+        // [Workflow] Added by Phu Vo on 2020.08.04 to support highlight main owner
+        fieldUiHolder.addClass("fieldValue").addClass(fieldModel.getName());
+        // End Phu Vo
+
+        var selectedTags = fieldModel.getValue()
+          ? JSON.stringify(fieldModel.getValue())
+          : "";
+        fieldSpecificUi =
+          '<input type="text" name="' +
+          fieldModel.getName() +
+          '" value="" data-selected-tags=\'' +
+          selectedTags +
+          '\' data-value="value" data-rule-main-owner="true" class="form-control">' +
+          '<input type="hidden" name="valuetype" value="rawtext" />';
+
+        // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
+        if (
+          fieldModel.getName() == "assigned_user_id" &&
+          jQuery.inArray(taskType, [
+            "VTCreateTodoTask",
+            "VTCreateEventTask",
+            "VTCreateEntityTask",
+          ]) >= 0
+        ) {
+          var checked =
+            fieldUiHolder.data("assignParentRecordOwners") == 1
+              ? "checked"
+              : "";
+          fieldSpecificUi +=
+            '<label><input type="checkbox" name="assign_parent_record_owners" ' +
+            checked +
+            " /> " +
+            fieldUiHolder.data("assignParentRecordOwnersLabel") +
+            "<label>";
+        }
+        // End Hieu Nguyen
+
+        fieldUiHolder.html(fieldSpecificUi);
+
+        // Init select2
+        var input = fieldUiHolder.find(
+          'input[name="' + fieldModel.getName() + '"]'
+        );
+        input.data("singleSelection", singleOwner);
+        CustomOwnerField.initCustomOwnerFields(input);
+
+        this.registerOwnerFieldEvent(fieldUiHolder);
+      }
+      // End Hieu Nguyen
+
+      // Added by Hieu Nguyen on 2019-06-30 to render user reference field
+      if (
+        fieldModel.getName() == "createdby" ||
+        fieldModel.getName() == "modifiedby" ||
+        fieldInfo.column == "inventorymanager"
+      ) {
+        var selectedTags = "";
+
+        if (fieldModel.get("selected_tags")) {
+          selectedTags = JSON.stringify(fieldModel.get("selected_tags"));
+        }
+
+        fieldSpecificUi =
+          '<input type="text" name="' +
+          fieldModel.getName() +
+          '" value="' +
+          fieldModel.getValue() +
+          '" data-selected-tags="' +
+          selectedTags +
+          '" data-value="value" data-rule-main-owner="true" class="form-control">' +
+          '<input type="hidden" name="valuetype" value="rawtext" />';
+        fieldUiHolder.html(fieldSpecificUi);
+
+        // Init select2
+        var input = fieldUiHolder.find(
+          'input[name="' + fieldModel.getName() + '"]'
+        );
+        input.data("singleSelection", singleOwner);
+        CustomOwnerField.initCustomOwnerFields(input);
+      }
+      // End Hieu Nguyen
+      return this;
+    },
+
+    getPopUp: function (container) {
+      var thisInstance = this;
+      if (typeof container == "undefined") {
+        // container = thisInstance.getContainer();
+        return;
+      }
+      var isPopupShowing = false;
+      container.on("click", ".getPopupUi", function (e) {
+        console.log("CLICK .getPopupui");
+        // Added to prevent multiple clicks event
+        if (isPopupShowing) {
+          return false;
+        }
+        var fieldValueElement = jQuery(e.currentTarget);
+        var fieldValue = fieldValueElement.val();
+        var fieldUiHolder = fieldValueElement.closest(".fieldUiHolder");
+        var valueType = fieldUiHolder.find('[name="valuetype"]').val();
+        if (valueType == "" || valueType == "null") {
+          valueType = "rawtext";
+        }
+        var conditionsContainer = fieldValueElement.closest(
+          ".conditionsContainer"
+        );
+        var conditionRow = fieldValueElement.closest(".conditionRow");
+
+        var clonedPopupUi = conditionsContainer
+          .find(".popupUi")
+          .clone(true, true)
+          .removeClass("hide")
+          .removeClass("popupUi")
+          .addClass("clonedPopupUi");
+        console.log(clonedPopupUi);
+        clonedPopupUi.find("select").addClass("select2");
+        clonedPopupUi.find(".fieldValue").val(fieldValue);
+        clonedPopupUi.find(".fieldValue").removeClass("hide");
+        if (fieldValueElement.hasClass("date")) {
+          clonedPopupUi
+            .find(".textType")
+            .find('option[value="rawtext"]')
+            .attr("data-ui", "input");
+          var dataFormat = fieldValueElement.data("date-format");
+          if (valueType == "rawtext") {
+            var value = fieldValueElement.val();
+          } else {
+            value = "";
+          }
+          var clonedDateElement =
+            '<input type="text" style="width: 30%;" class="dateField fieldValue inputElement" value="' +
+            value +
+            '" data-date-format="' +
+            dataFormat +
+            '" data-input="true" >';
+          clonedPopupUi
+            .find(".fieldValueContainer div")
+            .prepend(clonedDateElement);
+        } else if (fieldValueElement.hasClass("time")) {
+          clonedPopupUi
+            .find(".textType")
+            .find('option[value="rawtext"]')
+            .attr("data-ui", "input");
+          if (valueType == "rawtext") {
+            var value = fieldValueElement.val();
+          } else {
+            value = "";
+          }
+          var clonedTimeElement =
+            '<input type="text" style="width: 30%;" class="timepicker-default fieldValue inputElement" value="' +
+            value +
+            '" data-input="true" >';
+          clonedPopupUi
+            .find(".fieldValueContainer div")
+            .prepend(clonedTimeElement);
+        } else if (fieldValueElement.hasClass("boolean")) {
+          clonedPopupUi
+            .find(".textType")
+            .find('option[value="rawtext"]')
+            .attr("data-ui", "input");
+          if (valueType == "rawtext") {
+            var value = fieldValueElement.val();
+          } else {
+            value = "";
+          }
+          var clonedBooleanElement =
+            '<input type="checkbox" style="width: 30%;" class="fieldValue inputElement" value="' +
+            value +
+            '" data-input="true" >';
+          clonedPopupUi
+            .find(".fieldValueContainer div")
+            .prepend(clonedBooleanElement);
+
+          var fieldValue = clonedPopupUi
+            .find(".fieldValueContainer input")
+            .val();
+          if (value == "true:boolean" || value == "") {
+            clonedPopupUi
+              .find(".fieldValueContainer input")
+              .attr("checked", "checked");
+          } else {
+            clonedPopupUi
+              .find(".fieldValueContainer input")
+              .removeAttr("checked");
+          }
+        }
+        app.helper.hideModal();
+        var preCallbackFunction = function (data) {
+          console.log("PRECALLBACK");
+          data.off("hidden.bs.modal");
+        };
+        var callBackFunction = function (data) {
+          console.log("CALLBACKFUNC");
+          data.css("display", "block");
+          data.find("#modal-content").removeClass("hide");
+          isPopupShowing = false;
+          data.find(".clonedPopupUi").removeClass("hide");
+          var moduleNameElement = conditionRow.find('[name="modulename"]');
+          if (moduleNameElement.length > 0) {
+            var moduleName = moduleNameElement.val();
+            data.find(".useFieldElement").addClass("hide");
+            jQuery(data.find('[name="' + moduleName + '"]').get(0)).removeClass(
+              "hide"
+            );
+          }
+          thisInstance.postShowModalAction(data, valueType);
+          thisInstance.registerChangeFieldEvent(data);
+          thisInstance.registerSelectOptionEvent(data);
+          thisInstance.registerPopUpSaveEvent(data, fieldUiHolder);
+          thisInstance.registerRemoveModalEvent(data);
+          data.find(".fieldValue").filter(":visible").trigger("focus");
+        };
+        conditionsContainer.find(".clonedPopUp").html(clonedPopupUi);
+        jQuery(".clonedPopupUi").on("shown", function () {
+          if (typeof callBackFunction == "function") {
+            callBackFunction(jQuery(".clonedPopupUi", conditionsContainer));
+          }
+        });
+        isPopupShowing = true;
+        app.helper.showModal(
+          jQuery(".clonedPopUp", conditionsContainer).find(".clonedPopupUi"),
+          {
+            preShowCb: preCallbackFunction,
+            cb: callBackFunction,
+          }
+        );
+      });
+    },
+
+    registerRemoveModalEvent: function (data) {
+      data.on("click", ".closeModal", function (e) {
+        data.modal("hide");
+      });
+    },
+
+    registerPopUpSaveEvent: function (data, fieldUiHolder) {
+      jQuery('[name="saveButton"]', data).on("click", function (e) {
+        var valueType = jQuery("select.textType", data).val();
+
+        fieldUiHolder.find('[name="valuetype"]').val(valueType);
+        var fieldValueElement = fieldUiHolder.find(".getPopupUi");
+        if (valueType != "rawtext") {
+          fieldValueElement.addClass("ignore-validation");
+        } else {
+          fieldValueElement.removeClass("ignore-validation");
+        }
+        var fieldType = data
+          .find(".fieldValue")
+          .filter(":visible")
+          .attr("type");
+        var fieldValue = data.find(".fieldValue").filter(":visible").val();
+        //For checkbox field type, handling fieldValue
+        if (fieldType == "checkbox") {
+          if (data.find(".fieldValue").filter(":visible").is(":checked")) {
+            fieldValue = "true:boolean";
+          } else {
+            fieldValue = "false:boolean";
+          }
+        }
+        fieldValueElement.val(fieldValue);
+        data.modal("hide");
+      });
+    },
+
+    registerSelectOptionEvent: function (data) {
+      jQuery(".useField,.useFunction", data).on("change", function (e) {
+        var currentElement = jQuery(e.currentTarget);
+        var newValue = currentElement.val();
+        var oldValue = data.find(".fieldValue").filter(":visible").val();
+        var textType = currentElement
+          .closest(".clonedPopupUi")
+          .find("select.textType")
+          .val();
+        if (currentElement.hasClass("useField")) {
+          //If it is fieldname mode then we need to allow only one field
+          if (oldValue != "" && textType != "fieldname") {
+            var concatenatedValue = oldValue + " " + newValue;
+          } else {
+            concatenatedValue = newValue;
+          }
+        } else {
+          concatenatedValue = oldValue + newValue;
+        }
+        data.find(".fieldValue").val(concatenatedValue);
+        currentElement.val("").select2("val", "");
+      });
+    },
+
+    registerChangeFieldEvent: function (data) {
+      jQuery(".textType", data).on("change", function (e) {
+        var valueType = jQuery(e.currentTarget).val();
+        var useFieldContainer = jQuery(".useFieldContainer", data);
+        var useFunctionContainer = jQuery(".useFunctionContainer", data);
+        var uiType = jQuery(e.currentTarget).find("option:selected").data("ui");
+        jQuery(".fieldValue", data).hide();
+        jQuery("[data-" + uiType + "]", data).show();
+        if (valueType == "fieldname") {
+          useFieldContainer.removeClass("hide");
+          useFunctionContainer.addClass("hide");
+        } else if (valueType == "expression") {
+          useFieldContainer.removeClass("hide");
+          useFunctionContainer.removeClass("hide");
+        } else {
+          useFieldContainer.addClass("hide");
+          useFunctionContainer.addClass("hide");
+        }
+        jQuery(".helpmessagebox", data).addClass("hide");
+        jQuery("#" + valueType + "_help", data).removeClass("hide");
+        data.find(".fieldValue").val("");
+      });
+    },
+
+    postShowModalAction: function (data, valueType) {
+      if (valueType == "fieldname") {
+        jQuery(".useFieldContainer", data).removeClass("hide");
+        jQuery(".textType", data).val(valueType).trigger("change");
+      } else if (valueType == "expression") {
+        jQuery(".useFieldContainer", data).removeClass("hide");
+        jQuery(".useFunctionContainer", data).removeClass("hide");
+        jQuery(".textType", data).val(valueType).trigger("change");
+      }
+      jQuery("#" + valueType + "_help", data).removeClass("hide");
+      var uiType = jQuery(".textType", data).find("option:selected").data("ui");
+      jQuery(".fieldValue", data).hide();
+      jQuery("[data-" + uiType + "]", data).show();
+    },
+
+    registerSaveTaskSubmitEvent: function () {
+      var self = this;
+      var form = jQuery("#form-create-new-record");
+      var params = {
+        submitHandler: function (form) {
+          var form = jQuery(form);
+          // to Prevent submit if already submitted
+          jQuery("button[name='saveButton']", form).attr(
+            "disabled",
+            "disabled"
+          );
+          var params = form.serializeFormData();
+          console.log(params);
+          self.action["createNewRecordInfo"] = params;
+          self.action["action_name"] = params.action_name;
+          self.action["action_type"] = "createNewRecord";
+          self.action["time"] = parseInt(self.action["time"]);
+          self.targetController.pushAction(self.action, self.isEdit);
+          app.helper.hidePageContentOverlay();
+          return false;
+        },
+        ignore: ".ignore-validation",
+      };
+      form.vtValidate(params);
+    },
+    // End Create new record Modal
 
     showDataFieldUpdateModal: function (targetBtn) {
       let self = this;
@@ -2977,6 +3824,7 @@ CustomView_BaseController_Js(
     showSendSMSModal: function (targetBtn) {
       var self = this;
       app.helper.showProgress();
+
       // Request modal content
       let params = {
         module: "PipelineConfig",
@@ -2985,20 +3833,33 @@ CustomView_BaseController_Js(
         mode: "getSendSMSModal",
         currentNameModule: self.currentNameModule,
       };
+
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
         if (err) {
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+
         // Show modal
         app.helper.showModal(res, {
           preShowCb: function (modal) {
             modal.off("hidden.bs.modal");
+
             const form = modal.find("form#form-send-sms");
             // var textAreaElement = modal.find("#content");
-            self.registerFillSMSTaskFieldsEvent();
-            self.registerFillSMSContentEvent();
+
+            // Register events
+            self.registerFillContentEvent(
+              "#form-send-sms",
+              ".task-fields",
+              'input[name="sms_recepient"]'
+            );
+            self.registerFillContentEvent(
+              "#form-send-sms",
+              "#task-fieldnames",
+              'textarea[name="content"]'
+            );
             self.validateContentSMSModal();
           },
           cb: function (modal) {
@@ -3077,6 +3938,7 @@ CustomView_BaseController_Js(
     showSendEmailModal: function (targetBtn) {
       var self = this;
       app.helper.showProgress();
+
       // Request modal content
       let params = {
         module: "PipelineConfig",
@@ -3085,30 +3947,42 @@ CustomView_BaseController_Js(
         mode: "getSendEmailModal",
         currentNameModule: self.currentNameModule,
       };
+
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
         if (err) {
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+
         // Show modal
         app.helper.showModal(res, {
           preShowCb: function (modal) {
             modal.off("hidden.bs.modal");
+
             const form = modal.find("form#form-send-email");
             var textAreaElement = modal.find("#content");
             var ckEditorInstance = self.getckEditorInstance();
-            ckEditorInstance.loadCkEditor(textAreaElement);
-            self.registerFillMailContentEvent();
-            self.registerTooltipEventForSignatureField();
-            self.registerFillTaskFromEmailFieldEvent();
-            self.registerFillTaskFieldsEvent();
-
-            // Event click CC, BCC in modal
             var ccLink = modal.find("#ccLink");
             var bccLink = modal.find("#bccLink");
             var ccContainer = modal.find("#ccContainer");
             var bccContainer = modal.find("#bccContainer");
+
+            // Register events
+            ckEditorInstance.loadCkEditor(textAreaElement);
+            self.registerFillContentEvent(
+              "#form-send-email",
+              ".task-fields",
+              ".fields"
+            );
+            self.registerFillContentEvent(
+              "#form-send-email",
+              "#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates",
+              "content",
+              true
+            );
+            self.registerTooltipEventForSignatureField();
+            self.registerFillTaskFromEmailFieldEvent();
 
             if (ccLink.length) {
               ccLink.on("click", function () {
@@ -3126,679 +4000,28 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
+
             const form = modal.find("form#form-send-email");
+
             // Form validation
             var params = {
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
-                console.log(params);
                 var emailValues = self.getValuesFromSendEmailModal();
+
                 self.action["time"] = parseInt(self.action["time"]);
                 self.action["action_name"] = params.titleEmail;
                 self.action["action_type"] = "sendEmail";
                 self.action.sendEmailData = emailValues;
                 self.targetController.pushAction(self.action);
+
                 app.helper.hideModal();
+
                 return false;
               },
             };
             form.vtValidate(params);
-          },
-        });
-      });
-    },
-
-    showNotificationModal: function (targetBtn) {
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getAddNotificationModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            modal.find(".modal-content").removeClass("hide");
-            var form = modal.find("#form-notification");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                console.log("Submit add action setting modal");
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showAddCallModal: function (targetBtn) {
-      var self = this;
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getAddCallModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            const form = modal.find("form#form-add-call");
-            vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
-            self.registerToggleCheckboxEvent(form);
-            CustomOwnerField.initCustomOwnerFields(
-              form.find('input[name="assigned_user_id"]')
-            );
-            self.registerOwnerFieldEvent(form);
-            $("#fullInfo").click(function () {
-              $("#extraInfo").slideDown();
-              $(this).hide(); // Ẩn nút "Toàn bộ thông tin"
-            });
-            function calculateEndTime() {
-              let startTime = $("input[name='startTime']").val();
-              let duration = parseInt($("input[name='duration']").val());
-              let durationUnit = $("select[name='durationUnit']").val();
-              let endTimeInput = $("input[name='endTime']");
-
-              if (startTime && !isNaN(duration)) {
-                let timeFormat =
-                  startTime.includes("AM") || startTime.includes("PM")
-                    ? "hh:mm A"
-                    : "HH:mm";
-                let momentStartTime = moment(startTime, timeFormat);
-
-                if (durationUnit === "hours") {
-                  momentStartTime.add(duration, "hours");
-                } else {
-                  momentStartTime.add(duration, "minutes");
-                }
-
-                let newEndTime = momentStartTime.format(timeFormat);
-                endTimeInput.val(newEndTime);
-              }
-            }
-
-            // Gọi hàm khi nhập thời gian bắt đầu hoặc thời lượng
-            $(
-              "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
-            ).on("change keyup", calculateEndTime);
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                console.log("SUBMIT ADD CALL");
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                console.log(params);
-                let callInfo = {
-                  assigned_user_id: params.assigned_user_id,
-                  description: params.description,
-                  duration: parseInt(params.duration),
-                  durationUnit: params.durationunit,
-
-                  endTime: params.endTime,
-                  eventName: params.eventName,
-                  events_call_direction: params.events_call_direction,
-                  inputDate: params.inputDate,
-                  recurringCheck: params.recurringcheck,
-                  recurringtype: params.recurringtype,
-                  repeat_frequency: params.repeat_frequency
-                    ? parseInt(params.repeat_frequency)
-                    : null,
-                  startDate: parseInt(params.startDate),
-                  startDateField: params.startDateField,
-                  startDirection: params.startDirection,
-                  startTime: params.startTime,
-                  status: params.status,
-                };
-                self.action["callInfo"] = callInfo;
-                self.action["action_name"] = params.action_name;
-                self.action["action_type"] = "addCall";
-                self.action["time"] = self.action["time"]
-                  ? parseInt(self.action["time"])
-                  : null;
-                self.targetController.pushAction(self.action, self.isEdit);
-                app.helper.hideModal();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
-    registerOwnerFieldEvent: function (container) {
-      var assignedUsersInput = container.find('input[name="assigned_user_id"]');
-      var assignParentRecordOwnersInput = container.find(
-        'input[name="assign_parent_record_owners"]'
-      );
-
-      // Init at form load
-      displayOnwerFieldStatus();
-
-      // Init when checkbox change
-      assignParentRecordOwnersInput.on("change", function () {
-        displayOnwerFieldStatus();
-      });
-
-      function displayOnwerFieldStatus() {
-        if (assignParentRecordOwnersInput.is(":checked")) {
-          console.log(true);
-          assignedUsersInput.select2("data", null).trigger("change");
-          assignedUsersInput.select2("enable", false);
-          assignedUsersInput.removeAttr("data-rule-required");
-          vtUtils.hideValidationMessage(assignedUsersInput);
-          assignedUsersInput
-            .closest(".fieldValue")
-            .find(".input-error")
-            .removeClass("input-error");
-        } else {
-          console.log(false);
-          assignedUsersInput.select2("enable", true);
-          assignedUsersInput.attr("data-rule-required", "true");
-        }
-      }
-    },
-
-    showAddMeetingModal: function (targetBtn) {
-      var self = this;
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getAddMeetingModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            const form = modal.find("form#form-add-meeting");
-            vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
-            self.registerToggleCheckboxEvent(form);
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showCreateNewTaskModal: function (targetBtn) {
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getCreateNewTaskModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showCreateNewProjectTaskModal: function (targetBtn) {
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getCreateNewProjectTaskModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showCreateNewRecordModal: function (targetBtn) {
-      var self = this;
-      app.helper.showProgress();
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getCreateNewRecordModal",
-      };
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        let modalInstance = app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-            const form = modal.find("form#form-create-new-record");
-
-            vtUtils.initDatePickerFields(form);
-
-            // Bind change event to #recordModule
-            // let recordModuleSelect = form.find("#recordModule");
-            // let dataField = form.find("#dataField");
-            form.find("#recordModule").on("change", function () {
-              form
-                .find(".initialDataField")
-                .toggleClass("hide", !$(this).val());
-            });
-
-            let addNewDataField = form.find("#addNewDataField");
-
-            addNewDataField.on("click", function () {
-              let newField = $(`
-                  <div class="form-group d-flex align-item-center">
-                      <div class="controls col-sm-4 text-left">
-                          <select class="inputElement select2 ml-3">
-                              <option value="">Chọn trường</option>
-                              <option value="value1">Option 1</option>
-                          </select>
-                      </div>
-                      <div class="controls col-sm-4 ml-3">
-                          <input type="text" class="inputElement inputPopup">
-                      </div>
-                      <i class="far fa-trash-alt icon ml-3 removeField"></i>
-                  </div>
-              `);
-
-              // Thêm newField vào .newDataField
-              form.find(".newDataField").append(newField);
-
-              // Khởi tạo lại Select2 cho dropdown mới
-              newField.find("select").select2();
-            });
-
-            // Xóa phần tử khi nhấn vào icon thùng rác
-            form.on("click", ".removeField", function () {
-              $(this).closest(".form-group").remove();
-            });
-
-            // Bắt sự kiện click vào input có class inputHihi
-            form.find(".inputPopup").on("click", function () {
-              // alert("Click vào inputPopup");
-              modalInstance.modal("hide"); // Ẩn modal nhưng giữ nguyên dữ liệu
-              self.showSetValuePopup(modalInstance); // Gọi modal mới
-            });
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                var params = form.serializeFormData();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-          },
-        });
-      });
-    },
-
-    showSetValuePopup: function (previousModalInstance) {
-      let self = this;
-
-      // Show loading
-      app.helper.showProgress();
-
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getSetValuePopup",
-      };
-
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-
-        // Show modal
-        let setValueModal = app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            const form = modal.find("form#form-set-value-popup");
-            let selectSetValue = form.find("#selectSetValue");
-            let setValueContent = form.find(".setValueContent");
-            let selectDataField = form.find("#selectDataField");
-            let selectExpression = form.find("#selectExpression");
-
-            // Đặt giá trị mặc định
-            selectSetValue.val("").trigger("change");
-
-            // Xử lý sự kiện khi chọn giá trị trong selectSetValue
-            selectSetValue.on("change", function () {
-              let selectedValue = $(this).val();
-              self.updateSetValueContent(
-                selectedValue,
-                setValueContent,
-                selectDataField,
-                selectExpression
-              );
-            });
-          },
-        });
-
-        // Khi modal này đóng, hiển thị lại showCreateNewRecordModal
-        // setValueModal.on("hidden.bs.modal", function () {
-        //   if (previousModalInstance) {
-        //     console.log("Modal có bị ẩn không?", previousModalInstance.is(":hidden"));
-
-        //     previousModalInstance.modal("show");
-        //   }
-        // });
-      });
-    },
-
-    updateSetValueContent: function (
-      selectedValue,
-      setValueContent,
-      selectDataField,
-      selectExpression
-    ) {
-      // Xóa nội dung cũ
-      setValueContent.html("");
-      selectDataField.html("");
-      selectExpression.html("");
-
-      if (selectedValue === "text") {
-        setValueContent.html(`
-          <div class="controls col-sm-12 mb-3">
-            <div class="box-text">
-                <div class="ml-3 p-05">
-                    <h5>Văn bản</h5>
-                    <p>CloudGO</p>
-                    <p>2025</p>
-                </div>
-            </div>
-          </div>`);
-      } else if (selectedValue === "dataField") {
-        setValueContent.html(`
-          <div class="controls col-sm-12 mb-3">
-            <div class="box-text">
-                <div class="ml-3 p-05">
-                    <h5>Trường dữ liệu</h5>
-                    <p>Doanh thu hằng năm</p>
-                    <p>Thông báo cho người quản lý</p>
-                </div>
-            </div>
-          </div>`);
-
-        // Thêm dropdown vào selectDataField
-        selectDataField.html(`
-          <select class="inputElement select2" tabindex="-1">
-            <option value="">Sử dụng trường</option>
-            <option value="value1">Option 1</option>
-          </select>
-        `);
-        selectDataField.find("select").select2();
-      } else if (selectedValue === "expression") {
-        setValueContent.html(`
-          <div class="controls col-sm-12 mb-3">
-            <div class="box-text p-05">
-                <div class="ml-3">
-                    <h5>Biểu thức</h5>
-                    <p>Doanh thu hằng năm / 12</p>
-                    <p>
-                        if mailingcountry == 'Vietnam' then concat(firstname,' ', lastname) 
-                        else concat(lastname,' ', firstname) end
-                    </p>
-                </div>
-            </div>
-          </div>`);
-
-        // Thêm dropdown vào selectDataField, selectExpression
-        selectDataField.html(`
-          <select class="inputElement select2" tabindex="-1">
-            <option value="">Sử dụng trường</option>
-            <option value="value1">Option 1</option>
-          </select>
-        `);
-        selectExpression.html(`
-          <select class="inputElement select2" tabindex="-1">
-            <option value="">Sử dụng chức năng</option>
-            <option value="value1">Option 1</option>
-          </select>
-        `);
-
-        selectDataField.find("select").select2();
-        selectExpression.find("select").select2();
-      }
-    },
-
-    showDataFieldUpdateModal: function (targetBtn) {
-      let self = this;
-
-      // Show loading
-      app.helper.showProgress();
-
-      // Request modal content
-      let params = {
-        module: "PipelineConfig",
-        parent: "Settings",
-        view: "EditPipelineAjax",
-        mode: "getUpdateDataFieldModal",
-        currentNameModule: self.currentNameModule,
-      };
-
-      app.request.post({ data: params }).then((err, res) => {
-        app.helper.hideProgress();
-        if (err) {
-          app.helper.showErrorNotification({ message: err.message });
-          return;
-        }
-        // Show modal
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            modal.off("hidden.bs.modal");
-            const form = modal.find("form#form-update-data-field");
-            let addDataField = form.find("#addDataField");
-            addDataField.on("click", function () {
-              var basicElement = jQuery(".basic");
-              var newRowElement = basicElement
-                .find(".fieldRow")
-                .clone(true, true);
-              jQuery("select", newRowElement).addClass("select2");
-              var newDataField = jQuery(".newDataField");
-              newRowElement.addClass("op0");
-              newRowElement.appendTo(newDataField);
-              setTimeout(function () {
-                newRowElement.addClass("fadeInx");
-              }, 100);
-              //change in to chosen elements
-
-              newRowElement.find("select.select2").select2();
-            });
-            // Xóa phần tử khi nhấn vào icon thùng rác
-            form.on("click", ".removeField", function () {
-              $(this).closest(".form-group").remove();
-            });
-          },
-          cb: function (modal) {
-            modal.css("display", "block");
-            modal.find("#modal-content").removeClass("hide");
-            var form = modal.find("#form-update-data-field");
-            var controller = Vtiger_Edit_Js.getInstance();
-            controller.registerBasicEvents(form);
-            vtUtils.applyFieldElementsView(form);
-            // Form validation
-            var params = {
-              submitHandler: function (form) {
-                var form = jQuery(form);
-                let fieldRows = self.getValuesFromDataFieldUpdateModal();
-                var params = form.serializeFormData();
-                console.log(params);
-                params["updateDataFields"] = fieldRows;
-                self.action["updateDataFields"] = fieldRows;
-                self.action["action_name"] = params.action_name;
-                self.action["action_type"] = "updateDataField";
-                self.action["time"] = parseInt(self.action["time"]);
-                self.targetController.pushAction(self.action, self.isEdit);
-                app.helper.hideModal();
-                return false;
-              },
-            };
-            form.vtValidate(params);
-            form.find(".select2").each(function () {
-              if (!jQuery(this).data("select2")) {
-                jQuery(this).select2();
-              }
-            });
-            self.initialize();
           },
         });
       });
@@ -4370,7 +4593,7 @@ CustomView_BaseController_Js(
 
       fieldUiHolder.html(fieldSpecificUi);
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Added by Hieu Nguyen on 2020-12-16 to fix bug multi-select field cause js error
-      console.log(fieldSpecificUi);
+
       if (fieldSpecificUi.is("input.select2")) {
         var tagElements = fieldSpecificUi.data("tags");
         var params = { tags: tagElements, tokenSeparators: [","] };
@@ -4758,6 +4981,10 @@ Vtiger_Field_Js(
     },
   }
 );
+//End Tran Dien
+
+// Add by Tran Dien on 2025-03-03 to override getModuleName function
+
 //End Tran Dien
 
 //http://stackoverflow.com/questions/946534/insert-text-into-textarea-with-jquery

@@ -6,7 +6,6 @@
 	Purpose: Display interface for adding new Pipeline and editing existing Pipeline records
 */
 class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConfig_View {
-
     function __construct() {
         parent::__construct();
     }
@@ -37,6 +36,10 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 	
 		
 		$viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
+		$moduleName = $request->getModule(false);
+		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('PICKLIST_MODULES', $filteredPickListModules);
 		$viewer->assign('PIPELINE_DETAIL', $pipelineDetail);
 		$viewer->assign('MODULE_NAME', $moduleName);
@@ -46,11 +49,13 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 	public function getPageTitle(Vtiger_Request $request) {
 		return "Pipeline";
 	}
+
     public function getHeaderScripts(Vtiger_Request $request) {
 		$headerScriptInstances = parent::getHeaderScripts($request);
 		$moduleName = $request->getModule();
 		$viewName = $request->get('view');
 		$jsFileNames = array(
+			"~modules/Settings/PipelineConfig/resources/AdvanceFilter.js",
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);

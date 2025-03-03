@@ -9,10 +9,12 @@ require_once('include/utils/LangUtils.php');
 class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View {
 
 	function __construct() {
+		//Begin The Vi 3/3/2025
 		$this->exposeMethod('getStagePipelineModal');
 		$this->exposeMethod('getStagePipelineModalNew');
 		$this->exposeMethod('getDeleteStageModal');
 		$this->exposeMethod('getStagePipelineList');
+		//End The Vi 3/3/2025
 		//Begin Tran Dien
 		$this->exposeMethod('getAddActionSettingModal');
 		$this->exposeMethod('getAddConditionModal');
@@ -43,7 +45,8 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		}
         
 	}
-	
+	// Implemented by The Vi to show Modal Add New Stage
+
 	function getStagePipelineModal(Vtiger_Request $request) {
 
 		$sourceModule = $request->get('source_module');
@@ -82,12 +85,16 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddStagePipelineModal.tpl');
 	}
+	// Implemented by The Vi to show Stage Pipeline
+
 	function getStagePipelineList(Vtiger_Request $request) {
 		
         $viewer = $this->getViewer($request);
 		$viewer = $this->getViewer($request);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/StagePipeline.tpl');
 	}
+	// Implemented by The Vi to show Modal Delete Stage
+
 	function getDeleteStageModal(Vtiger_Request $request) {
     
 		$idPipeline = $request->get('idPipeline');
@@ -99,9 +106,11 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
         $viewer->assign('PIPELINE_ID', $idPipeline);
 		$viewer->assign('STAGE_LIST', $listStage);
 		$viewer->assign('MODULE_NAME', $moduleName);
-		// echo '<pre>' . json_encode($listStage, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+		
 		$viewer->display('modules/Settings/PipelineConfig/tpls/DeleteStageModal.tpl');
 	}
+	// Implemented by The Vi to show Modal Add New Stage
+
 	function getStagePipelineModalNew(Vtiger_Request $request) {
     
 		$moduleName = $request->getModule(false);

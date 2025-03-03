@@ -27,12 +27,11 @@ class Settings_PipelineConfig_Config_View extends Settings_Vtiger_BaseConfig_Vie
 		$qualifiedName = $request->getModule(false);
 		$configEditorModel = Settings_Vtiger_ConfigEditor_Model::getInstance();
 		$viewer = $this->getViewer($request);
-		// $viewer->assign('CURRENT_ROLE_NAME', $roleName);
 		
 		$viewer->assign('MODEL', $configEditorModel);
 		$viewer->assign('MODULE_NAME', $qualifiedName);
 		$viewer->assign('QUALIFIED_MODULE', $qualifiedName);
-		// $viewer->assign('CURRENT_USER_MODEL', $currentUserModel);
+
 		$viewer->display('modules/Settings/PipelineConfig/tpls/Config.tpl');
     }
     public function getPageTitle(Vtiger_Request $request) {
@@ -45,8 +44,8 @@ class Settings_PipelineConfig_Config_View extends Settings_Vtiger_BaseConfig_Vie
 		$jsFileNames = array(
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
+
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
-		// var_dump($jsScriptInstances);
         $headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
 		return $headerScriptInstances;
 	}

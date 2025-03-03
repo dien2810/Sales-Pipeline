@@ -4,7 +4,7 @@
     Date: 22/1/2025
     Purpose: Handle events for EditPipeline interface
 */
-// Lấy tham số từ URL trước khi truyền vào object
+// Get parameters from URL
 const urlParams = new URLSearchParams(window.location.search);
 const record = urlParams.get("record");
 const mode = record ? "Edit" : "Add";
@@ -12,12 +12,10 @@ CustomView_BaseController_Js(
   "Settings_PipelineConfig_EditPipeline_Js",
   {},
   {
-    // Chỉnh sửa Pipeline
     urlParams: urlParams,
     record: record,
     mode: mode,
     stageReplaceMapping: [],
-    //End
     currentNameModule: "Potentials",
     pipelineId: "",
     isFirstOpen: 1,

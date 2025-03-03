@@ -7,6 +7,7 @@
 */
 class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
 
+    // Implemented by The Vi to retrieves detailed information about a pipeline
     public static function getDetailPipeline($pipelineId) { 
         $db = PearDatabase::getInstance();
         

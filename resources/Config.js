@@ -62,9 +62,6 @@ CustomView_BaseController_Js(
           });
           return false;
         }
-        // console.log("Final", self.pipelineReplaceMapping);
-        // console.log("Id Pipeline xóa", self.pipelineId);
-        // alert("Submit thành công");
         //Begin The Vi 28-2-2025
         const params = {
           module: "PipelineConfig",
@@ -105,7 +102,6 @@ CustomView_BaseController_Js(
         app.helper.hideModal();
         return false;
         //End By The Vi 28-2-2025
-        // console.log("Final", self.pipelineReplaceMapping);
       });
     },
     registerPipelineStageReplaceMapping: function () {
@@ -190,11 +186,8 @@ CustomView_BaseController_Js(
           }
 
           if (response.data) {
-            // console.log("Thay đổi Pipeline", response.data);
-            // Tạo option mặc định
             let options =
               '<option value="">Chọn một giá trị Pipeline thay thế</option>';
-            // Duyệt qua mảng các bước và tạo option
             response.data.forEach(function (stage) {
               options +=
                 '<option value="' +
@@ -203,13 +196,13 @@ CustomView_BaseController_Js(
                 stage.name +
                 "</option>";
             });
-            // Cập nhật vào tất cả các select của cột Pipeline thay thế (loại trừ select đang chọn pipeline thay thế)
+
             jQuery('select[name="swap_status"]')
               .not("#pipeline-list-replace")
               .each(function () {
                 jQuery(this).html(options);
               });
-            // Nếu đang dùng select2, có thể cần gọi lại hàm reinitialize
+
             jQuery('select[name="swap_status"]')
               .not("#pipeline-list-replace")
               .select2();
@@ -222,9 +215,7 @@ CustomView_BaseController_Js(
       let self = this;
       jQuery(document).on("change", "#pipeline-list-replace", function (e) {
         let pipelineId = jQuery(this).val();
-        //Begin The Vi 28-02-2025
-        // self.pipelineId = pipelineId;
-        //End The Vi 28-02-2025
+
         self.pipelineReplaceMapping.forEach(function (item) {
           item.idReplace = "";
         });
@@ -241,11 +232,10 @@ CustomView_BaseController_Js(
           });
           return;
         } else {
-          // Nếu có chọn pipeline thì enable lại các select
           stageSelects.prop("disabled", false);
         }
         //Begin By The Vi 28-2-2025
-        // console.log("Thay đổi Pipeline thay thế", pipelineId);
+
         self.pipelineIdReplace = pipelineId;
         //End by The Vi 28-2-2025
         app.helper.showProgress();

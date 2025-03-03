@@ -117,7 +117,6 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$response = new Vtiger_Response();
 
 		try {
-			// Gọi hàm trong model để lấy dữ liệu pipeline
 			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList($module);
 			$db = PearDatabase::getInstance();
 

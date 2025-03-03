@@ -1,3 +1,5 @@
+{* Added by Minh Hoang on 2021-02-03 *}
+
 {strip}
 <div class="modal-dialog modal-content modal-width-900">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_CREATE_NEW_PROJECT_TASK', $MODULE_NAME)}" }

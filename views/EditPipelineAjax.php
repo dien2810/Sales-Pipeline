@@ -485,7 +485,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$moduleName = $request->getModule(false);
 		// Respond
 		$viewer = $this->getViewer($request);
-		$viewer->display('modules/Settings/PipelineConfig/tpls/AddNotificationModal.tpl');
+		$viewer->display('modules/Settings/PipelineConfig/tpls/NotificationModal.tpl');
 	}
 	// End Minh Hoang
 

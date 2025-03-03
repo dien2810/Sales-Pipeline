@@ -446,7 +446,7 @@ i.icon {
   padding: 0.5rem;
 }
 
-.text90{
+.text90 {
   font-size: 90% !important;
 }
 
@@ -504,7 +504,7 @@ i.icon {
 }
 
 .align-item {
-	display: flex !important;
+  display: flex !important;
 }
 
 .form-group label {
@@ -592,7 +592,7 @@ i.icon {
 
 .info-box {
   margin-top: 5px;
-  text-align: left; 
+  text-align: left;
 }
 
 .info-box table td:first-child {

@@ -2477,109 +2477,111 @@ CustomView_BaseController_Js(
 
     // Minh Hoàng
     /**
-    * Function to get ckEditorInstance
-    */
+     * Function to get ckEditorInstance
+     */
     getckEditorInstance: function () {
       if (this.ckEditorInstance == false) {
-         this.ckEditorInstance = new Vtiger_CkEditor_Js();
+        this.ckEditorInstance = new Vtiger_CkEditor_Js();
       }
       return this.ckEditorInstance;
     },
 
     preSaveVTEmailTask: function (tasktype) {
-      var textAreaElement = jQuery('#content');
+      var textAreaElement = jQuery("#content");
       //To keep the plain text value to the textarea which need to be
       //sent to server
-      textAreaElement.val(CKEDITOR.instances['content'].getData());
+      textAreaElement.val(CKEDITOR.instances["content"].getData());
     },
 
     /**
-    * Function to fill the values ​​into the input box when selecting the options of Select
-    */
+     * Function to fill the values ​​into the input box when selecting the options of Select
+     */
     registerFillTaskFromEmailFieldEvent: function () {
-      jQuery('#form-send-email').on('change', '#fromEmailOption', function (e) {
-         var currentElement = jQuery(e.currentTarget);
-         var inputElement = currentElement.closest('.row').find('.fields');
-         inputElement.val(currentElement.val());
-      })
+      jQuery("#form-send-email").on("change", "#fromEmailOption", function (e) {
+        var currentElement = jQuery(e.currentTarget);
+        var inputElement = currentElement.closest(".row").find(".fields");
+        inputElement.val(currentElement.val());
+      });
     },
 
     registerFillTaskFieldsEvent: function () {
-      jQuery('#form-send-email').on('change', '.task-fields', function (e) {
-         var currentElement = jQuery(e.currentTarget);
-         var inputElement = currentElement.closest('.row').find('.fields');
-         if (currentElement.hasClass('overwriteSelection')) {
-            inputElement.val(currentElement.val());
-         } else {
-            var oldValue = inputElement.val();
-            var newValue = oldValue + currentElement.val();
-            inputElement.val(newValue);
-         }
+      jQuery("#form-send-email").on("change", ".task-fields", function (e) {
+        var currentElement = jQuery(e.currentTarget);
+        var inputElement = currentElement.closest(".row").find(".fields");
+        if (currentElement.hasClass("overwriteSelection")) {
+          inputElement.val(currentElement.val());
+        } else {
+          var oldValue = inputElement.val();
+          var newValue = oldValue + currentElement.val();
+          inputElement.val(newValue);
+        }
       });
     },
-    
+
     registerFillMailContentEvent: function () {
-      jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
-         var textarea = CKEDITOR.instances.content;
-         var value = jQuery(e.currentTarget).val();
-         if (textarea != undefined) {
-            textarea.insertHtml(value);
-         } else if (jQuery('textarea[name="content"]')) {
-            var textArea = jQuery('textarea[name="content"]');
-            textArea.insertAtCaret(value);
-         }
+      jQuery(
+        "#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates"
+      ).change(function (e) {
+        var textarea = CKEDITOR.instances.content;
+        var value = jQuery(e.currentTarget).val();
+        if (textarea != undefined) {
+          textarea.insertHtml(value);
+        } else if (jQuery('textarea[name="content"]')) {
+          var textArea = jQuery('textarea[name="content"]');
+          textArea.insertAtCaret(value);
+        }
       });
     },
 
     registerFillSMSTaskFieldsEvent: function () {
-      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var input = jQuery('input[name="sms_recepient"]');
-              var currentValue = input.val();
-              input.val(currentValue + '{' + selectedField + '}');
-          }
+      jQuery("#form-send-sms").on("change", ".task-fields", function (e) {
+        var selectedField = jQuery(e.currentTarget).val();
+        if (selectedField) {
+          var input = jQuery('input[name="sms_recepient"]');
+          var currentValue = input.val();
+          input.val(currentValue + "{" + selectedField + "}");
+        }
       });
     },
 
     registerFillSMSContentEvent: function () {
-      jQuery('#task-fieldnames').change(function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var textarea = jQuery('textarea[name="content"]');
-              var currentContent = textarea.val();
-              textarea.val(currentContent + '{' + selectedField + '}');
-          }
+      jQuery("#task-fieldnames").change(function (e) {
+        var selectedField = jQuery(e.currentTarget).val();
+        if (selectedField) {
+          var textarea = jQuery('textarea[name="content"]');
+          var currentContent = textarea.val();
+          textarea.val(currentContent + "{" + selectedField + "}");
+        }
       });
     },
-    
+
     registerFillSMSTaskFieldsEvent: function () {
-      jQuery('#form-send-sms').on('change', '.task-fields', function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var input = jQuery('input[name="sms_recepient"]');
-              var currentValue = input.val();
-              input.val(currentValue + '{' + selectedField + '}');
-          }
+      jQuery("#form-send-sms").on("change", ".task-fields", function (e) {
+        var selectedField = jQuery(e.currentTarget).val();
+        if (selectedField) {
+          var input = jQuery('input[name="sms_recepient"]');
+          var currentValue = input.val();
+          input.val(currentValue + "{" + selectedField + "}");
+        }
       });
     },
 
     registerFillSMSContentEvent: function () {
-      jQuery('#task-fieldnames').change(function (e) {
-          var selectedField = jQuery(e.currentTarget).val();
-          if (selectedField) {
-              var textarea = jQuery('textarea[name="content"]');
-              var currentContent = textarea.val();
-              textarea.val(currentContent + '{' + selectedField + '}');
-          }
+      jQuery("#task-fieldnames").change(function (e) {
+        var selectedField = jQuery(e.currentTarget).val();
+        if (selectedField) {
+          var textarea = jQuery('textarea[name="content"]');
+          var currentContent = textarea.val();
+          textarea.val(currentContent + "{" + selectedField + "}");
+        }
       });
     },
 
     registerTooltipEventForSignatureField: function () {
-      jQuery("#signaturePopover").on('mouseover', function (e) {
-         jQuery('#signaturePopover').popover({
-            'html': true
-         });
+      jQuery("#signaturePopover").on("mouseover", function (e) {
+        jQuery("#signaturePopover").popover({
+          html: true,
+        });
       });
     },
 
@@ -2596,33 +2598,39 @@ CustomView_BaseController_Js(
     // Add by Minh Hoang on 2025-01-23 to set validation rules for SMS content field
     validateContentSMSModal: function () {
       let contentInput = jQuery('[name="content"]');
-  
-      contentInput.closest('div').prev('div').append('<span class="redColor">*</span>');
-      contentInput.attr('data-rule-required', 'true');
 
-      if (typeof _PROVIDER_INFO !== 'undefined' && !_PROVIDER_INFO['unicode_sms_supported']) {
-        contentInput.attr('data-rule-asciiOnly', 'true');
+      contentInput
+        .closest("div")
+        .prev("div")
+        .append('<span class="redColor">*</span>');
+      contentInput.attr("data-rule-required", "true");
+
+      if (
+        typeof _PROVIDER_INFO !== "undefined" &&
+        !_PROVIDER_INFO["unicode_sms_supported"]
+      ) {
+        contentInput.attr("data-rule-asciiOnly", "true");
       }
     },
 
     /**
-    * Function to get values from modals
-    */
+     * Function to get values from modals
+     */
     getValuesFromSendSMSModal: function () {
       var values = {};
-      var modal = jQuery('#form-send-sms');
-  
+      var modal = jQuery("#form-send-sms");
+
       values.titleSMS = modal.find('input[name="titleSMS"]').val();
       values.sms_recepient = modal.find('input[name="sms_recepient"]').val();
       values.content = modal.find('textarea[name="content"]').val();
-  
+
       return values;
     },
-    
+
     getValuesFromSendEmailModal: function () {
       var values = {};
-      var modal = jQuery('#form-send-email');
-  
+      var modal = jQuery("#form-send-email");
+
       values.titleEmail = modal.find('input[name="titleEmail"]').val();
       values.fromEmail = modal.find('input[name="fromEmail"]').val();
       values.replyTo = modal.find('input[name="replyTo"]').val();
@@ -2630,15 +2638,19 @@ CustomView_BaseController_Js(
       values.emailcc = modal.find('input[name="emailcc"]').val();
       values.emailbcc = modal.find('input[name="emailbcc"]').val();
       values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal.find('input[name="safe_content"]').is(':checked') ? 1 : 0;
+      values.safe_content = modal
+        .find('input[name="safe_content"]')
+        .is(":checked")
+        ? 1
+        : 0;
       values.content = modal.find('textarea[name="content"]').val();
-  
+
       return values;
     },
 
     /**
-    * Function to show modals
-    */
+     * Function to show modals
+     */
     showAddCallModal: function (targetBtn) {
       var self = this;
       app.helper.showProgress();
@@ -2713,12 +2725,12 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             const form = modal.find("form#form-add-meeting");
-            
+
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
             vtUtils.initDatePickerFields(form);
-            
+
             self.registerToggleCheckboxEvent(form);
 
             // Form validation
@@ -3097,14 +3109,14 @@ CustomView_BaseController_Js(
             var bccLink = modal.find("#bccLink");
             var ccContainer = modal.find("#ccContainer");
             var bccContainer = modal.find("#bccContainer");
-            
+
             if (ccLink.length) {
               ccLink.on("click", function () {
                 ccContainer.removeClass("hide"); // Show CC container
                 ccLink.addClass("hide"); // Hide CC link
               });
             }
-            
+
             if (bccLink.length) {
               bccLink.on("click", function () {
                 bccContainer.removeClass("hide"); // Show BCC container
@@ -3790,7 +3802,7 @@ CustomView_BaseController_Js(
           },
         });
       });
-    },    
+    },
 
     showNotificationModal: function (targetBtn) {
       var self = this;
@@ -4748,31 +4760,33 @@ Vtiger_Field_Js(
 );
 //End Tran Dien
 
-
 //http://stackoverflow.com/questions/946534/insert-text-into-textarea-with-jquery
 jQuery.fn.extend({
-	insertAtCaret: function(myValue) {
-		return this.each(function(i) {
-			if (document.selection) {
-				//For browsers like Internet Explorer
-				this.focus();
-				var sel = document.selection.createRange();
-				sel.text = myValue;
-				this.focus();
-			} else if (this.selectionStart || this.selectionStart == '0') {
-				//For browsers like Firefox and Webkit based
-				var startPos = this.selectionStart;
-				var endPos = this.selectionEnd;
-				var scrollTop = this.scrollTop;
-				this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
-				this.focus();
-				this.selectionStart = startPos + myValue.length;
-				this.selectionEnd = startPos + myValue.length;
-				this.scrollTop = scrollTop;
-			} else {
-				this.value += myValue;
-				this.focus();
-			}
-		});
-	}
+  insertAtCaret: function (myValue) {
+    return this.each(function (i) {
+      if (document.selection) {
+        //For browsers like Internet Explorer
+        this.focus();
+        var sel = document.selection.createRange();
+        sel.text = myValue;
+        this.focus();
+      } else if (this.selectionStart || this.selectionStart == "0") {
+        //For browsers like Firefox and Webkit based
+        var startPos = this.selectionStart;
+        var endPos = this.selectionEnd;
+        var scrollTop = this.scrollTop;
+        this.value =
+          this.value.substring(0, startPos) +
+          myValue +
+          this.value.substring(endPos, this.value.length);
+        this.focus();
+        this.selectionStart = startPos + myValue.length;
+        this.selectionEnd = startPos + myValue.length;
+        this.scrollTop = scrollTop;
+      } else {
+        this.value += myValue;
+        this.focus();
+      }
+    });
+  },
 });

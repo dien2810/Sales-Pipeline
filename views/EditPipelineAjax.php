@@ -25,8 +25,9 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$this->exposeMethod('getCreateNewRecordModal');
 		$this->exposeMethod('getSetValuePopup');
 		$this->exposeMethod('getUpdateDataFieldModal');
-		$this->exposeMethod('getAddSMSModal');
-		$this->exposeMethod('getAddZNSModal');
+		$this->exposeMethod('getSendSMSModal');
+		$this->exposeMethod('getSendZNSModal');
+		$this->exposeMethod('getSendEmailModal');
 		$this->exposeMethod('getAddNotificationModal');
 
 		//End Tran Dien

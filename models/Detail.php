@@ -85,24 +85,20 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
                 'sequence' => $stageRow['sequence'],
                 'name' => $stageRow['name'],
                 'success_rate' => (int)$stageRow['success_rate'],
-                'vnLabel' => $stageRow['name'], // Giả định nhãn tiếng Việt
-                'enLabel' => $stageRow['name'], // Giả định nhãn tiếng Anh
+                'vnLabel' => $stageRow['name'], 
+                'enLabel' => $stageRow['name'], 
                 'value' => $stageRow['value'],
                 'execution_time' => array(
                     'value' => (int)$stageRow['time'],
                     'unit' => $stageRow['time_unit']
                 ),
-                'is_mandatory' => $stageRow['is_mandatory'] == 1, // Kiểm tra nếu is_mandatory là 1
+                'is_mandatory' => $stageRow['is_mandatory'] == 1, 
                 'next_stages' => $nextStages,
                 'permissions' => $permissions,
                 'color' => $stageRow['color_code'],
-                // 'actions' => $stageRow['actions'],
                 'actions' => $actions,
-                // 'conditions' => $stageRow['conditions'],
                 'conditions' => $conditions,
-                'status' => 'active', // Giả định mặc định
-                'created_time' => '2025-02-10T06:56:24.075Z', // Giả định
-                'modified_time' => '2025-02-10T06:56:24.075Z',
+                'status' => 'active',
                 'created_user_id' => '1',
                 'modified_user_id' => '1'
             );
@@ -115,7 +111,7 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
             'time' => (int)$pipelineData['duration'],
             'time_unit' => $pipelineData['time_unit'],
             'module' => $pipelineData['module'],
-            'autoTransition' => $pipelineData['auto_move'] == 1, // Explicitly check if auto_move is 1
+            'autoTransition' => $pipelineData['auto_move'] == 1, 
             'rolesSelected' => $rolesSelected,
             'description' => $pipelineData['description'],
             'status' => $pipelineData['status'],

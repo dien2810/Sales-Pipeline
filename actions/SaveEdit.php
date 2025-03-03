@@ -20,6 +20,20 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $this->exposeMethod('getDetailPipeline');
         $this->exposeMethod('deleteStagePipeline'); 
 	}
+    public function checkPermission(Vtiger_Request $request) {
+		$hasPermission = true;
+
+		if (!$hasPermission) {
+			throw new Exception(vtranslate('LBL_NOT_ACCESSIBLE'));
+		}
+	}
+	public function process(Vtiger_Request $request) {
+		$mode = $request->getMode();
+		if (!empty($mode) && $this->isMethodExposed($mode)) {
+			$this->invokeExposedMethod($mode, $request);
+			return;
+		}
+	}
     public function deleteStagePipeline(Vtiger_Request $request) {
         $idStageDelete  = $request->get('idStageDelete');
         $idStageReplace = $request->get('idStageReplace');
@@ -38,20 +52,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
         $response->emit();
     }
-	public function checkPermission(Vtiger_Request $request) {
-		$hasPermission = true;
 
-		if (!$hasPermission) {
-			throw new Exception(vtranslate('LBL_NOT_ACCESSIBLE'));
-		}
-	}
-	public function process(Vtiger_Request $request) {
-		$mode = $request->getMode();
-		if (!empty($mode) && $this->isMethodExposed($mode)) {
-			$this->invokeExposedMethod($mode, $request);
-			return;
-		}
-	}
 	public function addStagePipelineNew(Vtiger_Request $request) {
         $pickListName = $request->get('picklistName');
         $moduleName = $request->get('source_module');
@@ -103,31 +104,15 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
 
 	}
-
-    // public function getRoleList(Vtiger_Request $request) {
-    //     $roleList = Settings_Roles_Record_Model::getAll();
-    //     $response = new Vtiger_Response();
-    //     try {
-    //         $response->setResult($roleList);
-    //     } catch (Exception $e) {
-    //         $response->setError($e->getCode(), $e->getMessage());
-    //     }
-    //     $response->emit();
-	// }
     public function getRoleList(Vtiger_Request $request) {
-        // Lấy danh sách tất cả các role
         $roleList = Settings_Roles_Record_Model::getAll();
-        
-        // Mảng chứa kết quả với cả id và tên role
-        $result = [];
+                $result = [];
         foreach ($roleList as $roleId => $roleRecord) {
             $result[] = [
                 'roleid'   => $roleId,
-                'rolename' => $roleRecord->get('rolename'), // hoặc sử dụng $roleRecord->getName() nếu có
+                'rolename' => $roleRecord->get('rolename'), 
             ];
         }
-    
-        // Khởi tạo response
         $response = new Vtiger_Response();
         try {
             $response->setResult($result);
@@ -169,7 +154,6 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $idPipeline = $request->get('id');
         $response = new Vtiger_Response();
         $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
-       // Đảm bảo luôn có ID trong kết quả trả về
         $result['request_id'] = $idPipeline;
         $response->setResult($result);
         

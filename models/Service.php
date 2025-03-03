@@ -2,6 +2,8 @@
 require_once('include/SMSer.php');
 require_once('include/Mailer.php');
 class PipelineConfig_Service_Model {
+
+    // Implemented by The Vi to send repeat notifications
     public static function sendNotications() {
         $db = PearDatabase::getInstance();
         $log = LoggerManager::getLogger('PLATFORM');
@@ -32,7 +34,6 @@ class PipelineConfig_Service_Model {
                             (receiver_id, category, image, related_record_id, related_record_name, related_module_name, created_time, `read`, extra_data) 
                             VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                         $db->pquery($queryInsert, array(
-                        //     $newId,
                             $receiver_id,
                             $category,
                             $image,

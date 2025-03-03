@@ -7,8 +7,7 @@
 */
 class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
 
-    // Implemented by: The Vi - Retrieves a list of pipelines with optional filtering. 
-
+    // Implemented by The Vi to retrieves a list of pipelines with optional filtering. 
     public static function getPipelineList($nameModule = null, $name = null) {
         $db = PearDatabase::getInstance();
         $query = 'SELECT * FROM vtiger_pipeline';
@@ -30,7 +29,7 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $result = $db->pquery($query, $params);
         return $result;
     }
-    // Implemented by: The Vi - Retrieves active pipelines with optional filtering. 
+    // Implemented by The Vi to retrieves active pipelines with optional filtering. 
 
     public static function getPipelineStatusList($nameModule = null, $name = null) {
         $db = PearDatabase::getInstance();
@@ -52,42 +51,33 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         return $result;
     }
 
-    // Implemented by: The Vi - Retrieves pipelines excluding a specified pipeline ID. 
+    // Implemented by The Vi to retrieves pipelines excluding a specified pipeline ID. 
     public static function getPipelineListExcluding($nameModule = null, $name = null, $idpipeline = null) {
         $db = PearDatabase::getInstance();
         $query = 'SELECT * FROM vtiger_pipeline';
         $params = [];
         $conditions = [];
-    
-        // Lọc theo module nếu được truyền vào
         if (!empty($nameModule)) {
             $conditions[] = 'module = ?';
             $params[] = $nameModule;
         }
     
-        // Lọc theo tên (tìm kiếm dạng LIKE) nếu có giá trị name
         if (!empty($name)) {
             $conditions[] = 'name LIKE ?';
             $params[] = '%' . $name . '%';
         }
-    
-        // Loại trừ pipeline có pipelineid bằng với idpipeline được truyền vào
         if (!empty($idpipeline)) {
             $conditions[] = 'pipelineid <> ?';
             $params[] = $idpipeline;
         }
-    
-        // Nếu có điều kiện nào, nối chúng với nhau bằng AND
-        if (!empty($conditions)) {
+            if (!empty($conditions)) {
             $query .= ' WHERE ' . implode(' AND ', $conditions);
         }
-    
         $query .= ' ORDER BY pipelineid ASC';
-    
         $result = $db->pquery($query, $params);
         return $result;
     }
-    // Implemented by: The Vi - Retrieves all stages for a given pipeline ID. 
+    // Implemented by The Vi to retrieves all stages for a given pipeline ID. 
 
     public static function getStageList($idPipeline = null) {
         $db = PearDatabase::getInstance();
@@ -101,7 +91,7 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $result = $db->pquery($query, $params);
         return $result;
     }
-    //Implemented by: The Vi - Updates the status of a specified pipeline. 
+    //Implemented by The Vi updates the status of a specified pipeline. 
      
     public static function updatePipelineStatus($id, $status) {
         $db = PearDatabase::getInstance();
@@ -139,12 +129,10 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         }
     }
 
-    //Implemented by: The Vi - Deletes a pipeline and updates related records.
-
+    //Implemented by The Vi to deletes a pipeline and updates related records.
     public static function deletePipelineRecordExist($idPipeline, $idPipelineReplace, $stageReplace) {
         $db = PearDatabase::getInstance();
     
-        // Lấy tên pipeline thay thế
         $resultPipeline = $db->pquery("SELECT name FROM vtiger_pipeline WHERE pipelineid = ?", array($idPipelineReplace));
         if($db->num_rows($resultPipeline) > 0) {
             $pipelineNameReplace = $db->query_result($resultPipeline, 0, 'name');
@@ -152,13 +140,11 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
             throw new Exception("Không tìm thấy pipeline thay thế với id: " . $idPipelineReplace);
         }
     
-        // Cập nhật bảng vtiger_potential với pipeline thay thế
+    
         $updatePipelineSQL = "UPDATE vtiger_potential 
                               SET pipelineid = ?, pipelinename = ? 
                               WHERE pipelineid = ?";
         $db->pquery($updatePipelineSQL, array($idPipelineReplace, $pipelineNameReplace, $idPipeline));
-    
-        // Cập nhật stage nếu có truyền vào
         if (is_array($stageReplace) && count($stageReplace) > 0) {
             foreach($stageReplace as $map) {
                 $idCurrently = $map['idCurrently'];
@@ -178,12 +164,10 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                 }
             }
         }
-    
-        // Sau khi cập nhật, xóa pipeline cũ
-        $deleteResult = self::deletePipelineById($idPipeline);
+            $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
     }
-    // Implemented by: The Vi - Deletes a pipeline by ID with transaction handling. 
+    // Implemented by The Vi deletes a pipeline by ID with transaction handling. 
     public static function deletePipelineById($id) {
         $db = PearDatabase::getInstance();
 
@@ -235,7 +219,7 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
             ];
         }
     }
-    // Implemented by: The Vi - Checks if a pipeline record exists. 
+    // Implemented by The Vi to checks if a pipeline record exists. 
     public static function isPipelineRecordExist($pipelineId) {
         $db = PearDatabase::getInstance();
         

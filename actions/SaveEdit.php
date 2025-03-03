@@ -34,6 +34,8 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 			return;
 		}
 	}
+     // Implemented by The Vi to delete stage of pipeline in edit pipeline page
+
     public function deleteStagePipeline(Vtiger_Request $request) {
         $idStageDelete  = $request->get('idStageDelete');
         $idStageReplace = $request->get('idStageReplace');
@@ -52,6 +54,8 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
         $response->emit();
     }
+
+    // Implemented by The Vi to add new stage of pipeline in edit pipeline page
 
 	public function addStagePipelineNew(Vtiger_Request $request) {
         $pickListName = $request->get('picklistName');
@@ -104,6 +108,8 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
 
 	}
+    // Implemented by The Vi to get role list
+
     public function getRoleList(Vtiger_Request $request) {
         $roleList = Settings_Roles_Record_Model::getAll();
                 $result = [];
@@ -121,7 +127,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         }
         $response->emit();
     }
-
+    // Implemented by The Vi to save information of pipeline
     public function savePipeline(Vtiger_Request $request) {
         
         $pipelineData = $request->get('dataPipeline');
@@ -137,6 +143,8 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         }
         $response->emit();
     }
+    // Implemented by The Vi to update information of pipeline
+
     public function updatePipeline(Vtiger_Request $request) {
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
@@ -150,6 +158,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         // $response->setResult($pipelineData);
         $response->emit();
     }
+    // Implemented by The Vi to get detail of pipeline
     public function getDetailPipeline(Vtiger_Request $request) {
         $idPipeline = $request->get('id');
         $response = new Vtiger_Response();
@@ -158,9 +167,10 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->setResult($result);
         
         $response->emit();
-        }
-    public function getIdFieldByModule(Vtiger_Request $request) {
-        $pipeLine = $request->get('dataPipeline');
-        //Your code here
+    
     }
+    // public function getIdFieldByModule(Vtiger_Request $request) {
+    //     $pipeLine = $request->get('dataPipeline');
+    //     //Your code here
+    // }
 }

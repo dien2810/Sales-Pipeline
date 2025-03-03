@@ -7,7 +7,7 @@
 */
 class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
-    // Implemented by The Vi - Retrieves all stages for a given pipeline ID. 
+    // Implemented by The Vi to retrieves all stages for a given pipeline ID. 
     public static function getStagesByPipelineId($pipelineId) {
         $db = PearDatabase::getInstance();
 
@@ -33,7 +33,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
     
         return $stages;
     }
-    //Implemented by The Vi - Deletes a stage and updates related records. 
+    //Implemented by The Vi to deletes a stage and updates related records. 
     public static function deleteStagePipeline($idStageDelete, $idStageReplace, $module) {
         $adb = PearDatabase::getInstance();
         $adb->startTransaction();
@@ -77,7 +77,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
         }
     }
-    //Implemented by The Vi - Saves a new pipeline with its stages and roles. 
+    //Implemented by The Vi to saves a new pipeline with its stages and roles. 
     public static function savePipeline($pipelineData, $currentUser) {
         global $adb;
         $userDisplayName = $currentUser->getDisplayName();
@@ -190,7 +190,7 @@ stageid, pipelineid, name, success_rate, time, time_unit, is_mandatory, color_co
             ];
         }
     }
-    // Implemented by The Vi - Updates an existing pipeline and its related data. 
+    // Implemented by The Vi to updates an existing pipeline and its related data. 
     public static function updatePipeline($pipelineData, $currentUser) {
         global $adb;
         // $userDisplayName = $currentUser->getDisplayName();

@@ -12,22 +12,28 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 	public function process(Vtiger_Request $request)
 	{
 		$sourceModule = $request->get('source_module');
+
 		$pickListSupportedModules = Settings_Picklist_Module_Model::getPicklistSupportedModules();
-	
+		
 		$filteredPickListModules = array_filter($pickListSupportedModules, function($module) {
 			$moduleName = $module->get('name');
 			return in_array($moduleName, ['Potentials', 'Leads', 'HelpDesk', 'Project']);
 		});
+
 		$filteredPickListModules = array_values($filteredPickListModules);
-		$roleList = Settings_Roles_Record_Model::getAll();
+
+		// $roleList = Settings_Roles_Record_Model::getAll();
 		if(empty($sourceModule)) {
 			$sourceModule = $filteredPickListModules[0]->get('name');
 		}
-		//Lấy record cần chỉnh sửa
+
+		$moduleName = $request->getModule(false);
 		$recordId = $request->get('record');
+
         $pipelineDetail = Settings_PipelineConfig_Detail_Model::getDetailPipeline($recordId);
-   
-	    // echo '<pre>' . json_encode($pipelineDetail, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+
+	    echo '<pre>' . json_encode($pipelineDetail, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+	
 		
 		$viewer = $this->getViewer($request);
 		$moduleName = $request->getModule(false);
@@ -36,6 +42,7 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('PICKLIST_MODULES', $filteredPickListModules);
 		$viewer->assign('PIPELINE_DETAIL', $pipelineDetail);
+		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('ROLES_LIST', Settings_Roles_Record_Model::getAll());
 		$viewer->display('modules/Settings/PipelineConfig/tpls/EditPipeline.tpl');
 	}
@@ -52,7 +59,6 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
-		// var_dump($jsScriptInstances);
         $headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
 		return $headerScriptInstances;
 	}

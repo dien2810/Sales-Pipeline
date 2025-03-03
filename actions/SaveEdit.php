@@ -20,25 +20,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $this->exposeMethod('getDetailPipeline');
         $this->exposeMethod('deleteStagePipeline'); 
 	}
-    public function deleteStagePipeline(Vtiger_Request $request) {
-        $idStageDelete  = $request->get('idStageDelete');
-        $idStageReplace = $request->get('idStageReplace');
-        $module         = $request->get('current_module');
-        $response = new Vtiger_Response();
-        try {
-            $success = Settings_PipelineConfig_Edit_Model::deleteStagePipeline($idStageDelete, $idStageReplace, $module);
-            if ($success) {
-                $response->setResult(['success' => true]);
-            } else {
-                $response->setError(500, 'Không thể xóa bước pipeline!');
-            }
-        } catch (Exception $e) {
-            $response->setError($e->getCode(), $e->getMessage());
-        }
-
-        $response->emit();
-    }
-	public function checkPermission(Vtiger_Request $request) {
+    public function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
 
 		if (!$hasPermission) {
@@ -52,13 +34,41 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 			return;
 		}
 	}
+     // Implemented by The Vi to delete stage of pipeline in edit pipeline page
+
+    public function deleteStagePipeline(Vtiger_Request $request) {
+        $idStageDelete  = $request->get('idStageDelete');
+        $idStageReplace = $request->get('idStageReplace');
+        $module         = $request->get('current_module');
+
+        $response = new Vtiger_Response();
+        
+        try {
+            $success = Settings_PipelineConfig_Edit_Model::deleteStagePipeline($idStageDelete, $idStageReplace, $module);
+            if ($success) {
+                $response->setResult(['success' => true]);
+            } else {
+                $response->setError(500, 'Không thể xóa bước pipeline!');
+            }
+        } catch (Exception $e) {
+            $response->setError($e->getCode(), $e->getMessage());
+        }
+
+        $response->emit();
+    }
+
+    // Implemented by The Vi to add new stage of pipeline in edit pipeline page
+
 	public function addStagePipelineNew(Vtiger_Request $request) {
         $pickListName = $request->get('picklistName');
         $moduleName = $request->get('source_module');
         $selectedColor = $request->get('selectedColor');
+
         $moduleModel = Settings_Picklist_Module_Model::getInstance($moduleName);
         $fieldModel = Settings_Picklist_Field_Model::getInstance($pickListName, $moduleModel);
+       
         $rolesSelected = array();
+
         if($fieldModel->isRoleBased()) {
             $userSelectedRoles = $request->get('rolesSelected',array());
             //selected all roles option
@@ -91,7 +101,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
 			global $current_user;
             $result['labelDisplay'] = ($current_user->language == 'vn_vn') ? $itemLabelDisplayVn : $itemLabelDisplayEn;
-            // End Hieu Nguyen
+
 
 			$response->setResult($result);
         }  catch (Exception $e) {
@@ -100,20 +110,30 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
 
 	}
+    // Implemented by The Vi to get role list
+
     public function getRoleList(Vtiger_Request $request) {
         $roleList = Settings_Roles_Record_Model::getAll();
+                $result = [];
+        foreach ($roleList as $roleId => $roleRecord) {
+            $result[] = [
+                'roleid'   => $roleId,
+                'rolename' => $roleRecord->get('rolename'), 
+            ];
+        }
+
         $response = new Vtiger_Response();
+
         try {
-            $response->setResult($roleList);
+            $response->setResult($result);
         } catch (Exception $e) {
             $response->setError($e->getCode(), $e->getMessage());
         }
         $response->emit();
-	}
-    public function saveOther(Vtiger_Request $request) {
-       
-	}
+    }
+    // Implemented by The Vi to save information of pipeline
     public function savePipeline(Vtiger_Request $request) {
+        
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
         
@@ -127,11 +147,15 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         }
         $response->emit();
     }
+    // Implemented by The Vi to update information of pipeline
+
     public function updatePipeline(Vtiger_Request $request) {
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
         $response = new Vtiger_Response();
+
         $result = Settings_PipelineConfig_Edit_Model::updatePipeline($pipelineData, $currentUser);
+      
         if ($result['success']) {
             $response->setResult($result);
         } else {
@@ -140,18 +164,22 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         // $response->setResult($pipelineData);
         $response->emit();
     }
+    // Implemented by The Vi to get detail of pipeline
     public function getDetailPipeline(Vtiger_Request $request) {
         $idPipeline = $request->get('id');
+       
         $response = new Vtiger_Response();
-        $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
-       // Đảm bảo luôn có ID trong kết quả trả về
-        $result['request_id'] = $idPipeline;
-        $response->setResult($result);
         
+        $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
+       
+        $result['request_id'] = $idPipeline;
+        
+        $response->setResult($result);
         $response->emit();
-        }
-    public function getIdFieldByModule(Vtiger_Request $request) {
-        $pipeLine = $request->get('dataPipeline');
-        //Your code here
+    
     }
+    // public function getIdFieldByModule(Vtiger_Request $request) {
+    //     $pipeLine = $request->get('dataPipeline');
+    //     //Your code here
+    // }
 }

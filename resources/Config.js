@@ -10,6 +10,8 @@ CustomView_BaseController_Js(
   {
     currentNameModule: "",
     currentSeachText: "",
+    pipelineId: "",
+    pipelineIdReplace: "",
     pipelineReplaceMapping: [],
     modulePipelineDelete: "",
     registerEvents: function () {
@@ -28,10 +30,9 @@ CustomView_BaseController_Js(
       self.registerSubmitModalDelete();
     },
     registerSubmitModalDelete: function () {
+      let self = this;
       jQuery(document).on("submit", "form#deletePipelineModal", function (e) {
         e.preventDefault();
-        console.log(self.modulePipelineDelete);
-        console.log(self.pipelineReplaceMapping);
         let form = jQuery(this);
         let valid = true;
         let errorMessages = [];
@@ -61,8 +62,46 @@ CustomView_BaseController_Js(
           });
           return false;
         }
-        alert("Submit thành công");
+        //Begin The Vi 28-2-2025
+        const params = {
+          module: "PipelineConfig",
+          parent: "Settings",
+          action: "SaveConfig",
+          mode: "deletePipelineRecordExist",
+          pipelineId: self.pipelineId,
+          pipelineIdReplace: self.pipelineIdReplace,
+          stageReplace: self.pipelineReplaceMapping,
+        };
+        app.request.post({ data: params }).then((err, response) => {
+          if (err) {
+            app.helper.showErrorNotification({
+              message: err.message,
+            });
+            return;
+          }
+          console.log("Xóa Pipeline khác rỗng");
+          console.log(response);
+          if (response.success) {
+            app.helper.showSuccessNotification({
+              message: "Xóa Pipeline thành công",
+            });
+          } else {
+            app.helper.showErrorNotification({
+              message: response.data,
+            });
+          }
+          app.helper.hideModal();
+          app.helper.hideProgress();
+          let form = self.getForm();
+          self.loadPipelineList(
+            form,
+            self.currentNameModule,
+            self.currentSeachText
+          );
+        });
         app.helper.hideModal();
+        return false;
+        //End By The Vi 28-2-2025
       });
     },
     registerPipelineStageReplaceMapping: function () {
@@ -114,6 +153,7 @@ CustomView_BaseController_Js(
       let formModal = this.getFormModalDeletePipeline();
       jQuery("#pipeline-list-replace").on("change", function () {
         let pipelineId = jQuery(this).val();
+
         self.pipelineReplaceMapping.forEach(function (item) {
           item.idReplace = "";
         });
@@ -131,6 +171,7 @@ CustomView_BaseController_Js(
         if (!pipelineId) {
           return;
         }
+
         let params = {
           module: "PipelineConfig",
           parent: "Settings",
@@ -143,11 +184,10 @@ CustomView_BaseController_Js(
             app.helper.showErrorNotification({ message: err.message });
             return;
           }
+
           if (response.data) {
-            // Tạo option mặc định
             let options =
               '<option value="">Chọn một giá trị Pipeline thay thế</option>';
-            // Duyệt qua mảng các bước và tạo option
             response.data.forEach(function (stage) {
               options +=
                 '<option value="' +
@@ -156,13 +196,13 @@ CustomView_BaseController_Js(
                 stage.name +
                 "</option>";
             });
-            // Cập nhật vào tất cả các select của cột Pipeline thay thế (loại trừ select đang chọn pipeline thay thế)
+
             jQuery('select[name="swap_status"]')
               .not("#pipeline-list-replace")
               .each(function () {
                 jQuery(this).html(options);
               });
-            // Nếu đang dùng select2, có thể cần gọi lại hàm reinitialize
+
             jQuery('select[name="swap_status"]')
               .not("#pipeline-list-replace")
               .select2();
@@ -175,6 +215,7 @@ CustomView_BaseController_Js(
       let self = this;
       jQuery(document).on("change", "#pipeline-list-replace", function (e) {
         let pipelineId = jQuery(this).val();
+
         self.pipelineReplaceMapping.forEach(function (item) {
           item.idReplace = "";
         });
@@ -191,10 +232,12 @@ CustomView_BaseController_Js(
           });
           return;
         } else {
-          // Nếu có chọn pipeline thì enable lại các select
           stageSelects.prop("disabled", false);
         }
+        //Begin By The Vi 28-2-2025
 
+        self.pipelineIdReplace = pipelineId;
+        //End by The Vi 28-2-2025
         app.helper.showProgress();
         let params = {
           module: "PipelineConfig",
@@ -291,8 +334,10 @@ CustomView_BaseController_Js(
       );
     },
     showDeletePipelineModal: function (pipelineId, moduleName) {
-      app.helper.hideModal();
       let self = this;
+      app.helper.hideModal();
+      self.pipelineId = pipelineId;
+
       app.helper.showProgress();
       self.modulePipelineDelete = moduleName;
       let params = {

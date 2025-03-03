@@ -1,7 +1,9 @@
+{* Added by Minh Hoang on 2021-01-23 *}
+
 {strip}
 <div class="modal-dialog modal-content modal-width-900">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_SEND_ZNS', $MODULE_NAME)}" }
-    <form id="form-add-zns" class="form-horizontal addZNSModal form-modal" method="POST">
+    <form id="form-send-zns" class="form-horizontal sendZNSModal form-modal" method="POST">
         <div class="d-flex align-item justify-content-center form-content">
             <div>
                 <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />

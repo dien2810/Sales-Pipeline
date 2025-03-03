@@ -548,6 +548,7 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+
         self.rolesList = [{ id: "all", name: "Tất cả" }];
         for (let id in res) {
           let roleName = self.roleMapping[id] || id;

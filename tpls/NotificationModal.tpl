@@ -12,7 +12,8 @@
                             <span class="redColor">*</span>
                         </td>
                         <td class="fieldValue">
-                            <input data-rule-required="true" type="text" class="inputElement referencefield-wrapper" name="name" value="">
+                            <input data-rule-required="true" type="text" class="inputElement referencefield-wrapper"
+                                name="name" value="">
                         </td>
                     </tr>
                     <tr>
@@ -32,15 +33,13 @@
                                 <option value="value7">Option 1</option>
                                 <option value="value8">Option 2</option>
                             </select> *}
-                            <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%" data-rule-required="true" data-rule-main-owner="true"
-                                data-fieldtype="owner" data-fieldname="assigned_user_id" data-name="assigned_user_id" name="userList"
-                                {if $FOR_EVENT}
-                                    data-assignable-users-only="true" data-user-only="true" data-single-selection="true"
-                                {/if}
-                                {if $FIELD_VALUE}
-                                    data-selected-tags='{ZEND_JSON::encode(Vtiger_Owner_UIType::getCurrentOwners($FIELD_VALUE))}'
-                                {/if}
-                            />
+                            <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%"
+                                data-rule-required="true" data-rule-main-owner="true" data-fieldtype="owner"
+                                data-fieldname="assigned_user_id" data-name="assigned_user_id" name="userList" {if
+                                $FOR_EVENT} data-assignable-users-only="true" data-user-only="true"
+                                data-single-selection="true" {/if} {if $FIELD_VALUE}
+                                data-selected-tags='{ZEND_JSON::encode(Vtiger_Owner_UIType::getCurrentOwners($FIELD_VALUE))}'
+                                {/if} />
                         </td>
                     </tr>
                     <tr>
@@ -51,7 +50,8 @@
                             <select name="repetition" class="inputElement select2">
                                 <option value="">{vtranslate('LBL_CHOOSE_A_VALUE', $MODULE_NAME)}</option>
                                 <option value="nonRepetition">{vtranslate('LBL_NON_REPETITION', $MODULE_NAME)}</option>
-                                <option value="sixtyMinutes">{vtranslate('LBL_REPEAT_EVERY_SIXTY_MINUTES', $MODULE_NAME)}</option>
+                                <option value="sixtyMinutes">{vtranslate('LBL_REPEAT_EVERY_SIXTY_MINUTES',
+                                    $MODULE_NAME)}</option>
                                 <option value="everyDay">{vtranslate('LBL_REPEAT_EVERY_DAY', $MODULE_NAME)}</option>
                                 <option value="everyWeek">{vtranslate('LBL_REPEAT_EVERY_WEEK', $MODULE_NAME)}</option>
                             </select>
@@ -64,7 +64,8 @@
                             <span class="redColor">*</span>
                         </td>
                         <td class="fieldValue">
-                            <textarea rows="3" cols="12" class="inputElement textAreaElement col-lg-12" name="description" data-rule-required="true"></textarea>
+                            <textarea rows="3" cols="12" class="inputElement textAreaElement col-lg-12"
+                                name="description" data-rule-required="true"></textarea>
                         </td>
                     </tr>
                 </tbody>

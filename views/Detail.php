@@ -12,17 +12,14 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
     }
 
     public function process(Vtiger_Request $request) {
-       
-        $viewer = $this->getViewer($request);
 		$moduleName = $request->getModule(false);
-		$viewer->assign('MODULE_NAME', $moduleName);
-     
-        $recordId = $request->get('record');
-        
+		$recordId = $request->get('record');
+		$viewer = $this->getViewer($request);
+		
         $pipeline = Settings_PipelineConfig_Detail_Model::getDetailPipeline($recordId);
     //    var_dump(value: $pipeline);
-	echo '<pre>' . json_encode($pipeline, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
-
+	// echo '<pre>' . json_encode($pipeline, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+	    $viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('PIPELINE_DETAIL', $pipeline);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/DetailPipeline.tpl');
     }
@@ -37,7 +34,6 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
 			"modules.Settings.{$moduleName}.resources.{$viewName}",
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
-		// var_dump($jsScriptInstances);
         $headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
 		return $headerScriptInstances;
 	}

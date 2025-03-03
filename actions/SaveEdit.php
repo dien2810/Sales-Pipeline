@@ -56,9 +56,12 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $pickListName = $request->get('picklistName');
         $moduleName = $request->get('source_module');
         $selectedColor = $request->get('selectedColor');
+
         $moduleModel = Settings_Picklist_Module_Model::getInstance($moduleName);
         $fieldModel = Settings_Picklist_Field_Model::getInstance($pickListName, $moduleModel);
+       
         $rolesSelected = array();
+
         if($fieldModel->isRoleBased()) {
             $userSelectedRoles = $request->get('rolesSelected',array());
             //selected all roles option
@@ -91,7 +94,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
 			global $current_user;
             $result['labelDisplay'] = ($current_user->language == 'vn_vn') ? $itemLabelDisplayVn : $itemLabelDisplayEn;
-            // End Hieu Nguyen
+
 
 			$response->setResult($result);
         }  catch (Exception $e) {
@@ -100,20 +103,42 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
 
 	}
+
+    // public function getRoleList(Vtiger_Request $request) {
+    //     $roleList = Settings_Roles_Record_Model::getAll();
+    //     $response = new Vtiger_Response();
+    //     try {
+    //         $response->setResult($roleList);
+    //     } catch (Exception $e) {
+    //         $response->setError($e->getCode(), $e->getMessage());
+    //     }
+    //     $response->emit();
+	// }
     public function getRoleList(Vtiger_Request $request) {
+        // Lấy danh sách tất cả các role
         $roleList = Settings_Roles_Record_Model::getAll();
+        
+        // Mảng chứa kết quả với cả id và tên role
+        $result = [];
+        foreach ($roleList as $roleId => $roleRecord) {
+            $result[] = [
+                'roleid'   => $roleId,
+                'rolename' => $roleRecord->get('rolename'), // hoặc sử dụng $roleRecord->getName() nếu có
+            ];
+        }
+    
+        // Khởi tạo response
         $response = new Vtiger_Response();
         try {
-            $response->setResult($roleList);
+            $response->setResult($result);
         } catch (Exception $e) {
             $response->setError($e->getCode(), $e->getMessage());
         }
         $response->emit();
-	}
-    public function saveOther(Vtiger_Request $request) {
-       
-	}
+    }
+
     public function savePipeline(Vtiger_Request $request) {
+        
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
         

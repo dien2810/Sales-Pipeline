@@ -8,8 +8,9 @@
         <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />
         <div class="modal-body text-center" style="padding: 20px;">
             <p style="font-size: 18px; font-weight: 400;">
-                Bạn có chắc chắn muốn xóa Pipeline ?
+                {vtranslate('LBL_ARE_YOU_SURE_DELETE_PIPELINE', $MODULE_NAME)}
             </p>
+
         </div>
 
         <div class="modal-footer text-center">

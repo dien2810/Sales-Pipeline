@@ -23,21 +23,6 @@ CustomView_BaseController_Js(
     isFirstOpen: 1,
     stagesList: [],
     rolesList: [],
-    roleMapping: {
-      all: "Tất cả",
-      H1: "Organization",
-      H10: "Sales Admin",
-      H11: "CS Manager",
-      H12: "Support",
-      H2: "CEO",
-      H3: "Vice President",
-      H4: "Sales Manager",
-      H5: "Sales Person",
-      H6: "Marketing Manager",
-      H7: "Marketer",
-      H8: "Chief Accountant",
-      H9: "Accountant",
-    },
     getPicklistname: function () {
       switch (this.currentNameModule) {
         case "Potentials":
@@ -185,6 +170,7 @@ CustomView_BaseController_Js(
       // alert(self.record);
       // alert("Hello");
       //Begin The Vi
+      this.registerGetRoleList();
       this.registerModuleChangeEvent();
       this.registerCancelButtonClick();
       this.registerAddStageNewSaveEvent();
@@ -193,7 +179,7 @@ CustomView_BaseController_Js(
       this.registerTimeUnitChangeEvent();
       this.registerTimeValueChangeEvent();
       this.registerNextButtonClickEvent();
-      this.registerGetRoleList();
+
       this.handleColumnVisibility();
       form.find(".btn-add-stage").on("click", function () {
         self.showStagePipelineModal(this);
@@ -548,11 +534,15 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+        console.log("Response getRoleList:", res);
         self.rolesList = [{ id: "all", name: "Tất cả" }];
-        for (let id in res) {
-          let roleName = self.roleMapping[id] || id;
-          self.rolesList.push({ id: id, name: roleName });
-        }
+        // Duyệt qua mảng trả về và thêm vào rolesList
+        res.forEach((role) => {
+          self.rolesList.push({
+            id: role.roleid,
+            name: role.rolename,
+          });
+        });
         console.log("Updated rolesList:", self.rolesList);
       });
     },

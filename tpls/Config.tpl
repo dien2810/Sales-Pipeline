@@ -5,21 +5,22 @@
 <form autocomplete="off" id="pipeline" name="pipeline">
     <div class="listPipeline" id="listPipeline">
         <div class="header">
-            <h5 class="fieldBlockHeader">Thiết lập pipeline cho các module</h5>
+            <h5 class="fieldBlockHeader">{vtranslate('LBL_PIPELINE_CONFIG', $MODULE_NAME)}</h5>
             <button class="btn btn-default configButton" type="button">
-                <i class="far fa-cog"></i>&nbsp;&nbsp;
-                Cấu hình pipeline module
+                <i class="far fa-cog"></i>&nbsp;&nbsp;{vtranslate('LBL_CONFIG_PIPELINE_MODULE', $MODULE_NAME)}
             </button>
         </div>
         <div style="margin-bottom:20px">
             <div class="row form-group">
-                <label class="col-sm-2 textAlignLeft" style="padding-top: 7px; margin-left: 20px;">Chọn Module</label>
+                <label class="col-sm-2 textAlignLeft"
+                    style="padding-top: 7px; margin-left: 20px;">{vtranslate('LBL_CHOOSE_MODULE', $MODULE_NAME)}</label>
                 <div class="fieldValue col-sm-3 col-xs-3">
                     <select class="select2 inputElement" id="pickListModules" name="pickListModules">
-                        <option value="">Tất cả</option>
+                        <option value="">{vtranslate('LBL_ALL', $MODULE_NAME)}</option>
                         {foreach item=PICKLIST_MODULE from=$PICKLIST_MODULES}
                         <option {if $SELECTED_MODULE_NAME eq $PICKLIST_MODULE->get('name')} selected="" {/if}
-                            value="{$PICKLIST_MODULE->get('name')}">{vtranslate($PICKLIST_MODULE->get('name'),$PICKLIST_MODULE->get('name'))}
+                            value="{$PICKLIST_MODULE->get('name')}">
+                            {vtranslate($PICKLIST_MODULE->get('name'), $PICKLIST_MODULE->get('name'))}
                         </option>
                         {/foreach}
                     </select>
@@ -30,7 +31,8 @@
         <!-- Tìm kiếm pipeline -->
         <div class="search-bar">
             <div class="search-link hidden-xs searchPipeline" style="margin-top: 0px;">
-                <input class="searchWorkflows" type="text" value="" placeholder="Tìm kiếm">
+                <input class="searchWorkflows" type="text" value=""
+                    placeholder="{vtranslate('LBL_SEARCH', $MODULE_NAME)}">
                 <span aria-hidden="true" class="far fa-search"></span>
             </div>
             <div class="pagination">
@@ -39,20 +41,22 @@
                         <button type="button" id="PreviousPageButton" class="btn btn-default" disabled=""><i
                                 class="far fa-chevron-left"></i></button>
                         <button type="button" id="PageJump" data-toggle="dropdown" class="btn btn-default">
-                            <i class="far fa-ellipsis-h icon" title="Nhảy tới trang"></i>
+                            <i class="far fa-ellipsis-h icon"
+                                title="{vtranslate('LBL_JUMP_TO_PAGE', $MODULE_NAME)}"></i>
                         </button>
                         <ul class="listViewBasicAction dropdown-menu" id="PageJumpDropDown">
                             <li>
                                 <div class="listview-pagenum">
-                                    <span>Trang</span>&nbsp;
+                                    <span>{vtranslate('LBL_PAGE', $MODULE_NAME)}</span>&nbsp;
                                     <strong><span>1</span></strong>&nbsp;
-                                    <span>của</span>&nbsp;
+                                    <span>{vtranslate('LBL_OF', $MODULE_NAME)}</span>&nbsp;
                                     <strong><span id="totalPageCount"></span></strong>
                                 </div>
                                 <div class="listview-pagejump">
                                     <input type="text" id="pageToJump" class="listViewPagingInput text-center">&nbsp;
                                     <button type="button" id="pageToJumpSubmit"
-                                        class="btn btn-success listViewPagingInputSubmit text-center">Chuyển</button>
+                                        class="btn btn-success listViewPagingInputSubmit text-center">{vtranslate('LBL_GO',
+                                        $MODULE_NAME)}</button>
                                 </div>
                             </li>
                         </ul>
@@ -61,9 +65,9 @@
                     </div>
                     <!-- Phân trang -->
                     <span class="pagingInfo pull-right">
-                        <span>1 đến 20 của</span>&nbsp;
+                        <span>{vtranslate('LBL_RECORDS_RANGE', $MODULE_NAME)}</span>&nbsp;
                         <span class="totalRecords cursorPointer"><i class="far fa-question showTotalRecords"
-                                title="Click để xem tổng số bản ghi"></i></span>&nbsp;&nbsp;
+                                title="{vtranslate('LBL_VIEW_TOTAL_RECORDS', $MODULE_NAME)}"></i></span>&nbsp;&nbsp;
                     </span>
                 </div>
             </div>
@@ -73,13 +77,13 @@
             <table class=" tableListPipeline table fieldBlockContainer" id="pipeline-table">
                 <thead>
                     <tr>
-                        <th>Tên</th>
-                        <th>Số bước</th>
-                        <th>Trạng thái</th>
-                        <th>Phân quyền</th>
-                        <th>Module</th>
-                        <th>Mô tả</th>
-                        <th>Được tạo bởi</th>
+                        <th>{vtranslate('LBL_NAME', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_STEPS', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_STATUS', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_PERMISSION', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_MODULE', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_DESCRIPTION', $MODULE_NAME)}</th>
+                        <th>{vtranslate('LBL_CREATED_BY', $MODULE_NAME)}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -92,7 +96,7 @@
         <a href="index.php?parent=Settings&module=PipelineConfig&view=EditPipeline&block=9&fieldid=67"
             class="btn addButton btn-default module-buttons addPipelineBtn">
             <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>Thêm pipeline</span>
+            <span>{vtranslate('LBL_ADD_PIPELINE', $MODULE_NAME)}</span>
         </a>
     </div>
 </form>

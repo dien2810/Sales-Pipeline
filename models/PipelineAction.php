@@ -96,7 +96,6 @@ class PipelineAction
     // Implement by The Vi to process update data fields
 	public static function processUpdateDataFields($action, $idRecord, $moduleName) 
 	{
-			
 			// Initialize workflow utilities and get admin user context
 			$util = new VTWorkflowUtils();
 			$adminUser = $util->adminUser();
@@ -160,9 +159,9 @@ class PipelineAction
     //Implement by The Vi to check conditions
     public static function checkConditions($idRecord, $idStageNext, $moduleName) {
 
-       if(self::checkChangeStage($idRecord, $idStageNext)) {
-           return true;
-       }
+    //    if(self::checkChangeStage($idRecord, $idStageNext)) {
+    //        return true;
+    //    }
 
        $conditions = self::getConditions($idStageNext);
        return self::checkPipelineStageConditions($idRecord, $conditions, $idStageNext, $moduleName);
@@ -187,8 +186,8 @@ class PipelineAction
     public static function checkPipelineStageConditions($potentialid, $conditions, $stageid, $module) {
         $moduleModel = Vtiger_Module_Model::getInstance($module);
         $moduleName = $moduleModel->getName();
-    
-        // Lấy instance của CRMEntity để xác định tên trường ID
+		
+        //Get the entity instance
         $entity = CRMEntity::getInstance($moduleName);
         $tableName = $entity->table_name;
         $idColumn = $entity->tab_name_index[$tableName];
@@ -209,7 +208,6 @@ class PipelineAction
     
         if ($result && $adb->num_rows($result) > 0) {
             while ($row = $adb->fetchByAssoc($result)) {
-                // Sử dụng tên trường ID động dựa trên module
                 if ($row[$idColumn] == $potentialid) {
                     return true;
                 }

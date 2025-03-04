@@ -275,6 +275,9 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructureInstance->getStructure());
 
+		$dateTimeFields = $moduleModel->getFieldsByType(array('date', 'datetime'));
+		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
+
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);

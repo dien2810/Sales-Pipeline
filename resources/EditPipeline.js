@@ -2900,7 +2900,7 @@ CustomView_BaseController_Js(
             modal.css("display", "block");
             const form = modal.find("form#form-add-meeting");
             vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
+            // Register checkbox
             self.registerToggleCheckboxEvent(form);
             CustomOwnerField.initCustomOwnerFields(
               form.find('input[name="assigned_user_id"]')
@@ -2908,8 +2908,9 @@ CustomView_BaseController_Js(
             self.registerOwnerFieldEvent(form);
             $("#fullInfo").click(function () {
               $("#extraInfo").slideDown();
-              $(this).hide(); // Ẩn nút "Toàn bộ thông tin"
+              $(this).hide();
             });
+
             function calculateEndTime() {
               let startTime = $("input[name='startTime']").val();
               let duration = parseInt($("input[name='duration']").val());
@@ -2934,7 +2935,7 @@ CustomView_BaseController_Js(
               }
             }
 
-            // Gọi hàm khi nhập thời gian bắt đầu hoặc thời lượng
+            // calculate end time when enter start time and duration
             $(
               "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
             ).on("change keyup", calculateEndTime);
@@ -3019,7 +3020,17 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
+            var form = modal.find("#form-create-new-task");
+            // Register checkbox
+            self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide();
+            });
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -3029,6 +3040,28 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
+                let taskInfo = {
+                  assigned_user_id: params.assigned_user_id,
+                  assign_parent_record_owners:
+                    params.assign_parent_record_owners ? 1 : null,
+                  datefield: params.datefield,
+                  days: parseInt(params.days),
+                  description: params.description,
+                  direction: params.direction,
+                  priority: params.priority,
+                  sendNotification: params.sendNotification ? 1 : 0,
+                  status: params.status,
+                  todo: params.todo,
+                };
+                self.action["taskInfo"] = taskInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "createNewTask";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };

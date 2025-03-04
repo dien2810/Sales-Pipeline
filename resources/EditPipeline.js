@@ -1,6 +1,6 @@
 /*
     File: EditPipeline.js
-    Author: The Vi
+    Author:  Team
     Date: 22/1/2025
     Purpose: Handle events for EditPipeline interface
 */
@@ -1438,87 +1438,85 @@ CustomView_BaseController_Js(
       });
     },
     registerAddStageNewSaveEvent: function () {
+      //Update by The Vi 3/4/2025
       let self = this;
-      if (self.mode != "Edit") {
-        jQuery(document).on(
-          "submit",
-          "form#add-stage-pipeline-new",
-          function (e) {
-            e.preventDefault();
-            const form = jQuery(this);
-            const formData = form.serializeFormData();
-            // Validate required fields
-            let errors = [];
+      jQuery(document).on(
+        "submit",
+        "form#add-stage-pipeline-new",
+        function (e) {
+          e.preventDefault();
+          const form = jQuery(this);
+          const formData = form.serializeFormData();
+          // Validate required fields
+          let errors = [];
 
-            if (
-              !formData.itemLabelDisplayVn ||
-              formData.itemLabelDisplayVn.trim() === ""
-            ) {
-              errors.push("Vui lòng nhập nhãn hiển thị Tiếng Việt");
-            }
+          if (
+            !formData.itemLabelDisplayVn ||
+            formData.itemLabelDisplayVn.trim() === ""
+          ) {
+            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Việt");
+          }
 
-            if (
-              !formData.itemLabelDisplayEn ||
-              formData.itemLabelDisplayEn.trim() === ""
-            ) {
-              errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
-            }
+          if (
+            !formData.itemLabelDisplayEn ||
+            formData.itemLabelDisplayEn.trim() === ""
+          ) {
+            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
+          }
 
-            if (!formData.newValue || formData.newValue.trim() === "") {
-              errors.push("Vui lòng nhập giá trị");
-            }
+          if (!formData.newValue || formData.newValue.trim() === "") {
+            errors.push("Vui lòng nhập giá trị");
+          }
 
-            if (!formData.color || formData.color.trim() === "") {
-              errors.push("Vui lòng chọn màu");
-            }
-            if (errors.length > 0) {
-              const errorMessage = errors.join("<br>");
-              app.helper.showErrorNotification({
-                message: errorMessage,
-              });
-              return false;
-            }
-            app.helper.showProgress();
-            let params = {
-              module: "PipelineConfig",
-              parent: "Settings",
-              action: "SaveEdit",
-              mode: "addStagePipelineNew",
-              picklistName: self.getPicklistname(),
-              source_module: self.currentNameModule,
-              selectedColor: formData.color,
-              rolesSelected: ["H2"],
-              newValue: formData.newValue,
-              itemLabelDisplayEn: formData.itemLabelDisplayEn,
-              itemLabelDisplayVn: formData.itemLabelDisplayVn,
-            };
-            app.request.post({ data: params }).then((err, response) => {
-              app.helper.hideProgress();
-              if (err) {
-                app.helper.showErrorNotification({
-                  message:
-                    err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
-                });
-                return;
-              }
-              if (response && response.picklistValueId) {
-                app.helper.showSuccessNotification({
-                  message: "Thêm giai đoạn mới thành công",
-                });
-              } else {
-                const errorMsg =
-                  (response && response.message) ||
-                  "Thêm giai đoạn mới không thành công";
-                app.helper.showErrorNotification({
-                  message: errorMsg,
-                });
-              }
+          if (!formData.color || formData.color.trim() === "") {
+            errors.push("Vui lòng chọn màu");
+          }
+          if (errors.length > 0) {
+            const errorMessage = errors.join("<br>");
+            app.helper.showErrorNotification({
+              message: errorMessage,
             });
-            app.helper.hideModal();
             return false;
           }
-        );
-      }
+          app.helper.showProgress();
+          let params = {
+            module: "PipelineConfig",
+            parent: "Settings",
+            action: "SaveEdit",
+            mode: "addStagePipelineNew",
+            picklistName: self.getPicklistname(),
+            source_module: self.currentNameModule,
+            selectedColor: formData.color,
+            rolesSelected: ["H2"],
+            newValue: formData.newValue,
+            itemLabelDisplayEn: formData.itemLabelDisplayEn,
+            itemLabelDisplayVn: formData.itemLabelDisplayVn,
+          };
+          app.request.post({ data: params }).then((err, response) => {
+            app.helper.hideProgress();
+            if (err) {
+              app.helper.showErrorNotification({
+                message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+              });
+              return;
+            }
+            if (response && response.picklistValueId) {
+              app.helper.showSuccessNotification({
+                message: "Thêm giai đoạn mới thành công",
+              });
+            } else {
+              const errorMsg =
+                (response && response.message) ||
+                "Thêm giai đoạn mới không thành công";
+              app.helper.showErrorNotification({
+                message: errorMsg,
+              });
+            }
+          });
+          app.helper.hideModal();
+          return false;
+        }
+      );
     },
     calculateTotalTime: function () {
       let totalDays = 0;
@@ -2642,7 +2640,11 @@ CustomView_BaseController_Js(
       values.emailcc = modal.find('input[name="emailcc"]').val();
       values.emailbcc = modal.find('input[name="emailbcc"]').val();
       values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal.find('input[name="safe_content"]').is(":checked") ? 1 : 0;
+      values.safe_content = modal
+        .find('input[name="safe_content"]')
+        .is(":checked")
+        ? 1
+        : 0;
       values.content = modal.find('textarea[name="content"]').val();
 
       return values;
@@ -3076,66 +3078,142 @@ CustomView_BaseController_Js(
           return;
         }
         app.helper.hideModal();
-        // Show modal
-        let modalInstance = app.helper
-          .loadPageContentOverlay(res)
-          .then(function (modal) {
-            modal.css("display", "block");
-            var form = modal.find("#form-create-new-record");
-            form.on("change", "#createEntityModule", function (e) {
-              // form
-              //   .find(".initialDataField")
-              //   .toggleClass("hide", !$(this).val());
-              var relatedModule = jQuery(e.currentTarget).val();
-              var module_name = jQuery("#module_name").val();
-              if (relatedModule == module_name) {
-                jQuery(e.currentTarget)
-                  .closest(".taskTypeUi")
-                  .find(".sameModuleError")
-                  .removeClass("hide");
-              } else {
-                jQuery(e.currentTarget)
-                  .closest(".taskTypeUi")
-                  .find(".sameModuleError")
-                  .addClass("hide");
+        // Show modal fix error
+        app.helper.loadPageContentOverlay(res).then(function (modal) {
+          modal.css("display", "block");
+          var form = modal.find("#form-create-new-record");
+          form.on("change", "#createEntityModule", function (e) {
+            // form
+            //   .find(".initialDataField")
+            //   .toggleClass("hide", !$(this).val());
+            var relatedModule = jQuery(e.currentTarget).val();
+            var module_name = jQuery("#module_name").val();
+            if (relatedModule == module_name) {
+              jQuery(e.currentTarget)
+                .closest(".taskTypeUi")
+                .find(".sameModuleError")
+                .removeClass("hide");
+            } else {
+              jQuery(e.currentTarget)
+                .closest(".taskTypeUi")
+                .find(".sameModuleError")
+                .addClass("hide");
+            }
+            var params = {
+              module: app.getModuleName(),
+              parent: app.getParentModuleName(),
+              view: "EditPipelineAjax",
+              mode: "getCreateEntity",
+              relatedModule: jQuery(e.currentTarget).val(),
+              module_name: self.currentNameModule,
+            };
+
+            app.helper.showProgress();
+            app.request.post({ data: params }).then(function (error, data) {
+              if (error) {
+                console.log(error);
               }
-              var params = {
-                module: app.getModuleName(),
-                parent: app.getParentModuleName(),
-                view: "EditPipelineAjax",
-                mode: "getCreateEntity",
-                relatedModule: jQuery(e.currentTarget).val(),
-                module_name: self.currentNameModule,
-              };
+              app.helper.hideProgress();
+              var createEntityContainer = jQuery("#addCreateEntityContainer");
+              createEntityContainer.html(data);
+              vtUtils.showSelect2ElementView(
+                createEntityContainer.find(".select2")
+              );
 
-              app.helper.showProgress();
-              app.request.post({ data: params }).then(function (error, data) {
-                if (error) {
-                  console.log(error);
-                }
-                app.helper.hideProgress();
-                var createEntityContainer = jQuery("#addCreateEntityContainer");
-                createEntityContainer.html(data);
-                vtUtils.showSelect2ElementView(
-                  createEntityContainer.find(".select2")
-                );
-
-                self.registerAddFieldEvent();
-                self.fieldValueMap = false;
-                if (jQuery("#fieldValueMapping").val()) {
-                  self.fieldValueReMapping();
-                }
-                var fields = jQuery("#save_fieldvaluemapping").find(
-                  'select[name="fieldname"]'
-                );
-                jQuery.each(fields, function (i, field) {
-                  self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
-                });
+              self.registerAddFieldEvent();
+              self.fieldValueMap = false;
+              if (jQuery("#fieldValueMapping").val()) {
+                self.fieldValueReMapping();
+              }
+              var fields = jQuery("#save_fieldvaluemapping").find(
+                'select[name="fieldname"]'
+              );
+              jQuery.each(fields, function (i, field) {
+                self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
               });
             });
-            self.registerVTUpdateFieldsTaskEvents();
-            self.registerSaveTaskSubmitEvent();
           });
+          self.registerVTUpdateFieldsTaskEvents();
+          self.registerSaveTaskSubmitEvent();
+        });
+        // Show modal
+        // app.helper.showModal(res, {
+        //   preShowCb: function (modal) {
+        //     modal.off("hidden.bs.modal");
+        //   },
+        //   cb: function (modal) {
+        //     modal.css("display", "block");
+        //     var form = modal.find("#form-create-new-record");
+        //     form.on("change", "#createEntityModule", function (e) {
+        //       // form
+        //       //   .find(".initialDataField")
+        //       //   .toggleClass("hide", !$(this).val());
+        //       var relatedModule = jQuery(e.currentTarget).val();
+        //       var module_name = jQuery("#module_name").val();
+        //       if (relatedModule == module_name) {
+        //         jQuery(e.currentTarget)
+        //           .closest(".taskTypeUi")
+        //           .find(".sameModuleError")
+        //           .removeClass("hide");
+        //       } else {
+        //         jQuery(e.currentTarget)
+        //           .closest(".taskTypeUi")
+        //           .find(".sameModuleError")
+        //           .addClass("hide");
+        //       }
+        //       var params = {
+        //         module: app.getModuleName(),
+        //         parent: app.getParentModuleName(),
+        //         view: "EditPipelineAjax",
+        //         mode: "getCreateEntity",
+        //         relatedModule: jQuery(e.currentTarget).val(),
+        //         module_name: self.currentNameModule,
+        //       };
+
+        //       app.helper.showProgress();
+        //       app.request.post({ data: params }).then(function (error, data) {
+        //         if (error) {
+        //           console.log(error);
+        //         }
+        //         app.helper.hideProgress();
+        //         var createEntityContainer = jQuery("#addCreateEntityContainer");
+        //         createEntityContainer.html(data);
+        //         vtUtils.showSelect2ElementView(
+        //           createEntityContainer.find(".select2")
+        //         );
+
+        //         self.registerAddFieldEvent();
+        //         self.fieldValueMap = false;
+        //         if (jQuery("#fieldValueMapping").val()) {
+        //           self.fieldValueReMapping();
+        //         }
+        //         var fields = jQuery("#save_fieldvaluemapping").find(
+        //           'select[name="fieldname"]'
+        //         );
+        //         jQuery.each(fields, function (i, field) {
+        //           self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
+        //         });
+        //       });
+        //     });
+
+        //     self.registerVTUpdateFieldsTaskEvents();
+        //     self.registerSaveTaskSubmitEvent();
+        //     // Form validation
+        //     // var params = {
+        //     //   submitHandler: function (form) {
+        //     //     var form = jQuery(form);
+        //     //     var params = form.serializeFormData();
+        //     //     return false;
+        //     //   },
+        //     // };
+        //     form.vtValidate(params);
+        //     form.find(".select2").each(function () {
+        //       if (!jQuery(this).data("select2")) {
+        //         jQuery(this).select2();
+        //       }
+        //     });
+        //   },
+        // });
       });
     },
 
@@ -3866,7 +3944,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            
+
             // var form = modal.find(".sendSMSModal");
             const form = modal.find("form#form-send-sms");
 
@@ -3931,7 +4009,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
-                
+
                 return false;
               },
             };

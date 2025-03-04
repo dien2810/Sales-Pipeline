@@ -1,8 +1,10 @@
 {* Added by Minh Hoang on 2021-02-10 *}
 
 {strip}
-<div class="modal-dialog modal-content modal-width-700">
-    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_CREATE_NEW_RECORD', $MODULE_NAME)}" }
+<div class="modal-dialog modal-content modal-width-900">
+    {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_CREATE_NEW_RECORD',
+    $MODULE_NAME)}sfd"
+    }
     <form id="form-create-new-record" class="form-horizontal createNewRecordModal form-modal" method="POST">
         <input type="hidden" name="taskType" id="taskType" value="VTCreateEntityTask" />
         <div class="form-content">
@@ -22,10 +24,11 @@
                         <span class="redColor">*</span>
                     </div>
                     <div class="controls col-sm-8">
-                        <select id="createEntityModule" name="entity_type" class="inputElement text-left select2" data-rule-required="true">
+                        <select id="createEntityModule" name="entity_type" class="inputElement text-left select2"
+                            data-rule-required="true">
                             <option value="">{vtranslate('LBL_CHOOSE_FIELD', $MODULE_NAME)}</option>
                             {foreach from=$RELATED_MODULES item=MODULE}
-                                <option value="{$MODULE}">{vtranslate($MODULE,$MODULE)}</option>
+                            <option value="{$MODULE}">{vtranslate($MODULE,$MODULE)}</option>
                             {/foreach}
                         </select>
                     </div>
@@ -37,6 +40,7 @@
             <div class="newDataField">
             </div>
         </div>
+
         {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'}
     </form>
 </div>

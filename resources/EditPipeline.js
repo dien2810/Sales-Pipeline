@@ -2107,7 +2107,8 @@ CustomView_BaseController_Js(
       var fieldModel = Vtiger_Field_Js.getInstance(fieldInfo, moduleName);
       this.fieldModelInstance = fieldModel;
 
-      var fieldSpecificUi = this.getFieldSpecificUi(fieldSelect);
+      var fieldSpecificUi =
+        this.getFieldSpecificUiOnUpdateDataField(fieldSelect);
 
       //remove validation since we dont need validations for all eleements
       // Both filter and find is used since we dont know whether the element is enclosed in some conainer like currency
@@ -2161,6 +2162,7 @@ CustomView_BaseController_Js(
       }
       fieldUiHolder.html(fieldSpecificUi);
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Added by Hieu Nguyen on 2020-12-16 to fix bug multi-select field cause js error
+
       if (fieldSpecificUi.is("input.select2")) {
         var tagElements = fieldSpecificUi.data("tags");
         var params = { tags: tagElements, tokenSeparators: [","] };
@@ -2246,9 +2248,10 @@ CustomView_BaseController_Js(
       return this;
     },
 
-    getFieldSpecificUi: function (fieldSelectElement) {
+    getFieldSpecificUiOnUpdateDataField: function (fieldSelectElement) {
       var selectedOption = fieldSelectElement.find("option:selected");
       var fieldModel = this.fieldModelInstance;
+      console.log(fieldModel.getType());
       if (fieldModel.getType().toLowerCase() == "boolean") {
         console.log("TYPE: BOOLEAN");
         var conditionRow = fieldSelectElement.closest(".fieldRow");
@@ -2283,6 +2286,7 @@ CustomView_BaseController_Js(
         html = jQuery(html).val(app.htmlDecode(fieldModel.getValue()));
         return jQuery(html);
       } else {
+        console.log("ELSE");
         const fieldHtml = jQuery(fieldModel.getUiTypeSpecificHtml());
         return jQuery(fieldModel.getUiTypeSpecificHtml());
       }
@@ -2992,6 +2996,7 @@ CustomView_BaseController_Js(
     },
 
     showCreateNewTaskModal: function (targetBtn) {
+      var self = this;
       app.helper.showProgress();
       // Request modal content
       let params = {
@@ -2999,6 +3004,7 @@ CustomView_BaseController_Js(
         parent: "Settings",
         view: "EditPipelineAjax",
         mode: "getCreateNewTaskModal",
+        currentNameModule: self.currentNameModule,
       };
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
@@ -3237,7 +3243,7 @@ CustomView_BaseController_Js(
                 moduleNameElement.select2("disable");
               }
             }
-            thisInstance.loadFieldSpecificUi(selectedElement);
+            thisInstance.loadFieldSpecificUiOnCreateNewRecord(selectedElement);
           }
         }
       );
@@ -3272,6 +3278,7 @@ CustomView_BaseController_Js(
       var fieldValueMapping = this.getFieldValueMapping();
       var fieldValueMappingKey = fieldInfo.name;
       var taskType = jQuery("#taskType").val();
+
       if (taskType == "VTUpdateFieldsTask") {
         fieldValueMappingKey = fieldInfo.workflow_columnname;
         if (
@@ -3281,6 +3288,7 @@ CustomView_BaseController_Js(
           fieldValueMappingKey = selectedOption.val();
         }
       }
+
       if (
         fieldValueMapping != "" &&
         typeof fieldValueMapping[fieldValueMappingKey] != "undefined"
@@ -3312,6 +3320,22 @@ CustomView_BaseController_Js(
       if (fieldModel.getType() == "multipicklist") {
         fieldName = fieldName + "[]";
       }
+
+      if (fieldSpecificUi.find(".add-on").length > 0) {
+        fieldSpecificUi.filter(".input-append").addClass("row-fluid");
+        fieldSpecificUi.find(".input-append").addClass("row-fluid");
+        fieldSpecificUi.filter(".input-prepend").addClass("row-fluid");
+        fieldSpecificUi.find(".input-prepend").addClass("row-fluid");
+        fieldSpecificUi.find('input[type="text"]').css("width", "79%");
+      } else {
+        fieldSpecificUi
+          .filter('[name="' + fieldName + '"]')
+          .addClass("row-fluid");
+        fieldSpecificUi
+          .find('[name="' + fieldName + '"]')
+          .addClass("row-fluid");
+      }
+
       fieldSpecificUi
         .filter('[name="' + fieldName + '"]')
         .attr("data-value", "value")
@@ -3342,6 +3366,9 @@ CustomView_BaseController_Js(
       }
 
       fieldUiHolder.html(fieldSpecificUi);
+      fieldUiHolder.css({
+        display: "inline-block",
+      });
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Add by Dien Nguyen on 2025-03-01 to avoid JS error
 
       if (fieldSpecificUi.is("input.select2")) {
@@ -3394,7 +3421,7 @@ CustomView_BaseController_Js(
           fieldModel.getName() +
           '" value="" data-selected-tags=\'' +
           selectedTags +
-          '\' data-value="value" data-rule-main-owner="true" class="form-control">' +
+          '\' data-value="value" data-rule-main-owner="true" class="form-control" style="display: inline-block">' +
           '<input type="hidden" name="valuetype" value="rawtext" />';
 
         // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
@@ -3420,6 +3447,10 @@ CustomView_BaseController_Js(
         // End Hieu Nguyen
 
         fieldUiHolder.html(fieldSpecificUi);
+        fieldUiHolder.css({
+          display: "inline-flex",
+          flexDirection: "column",
+        });
 
         // Init select2
         var input = fieldUiHolder.find(
@@ -4545,6 +4576,7 @@ CustomView_BaseController_Js(
       if (fieldModel.getType() == "multipicklist") {
         fieldName = fieldName + "[]";
       }
+
       if (
         (fieldModel.getType() == "picklist" ||
           fieldModel.getType() == "owner") &&

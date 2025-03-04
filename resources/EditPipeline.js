@@ -4,7 +4,7 @@
     Date: 22/1/2025
     Purpose: Handle events for EditPipeline interface
 */
-// Lấy tham số từ URL trước khi truyền vào object
+
 const urlParams = new URLSearchParams(window.location.search);
 const record = urlParams.get("record");
 const mode = record ? "Edit" : "Add";
@@ -23,21 +23,6 @@ CustomView_BaseController_Js(
     isFirstOpen: 1,
     stagesList: [],
     rolesList: [],
-    roleMapping: {
-      all: "Tất cả",
-      H1: "Organization",
-      H10: "Sales Admin",
-      H11: "CS Manager",
-      H12: "Support",
-      H2: "CEO",
-      H3: "Vice President",
-      H4: "Sales Manager",
-      H5: "Sales Person",
-      H6: "Marketing Manager",
-      H7: "Marketer",
-      H8: "Chief Accountant",
-      H9: "Accountant",
-    },
     getPicklistname: function () {
       switch (this.currentNameModule) {
         case "Potentials":
@@ -550,10 +535,12 @@ CustomView_BaseController_Js(
         }
 
         self.rolesList = [{ id: "all", name: "Tất cả" }];
-        for (let id in res) {
-          let roleName = self.roleMapping[id] || id;
-          self.rolesList.push({ id: id, name: roleName });
-        }
+        res.forEach((role) => {
+          self.rolesList.push({
+            id: role.roleid,
+            name: role.rolename,
+          });
+        });
         console.log("Updated rolesList:", self.rolesList);
       });
     },

@@ -651,3 +651,6 @@ i.icon {
   color: var(--primary1-color);
 }
 /* End Minh Hoang */
+.overlayPageContent {
+  background: transparent !important;
+}

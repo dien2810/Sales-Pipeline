@@ -1,9 +1,8 @@
+{* Added by The Vi on 2025-03-05 *}
 {strip}
 <link rel="stylesheet" href="{vresource_url('modules/Settings/PipelineConfig/resources/EditPipeline.css')}">
 </link>
-
 <div>
-    <!-- Bắt đầu nội dung hiện khi stageList khác rỗng -->
     <table id="stagesTable" style="margin: 15px;">
         <thead>
             <tr class="listViewHeaders">
@@ -31,7 +30,6 @@
             </tr>
         </thead>
         <tbody id="pipeline-stage-list" class="ui-sortable" style="width: auto;">
-            <!-- Item stage -->
         </tbody>
     </table>
     <div style="text-align: center; margin-top: 10px; margin-bottom: 60px;">
@@ -39,6 +37,5 @@
             <i class="far fa-plus"></i>&nbsp;&nbsp;{vtranslate('LBL_ADD_STAGE', $MODULE_NAME)}
         </button>
     </div>
-    <!-- Kết thúc nội dung hiện khi stageList khác rỗng -->
 </div>
 {/strip}

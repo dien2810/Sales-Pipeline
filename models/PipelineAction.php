@@ -11,10 +11,10 @@ require_once('modules/com_vtiger_workflow/VTTaskQueue.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateEventTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateTodoTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTUpdateFieldsTask.inc');
+require_once('modules/com_vtiger_workflow/tasks/VTCreateEntityTask.inc');
 require_once('data/CRMEntity.php');
 class PipelineAction 
 {
-    
     //Begin process Actions
     //Implement by Team to process actions
 	public static function processActions($idRecord, $idStageNext, $moduleName) {
@@ -41,8 +41,8 @@ class PipelineAction
                         // Implement by The Vi to process send notifications
 						self::processSendNotifications($action, $idRecord,  $moduleName);
 						break;
-					case 'createTask':
-						// $result = self::actionCreateTask($idPotential, $action);
+					case 'createNewRecord':
+						self::processCreateNewRecords($action, $idRecord,  $moduleName);
 						break;
 				}
 				
@@ -247,10 +247,10 @@ class PipelineAction
 			}
 		}
 	}
+	
     // Implement by The Vi to process update data fields
 	public static function processUpdateDataFields($action, $idRecord, $moduleName) 
 	{
-			
 			// Initialize workflow utilities and get admin user context
 			$util = new VTWorkflowUtils();
 			$adminUser = $util->adminUser();
@@ -281,6 +281,53 @@ class PipelineAction
 			$task->doTask($entity);
 			$util->revertUser();
     }
+	
+	// Implement by The Vi to process create new records
+	public static function processCreateNewRecords($action, $idRecord, $moduleName) 
+	{
+		// Initialize workflow utilities and retrieve the admin user
+		$util = new VTWorkflowUtils();
+		$adminUser = $util->adminUser();
+
+		// Retrieve the entity from the cache
+		$entityCache = new VTEntityCache($adminUser);
+		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+		$entity = $entityCache->forId($wsEntityId);
+
+		// Extract record creation information from the action
+		$createInfo = $action['createNewRecordInfo'];
+		$entityType = $createInfo['entity_type'];
+		$referenceField = $createInfo['reference_field'];
+		$assignParentOwners = isset($createInfo['assign_parent_record_owners']) ? $createInfo['assign_parent_record_owners'] : 0;
+
+		// Build the field_value_mapping from valid fields
+		$fieldValueMapping = [];
+		$excludedKeys = ['__vtrftk', 'taskType', 'action_name', 'modulename', 'fieldname', 'fieldValue', 'valuetype', 'entity_type', 'reference_field', 'assign_parent_record_owners'];
+		
+		foreach ($createInfo as $key => $value) {
+			if (!in_array($key, $excludedKeys)) {
+				$fieldValueMapping[] = [
+					'fieldname' => $key,
+					'valuetype' => 'rawtext', // Default value type is rawtext
+					'value' => $value
+				];
+			}
+		}
+
+		// Initialize and configure the task
+		$task = new VTCreateEntityTask();
+		$task->entity_type = $entityType;
+		$task->reference_field = $referenceField;
+		$task->field_value_mapping = $fieldValueMapping;
+		$task->assign_parent_record_owners = $assignParentOwners;
+
+		// Execute the task to create a new record
+		$task->doTask($entity);
+
+		// Revert to the original user
+		$util->revertUser();
+	}
+
     //End process Action
     // Implement by The Vi to get actions
 	public static function getActions($idStageNext) {
@@ -311,16 +358,18 @@ class PipelineAction
 
 		return $conditions;
 	}
+
     //Implement by The Vi to check conditions
     public static function checkConditions($idRecord, $idStageNext, $moduleName) {
 
-       if(self::checkChangeStage($idRecord, $idStageNext)) {
-           return true;
-       }
+    //    if(self::checkChangeStage($idRecord, $idStageNext)) {
+    //        return true;
+    //    }
 
        $conditions = self::getConditions($idStageNext);
        return self::checkPipelineStageConditions($idRecord, $conditions, $idStageNext, $moduleName);
     }
+
     //Implement by The Vi to check change stage
     public static function checkChangeStage($idRecord, $idStageNext) {
         $db = PearDatabase::getInstance();
@@ -341,8 +390,8 @@ class PipelineAction
     public static function checkPipelineStageConditions($potentialid, $conditions, $stageid, $module) {
         $moduleModel = Vtiger_Module_Model::getInstance($module);
         $moduleName = $moduleModel->getName();
-    
-        // Lấy instance của CRMEntity để xác định tên trường ID
+		
+        //Get the entity instance
         $entity = CRMEntity::getInstance($moduleName);
         $tableName = $entity->table_name;
         $idColumn = $entity->tab_name_index[$tableName];
@@ -363,7 +412,6 @@ class PipelineAction
     
         if ($result && $adb->num_rows($result) > 0) {
             while ($row = $adb->fetchByAssoc($result)) {
-                // Sử dụng tên trường ID động dựa trên module
                 if ($row[$idColumn] == $potentialid) {
                     return true;
                 }

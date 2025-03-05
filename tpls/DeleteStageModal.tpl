@@ -1,3 +1,4 @@
+{* Added by The Vi on 2025-03-05 *}
 {strip}
 <div class="modal-dialog modal-content">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_DELETE_STAGE', $MODULE_NAME)}"}

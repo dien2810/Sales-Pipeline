@@ -13,7 +13,6 @@ require_once('modules/com_vtiger_workflow/tasks/VTCreateEntityTask.inc');
 require_once('data/CRMEntity.php');
 class PipelineAction 
 {
-    
     //Begin process Actions
     //Implement by Team to process actions
 	public static function processActions($idRecord, $idStageNext, $moduleName) {

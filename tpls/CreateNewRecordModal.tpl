@@ -3,7 +3,7 @@
 {strip}
 <div class="modal-dialog modal-content modal-width-900">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_CREATE_NEW_RECORD',
-    $MODULE_NAME)}sfd"
+    $MODULE_NAME)}"
     }
     <form id="form-create-new-record" class="form-horizontal createNewRecordModal form-modal" method="POST">
         <input type="hidden" name="taskType" id="taskType" value="VTCreateEntityTask" />

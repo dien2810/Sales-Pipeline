@@ -12,7 +12,7 @@ CustomView_BaseController_Js(
   "Settings_PipelineConfig_EditPipeline_Js",
   {},
   {
-    //Begin by The Vi
+    //Begin The Vi
     urlParams: urlParams,
     record: record,
     mode: mode,
@@ -352,7 +352,6 @@ CustomView_BaseController_Js(
               "checked",
               decodedResponse.autoTransition
             );
-
             if (
               decodedResponse.rolesSelected &&
               decodedResponse.rolesSelected.length
@@ -531,7 +530,7 @@ CustomView_BaseController_Js(
       });
     },
 
-    //Submit save Pipeline final
+    // Submit save Pipeline final
     registerSavePipelineButtonClickEvent: function ($button) {
       let self = this;
       $button.on("click", function (e) {
@@ -1236,18 +1235,7 @@ CustomView_BaseController_Js(
         const stageIndex = self.stagesList.findIndex(
           (stage) => stage.id === stageId
         );
-        // if (stageIndex !== -1) {
-        //   self.stagesList[stageIndex].permissions = selectedRoles.map(
-        //     (roleId) => {
-        //       const role = self.rolesList.find((r) => r.id === roleId);
-        //       return {
-        //         role_id: role.id,
-        //         role_name: role.name,
-        //       };
-        //     }
-        //   );
-        // }
-        //Fix lỗi
+
         if (stageIndex !== -1 && Array.isArray(selectedRoles)) {
           self.stagesList[stageIndex].permissions = selectedRoles.map(
             (roleId) => {
@@ -3047,6 +3035,7 @@ CustomView_BaseController_Js(
         // Show modal fix error
         app.helper.loadPageContentOverlay(res).then(function (modal) {
           modal.css("display", "block");
+
           var form = modal.find("#form-create-new-record");
           form.on("change", "#createEntityModule", function (e) {
             // form
@@ -3102,84 +3091,6 @@ CustomView_BaseController_Js(
           self.registerVTUpdateFieldsTaskEvents();
           self.registerSaveTaskSubmitEvent();
         });
-        // Show modal
-        // app.helper.showModal(res, {
-        //   preShowCb: function (modal) {
-        //     modal.off("hidden.bs.modal");
-        //   },
-        //   cb: function (modal) {
-        //     modal.css("display", "block");
-        //     var form = modal.find("#form-create-new-record");
-        //     form.on("change", "#createEntityModule", function (e) {
-        //       // form
-        //       //   .find(".initialDataField")
-        //       //   .toggleClass("hide", !$(this).val());
-        //       var relatedModule = jQuery(e.currentTarget).val();
-        //       var module_name = jQuery("#module_name").val();
-        //       if (relatedModule == module_name) {
-        //         jQuery(e.currentTarget)
-        //           .closest(".taskTypeUi")
-        //           .find(".sameModuleError")
-        //           .removeClass("hide");
-        //       } else {
-        //         jQuery(e.currentTarget)
-        //           .closest(".taskTypeUi")
-        //           .find(".sameModuleError")
-        //           .addClass("hide");
-        //       }
-        //       var params = {
-        //         module: app.getModuleName(),
-        //         parent: app.getParentModuleName(),
-        //         view: "EditPipelineAjax",
-        //         mode: "getCreateEntity",
-        //         relatedModule: jQuery(e.currentTarget).val(),
-        //         module_name: self.currentNameModule,
-        //       };
-
-        //       app.helper.showProgress();
-        //       app.request.post({ data: params }).then(function (error, data) {
-        //         if (error) {
-        //           console.log(error);
-        //         }
-        //         app.helper.hideProgress();
-        //         var createEntityContainer = jQuery("#addCreateEntityContainer");
-        //         createEntityContainer.html(data);
-        //         vtUtils.showSelect2ElementView(
-        //           createEntityContainer.find(".select2")
-        //         );
-
-        //         self.registerAddFieldEvent();
-        //         self.fieldValueMap = false;
-        //         if (jQuery("#fieldValueMapping").val()) {
-        //           self.fieldValueReMapping();
-        //         }
-        //         var fields = jQuery("#save_fieldvaluemapping").find(
-        //           'select[name="fieldname"]'
-        //         );
-        //         jQuery.each(fields, function (i, field) {
-        //           self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
-        //         });
-        //       });
-        //     });
-
-        //     self.registerVTUpdateFieldsTaskEvents();
-        //     self.registerSaveTaskSubmitEvent();
-        //     // Form validation
-        //     // var params = {
-        //     //   submitHandler: function (form) {
-        //     //     var form = jQuery(form);
-        //     //     var params = form.serializeFormData();
-        //     //     return false;
-        //     //   },
-        //     // };
-        //     form.vtValidate(params);
-        //     form.find(".select2").each(function () {
-        //       if (!jQuery(this).data("select2")) {
-        //         jQuery(this).select2();
-        //       }
-        //     });
-        //   },
-        // });
       });
     },
 

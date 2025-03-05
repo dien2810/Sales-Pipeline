@@ -12,12 +12,12 @@ CustomView_BaseController_Js(
   "Settings_PipelineConfig_EditPipeline_Js",
   {},
   {
-    // Chỉnh sửa Pipeline
+    //Begin by The Vi
     urlParams: urlParams,
     record: record,
     mode: mode,
     stageReplaceMapping: [],
-    //End
+    //End by The Vi
     currentNameModule: "Potentials",
     pipelineId: "",
     isFirstOpen: 1,
@@ -329,23 +329,18 @@ CustomView_BaseController_Js(
               );
               $(".toal-time-pipeline").text(totalTime + " ngày");
             } else {
-              // Xử lý cho các module khác
               $(".othermodule").show();
               $(".potentials").hide();
 
-              // Set giá trị mặc định nếu time và time_unit không tồn tại
               const defaultTime = decodedResponse.time || 0;
               const defaultTimeUnit = decodedResponse.time_unit || "Day";
 
-              // Gán giá trị cho input time
               $('input[name="time"]').val(defaultTime);
 
-              // Reset và set lại giá trị cho select box
               const $timeTypeSelect = $('select[name="timetype"]');
-              $timeTypeSelect.val(""); // Reset giá trị
-              $timeTypeSelect.val(defaultTimeUnit); // Set giá trị mới
+              $timeTypeSelect.val("");
+              $timeTypeSelect.val(defaultTimeUnit);
 
-              // Nếu sử dụng select2, cần thêm dòng sau
               if ($timeTypeSelect.hasClass("select2-offscreen")) {
                 $timeTypeSelect.select2("val", defaultTimeUnit);
               }
@@ -353,13 +348,11 @@ CustomView_BaseController_Js(
 
             $("#listModule").val(decodedResponse.module).trigger("change");
 
-            // Xử lý autoTransition
             $("#autoTransition").prop(
               "checked",
               decodedResponse.autoTransition
             );
 
-            // Xử lý roles
             if (
               decodedResponse.rolesSelected &&
               decodedResponse.rolesSelected.length
@@ -380,10 +373,8 @@ CustomView_BaseController_Js(
               $rolesDropdown.trigger("change");
             }
 
-            // Set mô tả
             $('textarea[name="description"]').val(decodedResponse.description);
 
-            // Set trạng thái
             const statusValue =
               decodedResponse.status === "1" ? "active" : "inActive";
             $(`input[name="status"][value="${statusValue}"]`).prop(
@@ -391,7 +382,6 @@ CustomView_BaseController_Js(
               true
             );
 
-            // Xử lý stagesList
             self.stagesList = decodedResponse.stagesList.map((stage) => {
               let decodedActions = stage.actions;
               try {
@@ -441,7 +431,7 @@ CustomView_BaseController_Js(
       }
       return obj;
     },
-    // Hàm render stages
+
     renderStages() {
       this.stagesList.forEach((stage) => {
         console.log("Stage:", stage);
@@ -473,10 +463,8 @@ CustomView_BaseController_Js(
     //Begin The Vi
     handleColumnVisibility: function () {
       if (this.currentNameModule !== "Potentials") {
-        // Ẩn các cột không cần thiết
         $("#success-rate-column, #execution-time-column").hide();
 
-        // Điều chỉnh width cho từng cột khi ở module khác
         $("#stage-name-column").css("width", "15%");
         $("#mandatory-column").css("width", "8%");
         $("#next-stages-column").css("width", "25%");
@@ -508,11 +496,9 @@ CustomView_BaseController_Js(
     },
     handleColumnVisibilityTimePipeline: function () {
       if (this.currentNameModule === "Potentials") {
-        // Khi là module Potentials, ẩn trường dành cho các module khác và hiện trường dành cho Potentials
         jQuery(".othermodule").hide();
         jQuery(".potentials").show();
       } else {
-        // Với các module khác, ẩn trường Potentials và hiện trường othermodule
         jQuery(".othermodule").show();
         jQuery(".potentials").hide();
       }
@@ -545,7 +531,7 @@ CustomView_BaseController_Js(
       });
     },
 
-    //Hàm Lưu Pipeline Final
+    //Submit save Pipeline final
     registerSavePipelineButtonClickEvent: function ($button) {
       let self = this;
       $button.on("click", function (e) {
@@ -648,7 +634,7 @@ CustomView_BaseController_Js(
         e.preventDefault();
         let name = jQuery('input[name="name"]').val().trim();
         let module = jQuery('select[name="module"]').val();
-        let stageCount = self.stagesList.length; // Đếm số lượng stage
+        let stageCount = self.stagesList.length;
         let hasError = false;
         let errorMessage = "";
         if (!name) {
@@ -699,10 +685,7 @@ CustomView_BaseController_Js(
         let stageItem = self.stagesList.find((item) => item.id === stageId);
         if (stageItem) {
           stageItem.execution_time.unit = newUnit;
-          // app.helper.showSuccessNotification({
-          //   message: "Đã cập nhật đơn vị thời gian cho bước: " + stageItem.name,
-          // });
-          // Tính lại tổng thời gian
+
           self.calculateTotalTime();
           console.log("Cập nhật stage:", stageItem);
         }
@@ -720,11 +703,7 @@ CustomView_BaseController_Js(
         let stageItem = self.stagesList.find((item) => item.id === stageId);
         if (stageItem) {
           stageItem.execution_time.value = newTimeValue;
-          // app.helper.showSuccessNotification({
-          //   message:
-          //     "Đã cập nhật thời gian thực hiện cho bước: " + stageItem.name,
-          // });
-          // Tính lại tổng thời gian
+
           self.calculateTotalTime();
           console.log("Cập nhật stage:", self.stagesList);
         }
@@ -868,13 +847,12 @@ CustomView_BaseController_Js(
     },
     registerCheckboxEvents: function () {
       let self = this;
-      // Sử dụng event delegation để handle các checkbox được thêm động
+
       jQuery("#stagesTable").on("change", ".mandatory-checkbox", function () {
         const stageRow = jQuery(this).closest(".stageRow");
         const stageId = stageRow.data("stage-id");
         const isChecked = jQuery(this).prop("checked");
 
-        // Cập nhật giá trị is_mandatory trong stagesList
         self.stagesList = self.stagesList.map((stage) => {
           if (stage.id === stageId) {
             return {
@@ -892,11 +870,10 @@ CustomView_BaseController_Js(
           self.stagesList
         );
 
-        // Cập nhật lại toàn bộ các select 'stage-next-select'
         self.updateNextStagesOptions();
       });
     },
-    //Thêm mới bước vào StageList
+
     showStagePipelineModal: function (targetBtn) {
       app.helper.hideModal();
       let self = this;
@@ -1022,7 +999,7 @@ CustomView_BaseController_Js(
         });
       });
     },
-    // Hàm cập nhật options cho next stages
+
     updateNextStageOptions: function () {
       const self = this;
       const rows = jQuery("#stagesTable tbody tr.stageRow");
@@ -1060,7 +1037,6 @@ CustomView_BaseController_Js(
     sortStagesBySuccessRate: function () {
       const self = this;
 
-      // Tách riêng các stage có tỉ lệ 0% và khác 0%
       const zeroRateStages = this.stagesList.filter(
         (stage) => stage.success_rate === 0
       );
@@ -1068,18 +1044,14 @@ CustomView_BaseController_Js(
         (stage) => stage.success_rate > 0
       );
 
-      // Sắp xếp các stage khác 0% theo tỉ lệ tăng dần
       nonZeroStages.sort((a, b) => a.success_rate - b.success_rate);
 
-      // Gộp lại với stages 0% ở cuối
       this.stagesList = [...nonZeroStages, ...zeroRateStages];
 
-      // Cập nhật sequence
       this.stagesList.forEach((stage, index) => {
         stage.sequence = index + 1;
       });
 
-      // Cập nhật UI
       const tbody = jQuery("#stagesTable tbody");
       tbody.empty();
 
@@ -1103,7 +1075,7 @@ CustomView_BaseController_Js(
         tbody.append(row);
       });
     },
-    //Tạo bưới mới
+
     createStageRow: function (stageData) {
       const self = this;
       const roleOptions = this.rolesList
@@ -1119,8 +1091,6 @@ CustomView_BaseController_Js(
       const showRateAndTime = this.currentNameModule === "Potentials";
       const showDragIcon = this.currentNameModule !== "Potentials";
 
-      // === TẠO OPTION CHO SELECT "stage-next-select" DỰA VÀO stagesList ===
-      // Lưu ý: Đảm bảo stagesList đã được sắp xếp theo sequence
       let optionsHtml = "";
       const sortedStages = [...self.stagesList].sort(
         (a, b) => a.sequence - b.sequence
@@ -1295,7 +1265,6 @@ CustomView_BaseController_Js(
         const selectedRate = $(this).val();
         const stageId = row.data("stage-id");
 
-        // Cập nhật tỉ lệ thành công trong stagesList
         const stageIndex = self.stagesList.findIndex(
           (stage) => stage.id === stageId
         );
@@ -1521,12 +1490,10 @@ CustomView_BaseController_Js(
     calculateTotalTime: function () {
       let totalDays = 0;
 
-      // Duyệt qua tất cả stages trong stagesList
       this.stagesList.forEach((stage) => {
         const timeValue = parseFloat(stage.execution_time.value) || 0;
         const timeUnit = stage.execution_time.unit;
 
-        // Chuyển đổi thời gian sang ngày
         switch (timeUnit) {
           case "Year":
           case "Năm":
@@ -1544,7 +1511,6 @@ CustomView_BaseController_Js(
         }
       });
 
-      // Cập nhật UI
       jQuery(".toal-time-pipeline").text(Math.round(totalDays) + " ngày");
     },
     //End The Vi

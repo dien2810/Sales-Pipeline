@@ -94,6 +94,7 @@ class PipelineAction
 			}
 		}
 	}
+	
     // Implement by The Vi to process update data fields
 	public static function processUpdateDataFields($action, $idRecord, $moduleName) 
 	{

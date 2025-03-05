@@ -361,11 +361,6 @@ class PipelineAction
 
     //Implement by The Vi to check conditions
     public static function checkConditions($idRecord, $idStageNext, $moduleName) {
-
-    //    if(self::checkChangeStage($idRecord, $idStageNext)) {
-    //        return true;
-    //    }
-
        $conditions = self::getConditions($idStageNext);
        return self::checkPipelineStageConditions($idRecord, $conditions, $idStageNext, $moduleName);
     }

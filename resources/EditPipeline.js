@@ -1,10 +1,10 @@
 /*
     File: EditPipeline.js
-    Author: The Vi
+    Author:  Team
     Date: 22/1/2025
     Purpose: Handle events for EditPipeline interface
 */
-// Lấy tham số từ URL trước khi truyền vào object
+
 const urlParams = new URLSearchParams(window.location.search);
 const record = urlParams.get("record");
 const mode = record ? "Edit" : "Add";
@@ -12,32 +12,17 @@ CustomView_BaseController_Js(
   "Settings_PipelineConfig_EditPipeline_Js",
   {},
   {
-    // Chỉnh sửa Pipeline
+    //Begin The Vi
     urlParams: urlParams,
     record: record,
     mode: mode,
     stageReplaceMapping: [],
-    //End
+    //End by The Vi
     currentNameModule: "Potentials",
     pipelineId: "",
     isFirstOpen: 1,
     stagesList: [],
     rolesList: [],
-    roleMapping: {
-      all: "Tất cả",
-      H1: "Organization",
-      H10: "Sales Admin",
-      H11: "CS Manager",
-      H12: "Support",
-      H2: "CEO",
-      H3: "Vice President",
-      H4: "Sales Manager",
-      H5: "Sales Person",
-      H6: "Marketing Manager",
-      H7: "Marketer",
-      H8: "Chief Accountant",
-      H9: "Accountant",
-    },
     getPicklistname: function () {
       switch (this.currentNameModule) {
         case "Potentials":
@@ -274,12 +259,6 @@ CustomView_BaseController_Js(
       //  =================================================================================================
 
       //Begin Tran Dien
-
-      // this.renderStageCrumbs(this.stagesList);
-      // this.renderStagesInfo(this.stagesList);
-      // this.registerAddActionSettingModal(form);
-      // this.registerAddCondition(form);
-      // this.registerSavePipelineButtonClickEvent(form.find(".savePipeline"));
       //End Tran Dien
       if (mode == "Edit") {
         let params = {
@@ -344,23 +323,18 @@ CustomView_BaseController_Js(
               );
               $(".toal-time-pipeline").text(totalTime + " ngày");
             } else {
-              // Xử lý cho các module khác
               $(".othermodule").show();
               $(".potentials").hide();
 
-              // Set giá trị mặc định nếu time và time_unit không tồn tại
               const defaultTime = decodedResponse.time || 0;
               const defaultTimeUnit = decodedResponse.time_unit || "Day";
 
-              // Gán giá trị cho input time
               $('input[name="time"]').val(defaultTime);
 
-              // Reset và set lại giá trị cho select box
               const $timeTypeSelect = $('select[name="timetype"]');
-              $timeTypeSelect.val(""); // Reset giá trị
-              $timeTypeSelect.val(defaultTimeUnit); // Set giá trị mới
+              $timeTypeSelect.val("");
+              $timeTypeSelect.val(defaultTimeUnit);
 
-              // Nếu sử dụng select2, cần thêm dòng sau
               if ($timeTypeSelect.hasClass("select2-offscreen")) {
                 $timeTypeSelect.select2("val", defaultTimeUnit);
               }
@@ -368,13 +342,10 @@ CustomView_BaseController_Js(
 
             $("#listModule").val(decodedResponse.module).trigger("change");
 
-            // Xử lý autoTransition
             $("#autoTransition").prop(
               "checked",
               decodedResponse.autoTransition
             );
-
-            // Xử lý roles
             if (
               decodedResponse.rolesSelected &&
               decodedResponse.rolesSelected.length
@@ -395,10 +366,8 @@ CustomView_BaseController_Js(
               $rolesDropdown.trigger("change");
             }
 
-            // Set mô tả
             $('textarea[name="description"]').val(decodedResponse.description);
 
-            // Set trạng thái
             const statusValue =
               decodedResponse.status === "1" ? "active" : "inActive";
             $(`input[name="status"][value="${statusValue}"]`).prop(
@@ -406,7 +375,6 @@ CustomView_BaseController_Js(
               true
             );
 
-            // Xử lý stagesList
             self.stagesList = decodedResponse.stagesList.map((stage) => {
               let decodedActions = stage.actions;
               try {
@@ -456,7 +424,7 @@ CustomView_BaseController_Js(
       }
       return obj;
     },
-    // Hàm render stages
+
     renderStages() {
       this.stagesList.forEach((stage) => {
         console.log("Stage:", stage);
@@ -488,10 +456,8 @@ CustomView_BaseController_Js(
     //Begin The Vi
     handleColumnVisibility: function () {
       if (this.currentNameModule !== "Potentials") {
-        // Ẩn các cột không cần thiết
         $("#success-rate-column, #execution-time-column").hide();
 
-        // Điều chỉnh width cho từng cột khi ở module khác
         $("#stage-name-column").css("width", "15%");
         $("#mandatory-column").css("width", "8%");
         $("#next-stages-column").css("width", "25%");
@@ -523,11 +489,9 @@ CustomView_BaseController_Js(
     },
     handleColumnVisibilityTimePipeline: function () {
       if (this.currentNameModule === "Potentials") {
-        // Khi là module Potentials, ẩn trường dành cho các module khác và hiện trường dành cho Potentials
         jQuery(".othermodule").hide();
         jQuery(".potentials").show();
       } else {
-        // Với các module khác, ẩn trường Potentials và hiện trường othermodule
         jQuery(".othermodule").show();
         jQuery(".potentials").hide();
       }
@@ -550,15 +514,17 @@ CustomView_BaseController_Js(
         }
 
         self.rolesList = [{ id: "all", name: "Tất cả" }];
-        for (let id in res) {
-          let roleName = self.roleMapping[id] || id;
-          self.rolesList.push({ id: id, name: roleName });
-        }
+        res.forEach((role) => {
+          self.rolesList.push({
+            id: role.roleid,
+            name: role.rolename,
+          });
+        });
         console.log("Updated rolesList:", self.rolesList);
       });
     },
 
-    //Hàm Lưu Pipeline Final
+    // Submit save Pipeline final
     registerSavePipelineButtonClickEvent: function ($button) {
       let self = this;
       $button.on("click", function (e) {
@@ -661,7 +627,7 @@ CustomView_BaseController_Js(
         e.preventDefault();
         let name = jQuery('input[name="name"]').val().trim();
         let module = jQuery('select[name="module"]').val();
-        let stageCount = self.stagesList.length; // Đếm số lượng stage
+        let stageCount = self.stagesList.length;
         let hasError = false;
         let errorMessage = "";
         if (!name) {
@@ -712,10 +678,7 @@ CustomView_BaseController_Js(
         let stageItem = self.stagesList.find((item) => item.id === stageId);
         if (stageItem) {
           stageItem.execution_time.unit = newUnit;
-          // app.helper.showSuccessNotification({
-          //   message: "Đã cập nhật đơn vị thời gian cho bước: " + stageItem.name,
-          // });
-          // Tính lại tổng thời gian
+
           self.calculateTotalTime();
           console.log("Cập nhật stage:", stageItem);
         }
@@ -733,11 +696,7 @@ CustomView_BaseController_Js(
         let stageItem = self.stagesList.find((item) => item.id === stageId);
         if (stageItem) {
           stageItem.execution_time.value = newTimeValue;
-          // app.helper.showSuccessNotification({
-          //   message:
-          //     "Đã cập nhật thời gian thực hiện cho bước: " + stageItem.name,
-          // });
-          // Tính lại tổng thời gian
+
           self.calculateTotalTime();
           console.log("Cập nhật stage:", self.stagesList);
         }
@@ -881,13 +840,12 @@ CustomView_BaseController_Js(
     },
     registerCheckboxEvents: function () {
       let self = this;
-      // Sử dụng event delegation để handle các checkbox được thêm động
+
       jQuery("#stagesTable").on("change", ".mandatory-checkbox", function () {
         const stageRow = jQuery(this).closest(".stageRow");
         const stageId = stageRow.data("stage-id");
         const isChecked = jQuery(this).prop("checked");
 
-        // Cập nhật giá trị is_mandatory trong stagesList
         self.stagesList = self.stagesList.map((stage) => {
           if (stage.id === stageId) {
             return {
@@ -905,11 +863,10 @@ CustomView_BaseController_Js(
           self.stagesList
         );
 
-        // Cập nhật lại toàn bộ các select 'stage-next-select'
         self.updateNextStagesOptions();
       });
     },
-    //Thêm mới bước vào StageList
+
     showStagePipelineModal: function (targetBtn) {
       app.helper.hideModal();
       let self = this;
@@ -1035,7 +992,7 @@ CustomView_BaseController_Js(
         });
       });
     },
-    // Hàm cập nhật options cho next stages
+
     updateNextStageOptions: function () {
       const self = this;
       const rows = jQuery("#stagesTable tbody tr.stageRow");
@@ -1073,7 +1030,6 @@ CustomView_BaseController_Js(
     sortStagesBySuccessRate: function () {
       const self = this;
 
-      // Tách riêng các stage có tỉ lệ 0% và khác 0%
       const zeroRateStages = this.stagesList.filter(
         (stage) => stage.success_rate === 0
       );
@@ -1081,18 +1037,14 @@ CustomView_BaseController_Js(
         (stage) => stage.success_rate > 0
       );
 
-      // Sắp xếp các stage khác 0% theo tỉ lệ tăng dần
       nonZeroStages.sort((a, b) => a.success_rate - b.success_rate);
 
-      // Gộp lại với stages 0% ở cuối
       this.stagesList = [...nonZeroStages, ...zeroRateStages];
 
-      // Cập nhật sequence
       this.stagesList.forEach((stage, index) => {
         stage.sequence = index + 1;
       });
 
-      // Cập nhật UI
       const tbody = jQuery("#stagesTable tbody");
       tbody.empty();
 
@@ -1116,7 +1068,7 @@ CustomView_BaseController_Js(
         tbody.append(row);
       });
     },
-    //Tạo bưới mới
+
     createStageRow: function (stageData) {
       const self = this;
       const roleOptions = this.rolesList
@@ -1132,8 +1084,6 @@ CustomView_BaseController_Js(
       const showRateAndTime = this.currentNameModule === "Potentials";
       const showDragIcon = this.currentNameModule !== "Potentials";
 
-      // === TẠO OPTION CHO SELECT "stage-next-select" DỰA VÀO stagesList ===
-      // Lưu ý: Đảm bảo stagesList đã được sắp xếp theo sequence
       let optionsHtml = "";
       const sortedStages = [...self.stagesList].sort(
         (a, b) => a.sequence - b.sequence
@@ -1279,18 +1229,7 @@ CustomView_BaseController_Js(
         const stageIndex = self.stagesList.findIndex(
           (stage) => stage.id === stageId
         );
-        // if (stageIndex !== -1) {
-        //   self.stagesList[stageIndex].permissions = selectedRoles.map(
-        //     (roleId) => {
-        //       const role = self.rolesList.find((r) => r.id === roleId);
-        //       return {
-        //         role_id: role.id,
-        //         role_name: role.name,
-        //       };
-        //     }
-        //   );
-        // }
-        //Fix lỗi
+
         if (stageIndex !== -1 && Array.isArray(selectedRoles)) {
           self.stagesList[stageIndex].permissions = selectedRoles.map(
             (roleId) => {
@@ -1308,7 +1247,6 @@ CustomView_BaseController_Js(
         const selectedRate = $(this).val();
         const stageId = row.data("stage-id");
 
-        // Cập nhật tỉ lệ thành công trong stagesList
         const stageIndex = self.stagesList.findIndex(
           (stage) => stage.id === stageId
         );
@@ -1451,97 +1389,93 @@ CustomView_BaseController_Js(
       });
     },
     registerAddStageNewSaveEvent: function () {
+      //Update by The Vi 3/4/2025
       let self = this;
-      if (self.mode != "Edit") {
-        jQuery(document).on(
-          "submit",
-          "form#add-stage-pipeline-new",
-          function (e) {
-            e.preventDefault();
-            const form = jQuery(this);
-            const formData = form.serializeFormData();
-            // Validate required fields
-            let errors = [];
+      jQuery(document).on(
+        "submit",
+        "form#add-stage-pipeline-new",
+        function (e) {
+          e.preventDefault();
+          const form = jQuery(this);
+          const formData = form.serializeFormData();
+          // Validate required fields
+          let errors = [];
 
-            if (
-              !formData.itemLabelDisplayVn ||
-              formData.itemLabelDisplayVn.trim() === ""
-            ) {
-              errors.push("Vui lòng nhập nhãn hiển thị Tiếng Việt");
-            }
+          if (
+            !formData.itemLabelDisplayVn ||
+            formData.itemLabelDisplayVn.trim() === ""
+          ) {
+            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Việt");
+          }
 
-            if (
-              !formData.itemLabelDisplayEn ||
-              formData.itemLabelDisplayEn.trim() === ""
-            ) {
-              errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
-            }
+          if (
+            !formData.itemLabelDisplayEn ||
+            formData.itemLabelDisplayEn.trim() === ""
+          ) {
+            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
+          }
 
-            if (!formData.newValue || formData.newValue.trim() === "") {
-              errors.push("Vui lòng nhập giá trị");
-            }
+          if (!formData.newValue || formData.newValue.trim() === "") {
+            errors.push("Vui lòng nhập giá trị");
+          }
 
-            if (!formData.color || formData.color.trim() === "") {
-              errors.push("Vui lòng chọn màu");
-            }
-            if (errors.length > 0) {
-              const errorMessage = errors.join("<br>");
-              app.helper.showErrorNotification({
-                message: errorMessage,
-              });
-              return false;
-            }
-            app.helper.showProgress();
-            let params = {
-              module: "PipelineConfig",
-              parent: "Settings",
-              action: "SaveEdit",
-              mode: "addStagePipelineNew",
-              picklistName: self.getPicklistname(),
-              source_module: self.currentNameModule,
-              selectedColor: formData.color,
-              rolesSelected: ["H2"],
-              newValue: formData.newValue,
-              itemLabelDisplayEn: formData.itemLabelDisplayEn,
-              itemLabelDisplayVn: formData.itemLabelDisplayVn,
-            };
-            app.request.post({ data: params }).then((err, response) => {
-              app.helper.hideProgress();
-              if (err) {
-                app.helper.showErrorNotification({
-                  message:
-                    err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
-                });
-                return;
-              }
-              if (response && response.picklistValueId) {
-                app.helper.showSuccessNotification({
-                  message: "Thêm giai đoạn mới thành công",
-                });
-              } else {
-                const errorMsg =
-                  (response && response.message) ||
-                  "Thêm giai đoạn mới không thành công";
-                app.helper.showErrorNotification({
-                  message: errorMsg,
-                });
-              }
+          if (!formData.color || formData.color.trim() === "") {
+            errors.push("Vui lòng chọn màu");
+          }
+          if (errors.length > 0) {
+            const errorMessage = errors.join("<br>");
+            app.helper.showErrorNotification({
+              message: errorMessage,
             });
-            app.helper.hideModal();
             return false;
           }
-        );
-      }
+          app.helper.showProgress();
+          let params = {
+            module: "PipelineConfig",
+            parent: "Settings",
+            action: "SaveEdit",
+            mode: "addStagePipelineNew",
+            picklistName: self.getPicklistname(),
+            source_module: self.currentNameModule,
+            selectedColor: formData.color,
+            rolesSelected: ["H2"],
+            newValue: formData.newValue,
+            itemLabelDisplayEn: formData.itemLabelDisplayEn,
+            itemLabelDisplayVn: formData.itemLabelDisplayVn,
+          };
+          app.request.post({ data: params }).then((err, response) => {
+            app.helper.hideProgress();
+            if (err) {
+              app.helper.showErrorNotification({
+                message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+              });
+              return;
+            }
+            if (response && response.picklistValueId) {
+              app.helper.showSuccessNotification({
+                message: "Thêm giai đoạn mới thành công",
+              });
+            } else {
+              const errorMsg =
+                (response && response.message) ||
+                "Thêm giai đoạn mới không thành công";
+              app.helper.showErrorNotification({
+                message: errorMsg,
+              });
+            }
+          });
+          app.helper.hideModal();
+          return false;
+        }
+      );
     },
     calculateTotalTime: function () {
       let totalDays = 0;
 
-      // Duyệt qua tất cả stages trong stagesList
       this.stagesList.forEach((stage) => {
         const timeValue = parseFloat(stage.execution_time.value) || 0;
         const timeUnit = stage.execution_time.unit;
 
-        // Chuyển đổi thời gian sang ngày
         switch (timeUnit) {
           case "Year":
           case "Năm":
@@ -1559,7 +1493,6 @@ CustomView_BaseController_Js(
         }
       });
 
-      // Cập nhật UI
       jQuery(".toal-time-pipeline").text(Math.round(totalDays) + " ngày");
     },
     //End The Vi
@@ -2107,7 +2040,8 @@ CustomView_BaseController_Js(
       var fieldModel = Vtiger_Field_Js.getInstance(fieldInfo, moduleName);
       this.fieldModelInstance = fieldModel;
 
-      var fieldSpecificUi = this.getFieldSpecificUi(fieldSelect);
+      var fieldSpecificUi =
+        this.getFieldSpecificUiOnUpdateDataField(fieldSelect);
 
       //remove validation since we dont need validations for all eleements
       // Both filter and find is used since we dont know whether the element is enclosed in some conainer like currency
@@ -2161,6 +2095,7 @@ CustomView_BaseController_Js(
       }
       fieldUiHolder.html(fieldSpecificUi);
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Added by Hieu Nguyen on 2020-12-16 to fix bug multi-select field cause js error
+
       if (fieldSpecificUi.is("input.select2")) {
         var tagElements = fieldSpecificUi.data("tags");
         var params = { tags: tagElements, tokenSeparators: [","] };
@@ -2246,9 +2181,10 @@ CustomView_BaseController_Js(
       return this;
     },
 
-    getFieldSpecificUi: function (fieldSelectElement) {
+    getFieldSpecificUiOnUpdateDataField: function (fieldSelectElement) {
       var selectedOption = fieldSelectElement.find("option:selected");
       var fieldModel = this.fieldModelInstance;
+      console.log(fieldModel.getType());
       if (fieldModel.getType().toLowerCase() == "boolean") {
         console.log("TYPE: BOOLEAN");
         var conditionRow = fieldSelectElement.closest(".fieldRow");
@@ -2283,6 +2219,7 @@ CustomView_BaseController_Js(
         html = jQuery(html).val(app.htmlDecode(fieldModel.getValue()));
         return jQuery(html);
       } else {
+        console.log("ELSE");
         const fieldHtml = jQuery(fieldModel.getUiTypeSpecificHtml());
         return jQuery(fieldModel.getUiTypeSpecificHtml());
       }
@@ -2651,7 +2588,11 @@ CustomView_BaseController_Js(
       values.emailcc = modal.find('input[name="emailcc"]').val();
       values.emailbcc = modal.find('input[name="emailbcc"]').val();
       values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal.find('input[name="safe_content"]').is(":checked") ? 1 : 0;
+      values.safe_content = modal
+        .find('input[name="safe_content"]')
+        .is(":checked")
+        ? 1
+        : 0;
       values.content = modal.find('textarea[name="content"]').val();
 
       return values;
@@ -2731,12 +2672,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "assign_parent_record_owners";
+                } else assigned_user_id = params.assigned_user_id;
                 let callInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -2746,7 +2688,7 @@ CustomView_BaseController_Js(
                   calendar_repeat_limit_date: self.convertDateFormat(
                     params.calendar_repeat_limit_date
                   ),
-                  recurringCheck: params.recurringcheck,
+                  recurringcheck: params.recurringcheck,
                   recurringtype: params.recurringtype,
                   repeat_frequency: params.repeat_frequency
                     ? parseInt(params.repeat_frequency)
@@ -2846,7 +2788,7 @@ CustomView_BaseController_Js(
             modal.css("display", "block");
             const form = modal.find("form#form-add-meeting");
             vtUtils.initDatePickerFields(form);
-            // Gọi hàm đăng ký toggle checkbox
+            // Register checkbox
             self.registerToggleCheckboxEvent(form);
             CustomOwnerField.initCustomOwnerFields(
               form.find('input[name="assigned_user_id"]')
@@ -2854,8 +2796,9 @@ CustomView_BaseController_Js(
             self.registerOwnerFieldEvent(form);
             $("#fullInfo").click(function () {
               $("#extraInfo").slideDown();
-              $(this).hide(); // Ẩn nút "Toàn bộ thông tin"
+              $(this).hide();
             });
+
             function calculateEndTime() {
               let startTime = $("input[name='startTime']").val();
               let duration = parseInt($("input[name='duration']").val());
@@ -2880,7 +2823,7 @@ CustomView_BaseController_Js(
               }
             }
 
-            // Gọi hàm khi nhập thời gian bắt đầu hoặc thời lượng
+            // calculate end time when enter start time and duration
             $(
               "input[name='startTime'], input[name='duration'], select[name='durationUnit']"
             ).on("change keyup", calculateEndTime);
@@ -2894,12 +2837,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "copyParentOwner";
+                } else assigned_user_id = params.assigned_user_id;
                 let meetingInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -2942,6 +2886,7 @@ CustomView_BaseController_Js(
     },
 
     showCreateNewTaskModal: function (targetBtn) {
+      var self = this;
       app.helper.showProgress();
       // Request modal content
       let params = {
@@ -2949,6 +2894,7 @@ CustomView_BaseController_Js(
         parent: "Settings",
         view: "EditPipelineAjax",
         mode: "getCreateNewTaskModal",
+        currentNameModule: self.currentNameModule,
       };
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
@@ -2963,7 +2909,17 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
+            var form = modal.find("#form-create-new-task");
+            // Register checkbox
+            self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide();
+            });
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -2973,6 +2929,28 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
+                let taskInfo = {
+                  assigned_user_id: params.assigned_user_id,
+                  assign_parent_record_owners:
+                    params.assign_parent_record_owners ? 1 : null,
+                  datefield: params.datefield,
+                  days: parseInt(params.days),
+                  description: params.description,
+                  direction: params.direction,
+                  priority: params.priority,
+                  sendNotification: params.sendNotification ? 1 : 0,
+                  status: params.status,
+                  todo: params.todo,
+                };
+                self.action["taskInfo"] = taskInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "createNewTask";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };
@@ -3009,7 +2987,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
+            var form = modal.find("#form-create-new-project-task");
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -3019,6 +2997,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
                 return false;
               },
             };
@@ -3054,12 +3033,8 @@ CustomView_BaseController_Js(
         let modalInstance = app.helper
           .loadPageContentOverlay(res)
           .then(function (modal) {
-            modal.css("display", "block");
             var form = modal.find("#form-create-new-record");
             form.on("change", "#createEntityModule", function (e) {
-              // form
-              //   .find(".initialDataField")
-              //   .toggleClass("hide", !$(this).val());
               var relatedModule = jQuery(e.currentTarget).val();
               var module_name = jQuery("#module_name").val();
               if (relatedModule == module_name) {
@@ -3187,7 +3162,7 @@ CustomView_BaseController_Js(
                 moduleNameElement.select2("disable");
               }
             }
-            thisInstance.loadFieldSpecificUi(selectedElement);
+            thisInstance.loadFieldSpecificUiOnCreateNewRecord(selectedElement);
           }
         }
       );
@@ -3222,6 +3197,7 @@ CustomView_BaseController_Js(
       var fieldValueMapping = this.getFieldValueMapping();
       var fieldValueMappingKey = fieldInfo.name;
       var taskType = jQuery("#taskType").val();
+
       if (taskType == "VTUpdateFieldsTask") {
         fieldValueMappingKey = fieldInfo.workflow_columnname;
         if (
@@ -3231,6 +3207,7 @@ CustomView_BaseController_Js(
           fieldValueMappingKey = selectedOption.val();
         }
       }
+
       if (
         fieldValueMapping != "" &&
         typeof fieldValueMapping[fieldValueMappingKey] != "undefined"
@@ -3262,6 +3239,22 @@ CustomView_BaseController_Js(
       if (fieldModel.getType() == "multipicklist") {
         fieldName = fieldName + "[]";
       }
+
+      if (fieldSpecificUi.find(".add-on").length > 0) {
+        fieldSpecificUi.filter(".input-append").addClass("row-fluid");
+        fieldSpecificUi.find(".input-append").addClass("row-fluid");
+        fieldSpecificUi.filter(".input-prepend").addClass("row-fluid");
+        fieldSpecificUi.find(".input-prepend").addClass("row-fluid");
+        fieldSpecificUi.find('input[type="text"]').css("width", "79%");
+      } else {
+        fieldSpecificUi
+          .filter('[name="' + fieldName + '"]')
+          .addClass("row-fluid");
+        fieldSpecificUi
+          .find('[name="' + fieldName + '"]')
+          .addClass("row-fluid");
+      }
+
       fieldSpecificUi
         .filter('[name="' + fieldName + '"]')
         .attr("data-value", "value")
@@ -3292,6 +3285,9 @@ CustomView_BaseController_Js(
       }
 
       fieldUiHolder.html(fieldSpecificUi);
+      fieldUiHolder.css({
+        display: "inline-block",
+      });
       fieldSpecificUi = jQuery(fieldSpecificUi[0]); // Add by Dien Nguyen on 2025-03-01 to avoid JS error
 
       if (fieldSpecificUi.is("input.select2")) {
@@ -3344,7 +3340,7 @@ CustomView_BaseController_Js(
           fieldModel.getName() +
           '" value="" data-selected-tags=\'' +
           selectedTags +
-          '\' data-value="value" data-rule-main-owner="true" class="form-control">' +
+          '\' data-value="value" data-rule-main-owner="true" class="form-control" style="display: inline-block">' +
           '<input type="hidden" name="valuetype" value="rawtext" />';
 
         // Added by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners
@@ -3370,6 +3366,10 @@ CustomView_BaseController_Js(
         // End Hieu Nguyen
 
         fieldUiHolder.html(fieldSpecificUi);
+        fieldUiHolder.css({
+          display: "inline-flex",
+          flexDirection: "column",
+        });
 
         // Init select2
         var input = fieldUiHolder.find(
@@ -3815,7 +3815,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            
+
             // var form = modal.find(".sendSMSModal");
             const form = modal.find("form#form-send-sms");
 
@@ -3880,7 +3880,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
-                
+
                 return false;
               },
             };
@@ -4506,6 +4506,7 @@ CustomView_BaseController_Js(
       if (fieldModel.getType() == "multipicklist") {
         fieldName = fieldName + "[]";
       }
+
       if (
         (fieldModel.getType() == "picklist" ||
           fieldModel.getType() == "owner") &&

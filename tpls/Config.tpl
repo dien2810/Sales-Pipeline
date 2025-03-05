@@ -1,3 +1,4 @@
+{* Added by The Vi on 2025-03-05 *}
 {strip}
 <link rel="stylesheet" href="{vresource_url('modules/Settings/PipelineConfig/resources/Config.css')}">
 </link>

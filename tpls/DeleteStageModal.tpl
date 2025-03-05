@@ -1,3 +1,4 @@
+{* Added by The Vi on 2025-03-05 *}
 {strip}
 <div class="modal-dialog modal-content">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_DELETE_STAGE', $MODULE_NAME)}"}
@@ -10,9 +11,7 @@
                 <span>{vtranslate('LBL_STAGE_TO_DELETE', $MODULE_NAME)}</span>
             </label>
             <div class="controls col-sm-6">
-                <!-- Trường ẩn chứa giá trị cần gửi lên server -->
                 <input type="hidden" name="name_stage_delete_hidden" value="" />
-                <!-- Trường hiển thị cho giao diện, không có thuộc tính name nên sẽ không được submit -->
                 <input type="text" value="{vtranslate('LBL_DISPLAY_VALUE', $MODULE_NAME)}" id="name_stage_delete"
                     class="form-control" readonly />
             </div>

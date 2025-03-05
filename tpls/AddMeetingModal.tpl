@@ -1,4 +1,4 @@
-{* Added by Minh Hoang on 2021-02-03 *}
+{* Added by Minh Hoang on 2025-02-03 *}
 
 {strip}
 <div class="modal-dialog modal-content modal-width-1100">

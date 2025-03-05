@@ -14,7 +14,14 @@ class Settings_PipelineConfig_Config_View extends Settings_Vtiger_BaseConfig_Vie
     public function process(Vtiger_Request $request) {
        
         $sourceModule = $request->get('source_module');
-        $pickListSupportedModules = Settings_Picklist_Module_Model::getPicklistSupportedModules();
+		$allModules = Settings_Picklist_Module_Model::getPicklistSupportedModules();
+		$allowedModules = ['Potentials', 'Leads', 'HelpDesk', 'Project'];
+		
+		$pickListSupportedModules = array_filter($allModules, function($module) use ($allowedModules) {
+			return in_array($module->getName(), $allowedModules);
+		});
+		
+		$pickListSupportedModules = array_values($pickListSupportedModules);
         
 		if(empty($sourceModule)) {
             $sourceModule = $pickListSupportedModules[0]->name;

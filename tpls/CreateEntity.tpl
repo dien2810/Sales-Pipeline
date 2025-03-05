@@ -12,7 +12,7 @@
                     {continue}
                 {/if}
                 <div class="row conditionRow form-group">
-                    <span class="col-lg-4" style="margin-right: 5px;">
+                    <span style="margin-right: 20px; margin-left: 15px;">
                         <select name="fieldname" class="select2" disabled="" style="min-width: 250px">
                             <option value="none"></option>
                             {foreach from=$RELATED_MODULE_MODEL->getFields() item=FIELD_MODEL}
@@ -34,7 +34,7 @@
                     </span>
 
                     {* Modified by Hieu Nguyen on 2020-10-26 to support assign new record to parent record owners *}
-                    <span class="fieldUiHolder col-lg-4"
+                    <span class="fieldUiHolder"
                         {if $MANDATORY_FIELD_MODEL->get('name') == 'assigned_user_id'}
                             data-assign-parent-record-owners=""
                             data-assign-parent-record-owners-label="{vtranslate('LBL_ASSIGN_TO_PARENT_RECORED_OWNERS', $QUALIFIED_MODULE)}"
@@ -51,7 +51,7 @@
     </div><br>
     {if $RELATED_MODULE_MODEL}
         <div class="row form-group basicAddFieldContainer hide">
-            <span class="col-lg-4">
+            <span style="margin-right: 20px; margin-left: 15px;">
                 <select name="fieldname" style="min-width: 250px">
                     <option value="none">{vtranslate('LBL_NONE',$QUALIFIED_MODULE)}</option>
                     {foreach from=$RELATED_MODULE_MODEL->getFields() item=FIELD_MODEL}
@@ -67,7 +67,7 @@
             <span>
                 <input type="hidden" name="modulename" value="{$SOURCE_MODULE}" />
             </span>
-            <span class="fieldUiHolder col-lg-4">
+            <span class="fieldUiHolder">
                 <input type="text" class="inputElement" readonly="" name="fieldValue" value="" />
                 <input type="hidden" name="valuetype" value="rawtext" />
             </span>

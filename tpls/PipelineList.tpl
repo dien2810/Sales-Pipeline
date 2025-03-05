@@ -1,3 +1,4 @@
+{* Added by The Vi on 2025-03-05 *}
 {strip}
 {if !empty($PIPELINE_LIST)}
 {foreach key=PIPELINE_ID item=PIPELINE from=$PIPELINE_LIST}

@@ -259,12 +259,6 @@ CustomView_BaseController_Js(
       //  =================================================================================================
 
       //Begin Tran Dien
-
-      // this.renderStageCrumbs(this.stagesList);
-      // this.renderStagesInfo(this.stagesList);
-      // this.registerAddActionSettingModal(form);
-      // this.registerAddCondition(form);
-      // this.registerSavePipelineButtonClickEvent(form.find(".savePipeline"));
       //End Tran Dien
       if (mode == "Edit") {
         let params = {
@@ -2642,7 +2636,11 @@ CustomView_BaseController_Js(
       values.emailcc = modal.find('input[name="emailcc"]').val();
       values.emailbcc = modal.find('input[name="emailbcc"]').val();
       values.subject = modal.find('input[name="subject"]').val();
-      values.safe_content = modal.find('input[name="safe_content"]').is(":checked") ? 1 : 0;
+      values.safe_content = modal
+        .find('input[name="safe_content"]')
+        .is(":checked")
+        ? 1
+        : 0;
       values.content = modal.find('textarea[name="content"]').val();
 
       return values;
@@ -2722,12 +2720,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "assign_parent_record_owners";
+                } else assigned_user_id = params.assigned_user_id;
                 let callInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -2737,7 +2736,7 @@ CustomView_BaseController_Js(
                   calendar_repeat_limit_date: self.convertDateFormat(
                     params.calendar_repeat_limit_date
                   ),
-                  recurringCheck: params.recurringcheck,
+                  recurringcheck: params.recurringcheck,
                   recurringtype: params.recurringtype,
                   repeat_frequency: params.repeat_frequency
                     ? parseInt(params.repeat_frequency)
@@ -2886,12 +2885,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "copyParentOwner";
+                } else assigned_user_id = params.assigned_user_id;
                 let meetingInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -3035,7 +3035,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
+            var form = modal.find("#form-create-new-project-task");
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -3045,6 +3045,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
                 return false;
               },
             };
@@ -3080,12 +3081,8 @@ CustomView_BaseController_Js(
         let modalInstance = app.helper
           .loadPageContentOverlay(res)
           .then(function (modal) {
-            modal.css("display", "block");
             var form = modal.find("#form-create-new-record");
             form.on("change", "#createEntityModule", function (e) {
-              // form
-              //   .find(".initialDataField")
-              //   .toggleClass("hide", !$(this).val());
               var relatedModule = jQuery(e.currentTarget).val();
               var module_name = jQuery("#module_name").val();
               if (relatedModule == module_name) {
@@ -3866,7 +3863,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            
+
             // var form = modal.find(".sendSMSModal");
             const form = modal.find("form#form-send-sms");
 
@@ -3931,7 +3928,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
-                
+
                 return false;
               },
             };

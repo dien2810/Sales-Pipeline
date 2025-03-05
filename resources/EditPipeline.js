@@ -263,7 +263,7 @@ CustomView_BaseController_Js(
         let params = {
           module: "PipelineConfig",
           parent: "Settings",
-          action: "SaveEdit",
+          action: "Detail",
           mode: "getDetailPipeline",
           id: self.record,
         };
@@ -502,7 +502,7 @@ CustomView_BaseController_Js(
       let params = {
         module: "PipelineConfig",
         parent: "Settings",
-        action: "SaveEdit",
+        action: "EditorAjax",
         mode: "getRoleList",
       };
       app.request.post({ data: params }).then((err, res) => {
@@ -519,7 +519,7 @@ CustomView_BaseController_Js(
             name: role.rolename,
           });
         });
-        console.log("Updated rolesList:", self.rolesList);
+        console.log("Updated rolesListđ:", self.rolesList);
       });
     },
 

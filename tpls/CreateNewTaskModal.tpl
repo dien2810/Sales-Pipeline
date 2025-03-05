@@ -93,19 +93,6 @@
                         <textarea rows="3" class="w50 resize-vertical" name="description"></textarea>
                     </div>
                 </div>
-                {* <div class="form-group">
-                    <div class="fieldLabel col-sm-3 text-left ml-3">
-                        {vtranslate('LBL_TIME', $MODULE_NAME)}
-                    </div>
-                    <div class="controls col-sm-6">
-                        <div class="input-group inputElement time" >
-                            <input type="text" name="typeTime" class="timepicker-default form-control" data-format="12" data-rule-required="true"/>
-                            <span class="input-group-addon">
-                                <i class="fa fa-clock-o"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div> *}
                 <div class="form-group">
                     <div class="fieldLabel col-sm-3 text-left ml-3">
                         {vtranslate('LBL_SEND_NOTIFICATION', $MODULE_NAME)}
@@ -116,7 +103,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer ">
+        <div class="modal-footer">
             <center>
                 {if $BUTTON_NAME neq null}
                     {assign var=BUTTON_LABEL value=$BUTTON_NAME}

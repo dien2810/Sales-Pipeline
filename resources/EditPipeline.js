@@ -258,12 +258,6 @@ CustomView_BaseController_Js(
       //  =================================================================================================
 
       //Begin Tran Dien
-
-      // this.renderStageCrumbs(this.stagesList);
-      // this.renderStagesInfo(this.stagesList);
-      // this.registerAddActionSettingModal(form);
-      // this.registerAddCondition(form);
-      // this.registerSavePipelineButtonClickEvent(form.find(".savePipeline"));
       //End Tran Dien
       if (mode == "Edit") {
         let params = {
@@ -2681,12 +2675,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "assign_parent_record_owners";
+                } else assigned_user_id = params.assigned_user_id;
                 let callInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -2696,7 +2691,7 @@ CustomView_BaseController_Js(
                   calendar_repeat_limit_date: self.convertDateFormat(
                     params.calendar_repeat_limit_date
                   ),
-                  recurringCheck: params.recurringcheck,
+                  recurringcheck: params.recurringcheck,
                   recurringtype: params.recurringtype,
                   repeat_frequency: params.repeat_frequency
                     ? parseInt(params.repeat_frequency)
@@ -2845,12 +2840,13 @@ CustomView_BaseController_Js(
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "copyParentOwner";
+                } else assigned_user_id = params.assigned_user_id;
                 let meetingInfo = {
-                  assigned_user_id: params.assigned_user_id,
+                  assigned_user_id: assigned_user_id,
                   assign_parent_record_owners:
-                    params.assign_parent_record_owners
-                      ? params.assign_parent_record_owners
-                      : null,
+                    params.assign_parent_record_owners ? 1 : null,
                   description: params.description,
                   duration: parseInt(params.duration),
                   durationUnit: params.durationUnit,
@@ -2994,7 +2990,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-            var form = modal.find(".addNotificationForm");
+            var form = modal.find("#form-create-new-project-task");
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
@@ -3004,6 +3000,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
+                console.log(params);
                 return false;
               },
             };
@@ -3035,65 +3032,62 @@ CustomView_BaseController_Js(
           return;
         }
         app.helper.hideModal();
-        // Show modal fix error
-        app.helper.loadPageContentOverlay(res).then(function (modal) {
-          modal.css("display", "block");
-
-          var form = modal.find("#form-create-new-record");
-          form.on("change", "#createEntityModule", function (e) {
-            // form
-            //   .find(".initialDataField")
-            //   .toggleClass("hide", !$(this).val());
-            var relatedModule = jQuery(e.currentTarget).val();
-            var module_name = jQuery("#module_name").val();
-            if (relatedModule == module_name) {
-              jQuery(e.currentTarget)
-                .closest(".taskTypeUi")
-                .find(".sameModuleError")
-                .removeClass("hide");
-            } else {
-              jQuery(e.currentTarget)
-                .closest(".taskTypeUi")
-                .find(".sameModuleError")
-                .addClass("hide");
-            }
-            var params = {
-              module: app.getModuleName(),
-              parent: app.getParentModuleName(),
-              view: "EditPipelineAjax",
-              mode: "getCreateEntity",
-              relatedModule: jQuery(e.currentTarget).val(),
-              module_name: self.currentNameModule,
-            };
-
-            app.helper.showProgress();
-            app.request.post({ data: params }).then(function (error, data) {
-              if (error) {
-                console.log(error);
+        // Show modal
+        let modalInstance = app.helper
+          .loadPageContentOverlay(res)
+          .then(function (modal) {
+            var form = modal.find("#form-create-new-record");
+            form.on("change", "#createEntityModule", function (e) {
+              var relatedModule = jQuery(e.currentTarget).val();
+              var module_name = jQuery("#module_name").val();
+              if (relatedModule == module_name) {
+                jQuery(e.currentTarget)
+                  .closest(".taskTypeUi")
+                  .find(".sameModuleError")
+                  .removeClass("hide");
+              } else {
+                jQuery(e.currentTarget)
+                  .closest(".taskTypeUi")
+                  .find(".sameModuleError")
+                  .addClass("hide");
               }
-              app.helper.hideProgress();
-              var createEntityContainer = jQuery("#addCreateEntityContainer");
-              createEntityContainer.html(data);
-              vtUtils.showSelect2ElementView(
-                createEntityContainer.find(".select2")
-              );
+              var params = {
+                module: app.getModuleName(),
+                parent: app.getParentModuleName(),
+                view: "EditPipelineAjax",
+                mode: "getCreateEntity",
+                relatedModule: jQuery(e.currentTarget).val(),
+                module_name: self.currentNameModule,
+              };
 
-              self.registerAddFieldEvent();
-              self.fieldValueMap = false;
-              if (jQuery("#fieldValueMapping").val()) {
-                self.fieldValueReMapping();
-              }
-              var fields = jQuery("#save_fieldvaluemapping").find(
-                'select[name="fieldname"]'
-              );
-              jQuery.each(fields, function (i, field) {
-                self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
+              app.helper.showProgress();
+              app.request.post({ data: params }).then(function (error, data) {
+                if (error) {
+                  console.log(error);
+                }
+                app.helper.hideProgress();
+                var createEntityContainer = jQuery("#addCreateEntityContainer");
+                createEntityContainer.html(data);
+                vtUtils.showSelect2ElementView(
+                  createEntityContainer.find(".select2")
+                );
+
+                self.registerAddFieldEvent();
+                self.fieldValueMap = false;
+                if (jQuery("#fieldValueMapping").val()) {
+                  self.fieldValueReMapping();
+                }
+                var fields = jQuery("#save_fieldvaluemapping").find(
+                  'select[name="fieldname"]'
+                );
+                jQuery.each(fields, function (i, field) {
+                  self.loadFieldSpecificUiOnCreateNewRecord(jQuery(field));
+                });
               });
             });
+            self.registerVTUpdateFieldsTaskEvents();
+            self.registerSaveTaskSubmitEvent();
           });
-          self.registerVTUpdateFieldsTaskEvents();
-          self.registerSaveTaskSubmitEvent();
-        });
       });
     },
 

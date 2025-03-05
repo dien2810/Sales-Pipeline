@@ -16,9 +16,11 @@
         <div class="modal-footer text-center">
             <button type="button" class="btn btn-secondary"
                 style="background-color: white; color: #008ecf; border: 1px solid #ced4da;" data-dismiss="modal">
-                Hủy
+                {vtranslate('LBL_CANCEL', $MODULE_NAME)}
             </button>
-            <button type="submit" class="btn btn-primary">Xóa</button>
+            <button type="submit" class="btn btn-primary">
+                {vtranslate('LBL_DELETE', $MODULE_NAME)}
+            </button>
         </div>
         <!-- {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'} -->
 

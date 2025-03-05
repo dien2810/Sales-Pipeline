@@ -51,7 +51,7 @@
     <td>
         <span class="fieldValue">
             <span class="value textOverflowEllipsis pipeline-creator">
-                {vtranslate('LBL_ROLE', $MODULE_NAME)}
+                {$PIPELINE.create_by}
             </span>
         </span>
     </td>

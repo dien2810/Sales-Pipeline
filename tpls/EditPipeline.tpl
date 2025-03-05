@@ -6,7 +6,6 @@
 <div id="editPipeline-page" class="row-fluid">
     <form autocomplete="off" id="editPipeline" name="editPipeline">
         <div class="fieldBlockContainer">
-            <!-- Sử dụng LBL_CREATE_PIPELINE thay cho “Tạo mới pipeline” -->
             <h4 class="fieldBlockHeader" style="margin-top:10px">{vtranslate('LBL_CREATE_PIPELINE', $MODULE_NAME)}</h4>
             <div class="contents tabbable" style="margin-top: 40px;">
                 <ul class="nav nav-tabs marginBottom10px">
@@ -39,7 +38,7 @@
                                         {vtranslate('LBL_PIPELINE_TIME', $MODULE_NAME)}&nbsp;
                                     </td>
                                     <td class="fieldValue">
-                                        <!-- Hiển thị khi là module khác -->
+
                                         <div class="input-group othermodule">
                                             <input type="text" name="time" value="" class="inputElement time"
                                                 style="width: 30px;">
@@ -55,7 +54,7 @@
                                                 <i class="far fa-info-circle"></i>
                                             </span>
                                         </div>
-                                        <!-- Hiện khi là module cốt lõi -->
+
                                         <div class="input-group potentials">
                                             <span class="textElement toal-time-pipeline"
                                                 style="margin-top:7px; margin-left: 10px;">0
@@ -276,7 +275,6 @@
         </div>
     </form>
 </div>
-<!-- Nút Thêm hoặc Hủy -->
 <div class="modal-overlay-footer clearfix">
     <div class="row clear-fix">
         <div class="textAlignCenter col-lg-12 col-md-12 col-sm-12">

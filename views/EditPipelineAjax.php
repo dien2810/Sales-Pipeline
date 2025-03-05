@@ -253,18 +253,18 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
         }
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
-		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
 		
-		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
-		$recordStructure = $recordStructureInstance->getStructure();
+		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
 		// Render view
 		$viewer = $this->getViewer($request);
 
 		$workflowModel = Settings_Workflows_Record_Model::getCleanInstance($pipelineModule);
+		
 		$taskType = 'VTCreateTodoTask';
-        $taskModel = Settings_Workflows_TaskRecord_Model::getCleanInstance($workflowModel, $taskType);
+        $taskModel = Settings_Workflows_TaskRecord_Model::getCleanInstance($workflowModel, $taskType);		
 
 		$taskTypeModel = $taskModel->getTaskType();
+		
 		$viewer->assign('TASK_TYPE_MODEL', $taskTypeModel);
 
 		$viewer->assign('TASK_TEMPLATE_PATH', $taskTypeModel->getTemplatePath());
@@ -280,9 +280,8 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('MODULE_NAME', $moduleName);
         $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
-		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
-		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
 		// Modal send Update Data Field
+		
 		$viewer->display('modules/Settings/PipelineConfig/tpls/CreateNewTaskModal.tpl');
 	}
 	

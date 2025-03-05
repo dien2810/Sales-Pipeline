@@ -21,7 +21,7 @@
                     <div class="tab-pane active" id="tab1">
                         <table class="table table-borderless">
                             <tbody>
-                                <!-- Dòng 1 -->
+
                                 <tr>
                                     <td class="fieldLabel name alignMiddle">
                                         {vtranslate('LBL_PIPELINE_NAME', $MODULE_NAME)}&nbsp;<span
@@ -42,7 +42,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- Dòng 2 -->
+
                                 <tr>
                                     <td class="fieldLabel module alignMiddle">
                                         {vtranslate('LBL_MODULE', $MODULE_NAME)}&nbsp;<span class="redColor">*</span>
@@ -57,7 +57,7 @@
                                             $MODULE_NAME)}{else}{vtranslate('LBL_NO', $MODULE_NAME)}{/if}</span>
                                     </td>
                                 </tr>
-                                <!-- Dòng 3 -->
+
                                 <tr>
                                     <td class="fieldLabel grant alignMiddle">
                                         {vtranslate('LBL_PERMISSIONS', $MODULE_NAME)}&nbsp;
@@ -80,7 +80,7 @@
                                         <span>{$PIPELINE_DETAIL.description}</span>
                                     </td>
                                 </tr>
-                                <!-- Dòng 4 -->
+
                                 <tr>
                                     <td class="fieldLabel status alignMiddle">
                                         {vtranslate('LBL_STATUS', $MODULE_NAME)}&nbsp;<span class="redColor">*</span>
@@ -171,7 +171,7 @@
                     </div>
 
                     <div class="tab-pane" id="tab2">
-                        <!-- Nội dung tab Tự động hóa nếu có -->
+
                     </div>
                 </div>
             </div>

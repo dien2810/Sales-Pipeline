@@ -51,7 +51,9 @@ CustomView_BaseController_Js(
                 .text()
                 .trim();
               errorMessages.push(
-                `Vui lòng chọn bước thay thế cho bước "${currentStage}".`
+                app
+                  .vtranslate("JS_ERROR_SELECT_REPLACEMENT_STAGE")
+                  .replace("{stage}", currentStage)
               );
               valid = false;
             }
@@ -79,11 +81,10 @@ CustomView_BaseController_Js(
             });
             return;
           }
-          console.log("Xóa Pipeline khác rỗng");
-          console.log(response);
+
           if (response.success) {
             app.helper.showSuccessNotification({
-              message: "Xóa Pipeline thành công",
+              message: app.vtranslate("JS_PIPELINE_DELETED_SUCCESS"),
             });
           } else {
             app.helper.showErrorNotification({
@@ -186,8 +187,10 @@ CustomView_BaseController_Js(
           }
 
           if (response.data) {
-            let options =
-              '<option value="">Chọn một giá trị Pipeline thay thế</option>';
+            let options = `<option value="">${app.vtranslate(
+              "JS_SELECT_REPLACEMENT_PIPELINE"
+            )}</option>`;
+
             response.data.forEach(function (stage) {
               options +=
                 '<option value="' +
@@ -309,11 +312,10 @@ CustomView_BaseController_Js(
               });
               return;
             }
-            console.log("Response");
-            console.log(response);
+
             if (response.success) {
               app.helper.showSuccessNotification({
-                message: "Xóa Pipeline thành công",
+                message: app.vtranslate("JS_PIPELINE_DELETED_SUCCESS"),
               });
             } else {
               app.helper.showErrorNotification({
@@ -362,7 +364,7 @@ CustomView_BaseController_Js(
             form.vtValidate({
               submitHandler: function () {
                 const formData = form.serializeFormData();
-                alert("Hello");
+
                 self.savePipelineStage(formData).then(() => {
                   form.find(".cancelLink").trigger("click");
                 });
@@ -449,7 +451,7 @@ CustomView_BaseController_Js(
             toggleElement.removeClass("active");
           }
           app.helper.showSuccessNotification({
-            message: "Cập nhật trạng thái thành công",
+            message: app.vtranslate("JS_STATUS_UPDATED_SUCCESS"),
           });
         } else {
           app.helper.showErrorNotification({
@@ -510,7 +512,7 @@ CustomView_BaseController_Js(
             this.currentSeachText
           );
           app.helper.showSuccessNotification({
-            message: "Nhân đôi pipeline thành công",
+            message: app.vtranslate("JS_PIPELINE_DUPLICATED_SUCCESS"),
           });
         } else {
           app.helper.showErrorNotification({
@@ -519,7 +521,6 @@ CustomView_BaseController_Js(
         }
         app.helper.hideProgress();
       });
-      alert("Nhân đôi Pipeline");
     },
     // End Dien Nguyen
     getForm: function () {

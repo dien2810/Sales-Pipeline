@@ -208,14 +208,13 @@ CustomView_BaseController_Js(
           .trim();
         if (!hiddenValue || !selectedValue) {
           app.helper.showErrorNotification({
-            message:
-              "Cả giá trị của bước xóa và bước thay thế đều đang rỗng. Vui lòng nhập đầy đủ thông tin!",
+            message: app.vtranslate("JS_DELETE_REPLACE_STEP_EMPTY"),
           });
           return;
         }
         if (hiddenValue == selectedValue) {
           app.helper.showErrorNotification({
-            message: "Bước xóa và bước thay thế phải khác nhau !",
+            message: app.vtranslate("JS_DELETE_REPLACE_STEP_MUST_DIFFERENT"),
           });
           return;
         }
@@ -234,7 +233,7 @@ CustomView_BaseController_Js(
           console.log("Responsive", response);
           if (err) {
             app.helper.showErrorNotification({
-              message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+              message: err.message,
             });
             return;
           }
@@ -244,7 +243,7 @@ CustomView_BaseController_Js(
           // Remove from DOM
           jQuery(`tr[data-stage-id="${hiddenValue}"]`).remove();
           app.helper.showSuccessNotification({
-            message: "Đã xóa bước thành công",
+            message: app.vtranslate("JS_STEP_DELETED_SUCCESS"),
           });
           self.calculateTotalTime();
           self.updateNextStagesOptions();
@@ -298,7 +297,7 @@ CustomView_BaseController_Js(
           app.helper.hideProgress();
           if (err) {
             app.helper.showErrorNotification({
-              message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+              message: err.message,
             });
             return;
           }
@@ -585,11 +584,11 @@ CustomView_BaseController_Js(
             app.helper.hideProgress();
             console.log("Response savePipeline:", response);
             app.helper.showSuccessNotification({
-              message: "Thêm pipeline thành công !",
+              message: app.vtranslate("JS_PIPELINE_ADDED_SUCCESS"),
             });
             if (err) {
               app.helper.showErrorNotification({
-                message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+                message: err.message,
               });
               return;
             }
@@ -607,11 +606,11 @@ CustomView_BaseController_Js(
             app.helper.hideProgress();
             console.log("Response updatePipeline:", response);
             app.helper.showSuccessNotification({
-              message: "Cập nhật pipeline thành công !",
+              message: app.vtranslate("JS_PIPELINE_UPDATED_SUCCESS"),
             });
             if (err) {
               app.helper.showErrorNotification({
-                message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+                message: err.message,
               });
               return;
             }
@@ -632,16 +631,18 @@ CustomView_BaseController_Js(
         let errorMessage = "";
         if (!name) {
           hasError = true;
-          errorMessage += "Vui lòng nhập tên pipeline\n";
+          errorMessage += app.vtranslate("JS_ERROR_ENTER_PIPELINE_NAME") + "\n";
         }
         if (!module) {
           hasError = true;
-          errorMessage += "Vui lòng chọn module\n";
+          errorMessage += app.vtranslate("JS_ERROR_SELECT_MODULE") + "\n";
         }
         if (stageCount < 1) {
           hasError = true;
-          errorMessage += "Vui lòng thêm ít nhất 1 stage\n";
+          errorMessage +=
+            app.vtranslate("JS_ERROR_ADD_AT_LEAST_ONE_STAGE") + "\n";
         }
+
         if (hasError) {
           app.helper.showErrorNotification({
             message: errorMessage,
@@ -741,7 +742,7 @@ CustomView_BaseController_Js(
       self.stagesList.sort((a, b) => a.sequence - b.sequence);
       self.updateNextStagesOptions();
       app.helper.showSuccessNotification({
-        message: "Bước đã được sắp xếp lại thành công",
+        message: app.vtranslate("JS_STEP_REORDERED_SUCCESS"),
       });
       console.log("Updated stagesList2:", self.stagesList);
     },
@@ -856,7 +857,7 @@ CustomView_BaseController_Js(
           return stage;
         });
         app.helper.showSuccessNotification({
-          message: "Cập nhật bước bắt buộc thành công !",
+          message: app.vtranslate("JS_MANDATORY_STEP_UPDATED_SUCCESS"),
         });
         console.log(
           "Updated stagesList after checkbox change:",
@@ -895,17 +896,18 @@ CustomView_BaseController_Js(
               const formData = form.serializeFormData();
               let errors = [];
               if (!formData.vn_label_select) {
-                errors.push("Vui lòng chọn nhãn hiển thị Tiếng Việt");
+                errors.push(app.vtranslate("JS_ERROR_SELECT_VN_LABEL"));
               }
               if (!formData.en_label) {
-                errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
+                errors.push(app.vtranslate("JS_ERROR_ENTER_EN_LABEL"));
               }
               if (!formData.value) {
-                errors.push("Vui lòng nhập giá trị");
+                errors.push(app.vtranslate("JS_ERROR_ENTER_VALUE"));
               }
               if (!formData.color) {
-                errors.push("Vui lòng chọn màu");
+                errors.push(app.vtranslate("JS_ERROR_SELECT_COLOR"));
               }
+
               if (errors.length > 0) {
                 const errorMessage = errors.join("<br>");
                 app.helper.showErrorNotification({
@@ -914,14 +916,14 @@ CustomView_BaseController_Js(
                 return false;
               }
               const inputValue = formData.value.trim().toLowerCase();
-              console.log("Check trùng", self.stagesList);
+              // console.log("Check trùng", self.stagesList);
               const isDuplicate = self.stagesList.some(function (stage) {
                 return stage.value.trim().toLowerCase() === inputValue;
               });
 
               if (isDuplicate) {
                 app.helper.showErrorNotification({
-                  message: "Giá trị đã tồn tại, không thể thêm bước trùng",
+                  message: app.vtranslate("JS_DUPLICATE_STEP_ERROR"),
                 });
                 return false;
               }
@@ -982,7 +984,7 @@ CustomView_BaseController_Js(
               // console.log("End", self.stagesList);
               app.helper.hideModal();
               app.helper.showSuccessNotification({
-                message: "Thêm giai đoạn mới thành công",
+                message: app.vtranslate("JS_ADD_STAGE_SUCCESS"),
               });
               //Begin The Vi
               // self.renderStageCrumbs(self.stagesList);
@@ -1254,7 +1256,7 @@ CustomView_BaseController_Js(
           self.stagesList[stageIndex].success_rate = parseInt(selectedRate);
           self.sortStagesBySuccessRate();
           app.helper.showSuccessNotification({
-            message: `Đã cập nhật tỉ lệ thành công thành ${selectedRate}%`,
+            message: app.vtranslate("JS_UPDATE_SUCCESS_RATE"),
           });
 
           console.log("Updated and sorted stages:", self.stagesList);
@@ -1289,7 +1291,7 @@ CustomView_BaseController_Js(
       if (self.mode != "Edit") {
         app.helper
           .showConfirmationBox({
-            message: "Bạn có chắc chắn muốn xóa bước này?",
+            message: app.vtranslate("JS_CONFIRM_DELETE_STEP"),
           })
           .then(function () {
             // Remove from stagesList array
@@ -1301,7 +1303,7 @@ CustomView_BaseController_Js(
             jQuery(`tr[data-stage-id="${stageId}"]`).remove();
 
             app.helper.showSuccessNotification({
-              message: "Đã xóa bước thành công",
+              message: app.vtranslate("JS_STEP_DELETED_SUCCESS"),
             });
             self.calculateTotalTime();
             self.updateNextStagesOptions();
@@ -1360,8 +1362,7 @@ CustomView_BaseController_Js(
         // alert(self.isFirstOpen);
 
         const newModule = jQuery(e.currentTarget).val();
-        const confirmMessage =
-          "Thay đổi module sẽ xóa tất cả các bước hiện tại. Bạn có chắc chắn muốn thực hiện?";
+        const confirmMessage = app.vtranslate("JS_CONFIRM_MODULE_CHANGE");
         // alert(self.isFirstOpen);
 
         if (self.mode !== "Edit" || self.isFirstOpen !== 1) {
@@ -1374,7 +1375,7 @@ CustomView_BaseController_Js(
               self.calculateTotalTime();
 
               app.helper.showSuccessNotification({
-                message: "Đã thay đổi module thành công",
+                message: app.vtranslate("JS_MODULE_CHANGED_SUCCESS"),
               });
 
               self.handleColumnVisibility();
@@ -1405,22 +1406,22 @@ CustomView_BaseController_Js(
             !formData.itemLabelDisplayVn ||
             formData.itemLabelDisplayVn.trim() === ""
           ) {
-            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Việt");
+            errors.push(app.vtranslate("JS_ERROR_ENTER_VN_LABEL"));
           }
 
           if (
             !formData.itemLabelDisplayEn ||
             formData.itemLabelDisplayEn.trim() === ""
           ) {
-            errors.push("Vui lòng nhập nhãn hiển thị Tiếng Anh");
+            errors.push(app.vtranslate("JS_ERROR_ENTER_EN_LABEL"));
           }
 
           if (!formData.newValue || formData.newValue.trim() === "") {
-            errors.push("Vui lòng nhập giá trị");
+            errors.push(app.vtranslate("JS_ERROR_ENTER_VALUE"));
           }
 
           if (!formData.color || formData.color.trim() === "") {
-            errors.push("Vui lòng chọn màu");
+            errors.push(app.vtranslate("JS_ERROR_SELECT_COLOR"));
           }
           if (errors.length > 0) {
             const errorMessage = errors.join("<br>");
@@ -1447,18 +1448,20 @@ CustomView_BaseController_Js(
             app.helper.hideProgress();
             if (err) {
               app.helper.showErrorNotification({
-                message: err.message || "Có lỗi xảy ra khi thêm giai đoạn mới",
+                message: err.message,
               });
               return;
             }
             if (response && response.picklistValueId) {
               app.helper.showSuccessNotification({
-                message: "Thêm giai đoạn mới thành công",
+                message: app.vtranslate("JS_STAGE_ADDED_SUCCESS"),
               });
             } else {
               const errorMsg =
-                (response && response.message) ||
-                "Thêm giai đoạn mới không thành công";
+                response && response.message
+                  ? response.message
+                  : app.vtranslate("JS_STAGE_ADDED_FAILURE");
+
               app.helper.showErrorNotification({
                 message: errorMsg,
               });
@@ -1826,7 +1829,7 @@ CustomView_BaseController_Js(
                 // Kiểm tra nếu action_time_type là "scheduled" thì bắt buộc nhập time
                 if (params.action_time_type === "scheduled" && !params.time) {
                   app.helper.showErrorNotification({
-                    message: "Vui lòng nhập giá trị thời gian!",
+                    message: app.vtranslate("JS_ERROR_ENTER_TIME_VALUE"),
                   });
                   return false;
                 }

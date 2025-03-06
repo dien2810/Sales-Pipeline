@@ -285,28 +285,39 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->display('modules/Settings/PipelineConfig/tpls/CreateNewTaskModal.tpl');
 	}
 	
+	// Add by Dien Nguyen on 2025-03-06 to show Modal Create New Project Task
 	function getCreateNewProjectTaskModal(Vtiger_Request $request) {
-		$moduleName = $request->getModule(false);
-		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
-        $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
-        foreach ($allModules as $name => $label) {
-            if (!in_array($name, $allowedModules)) {
-                unset($allModules[$name]);
-            }
-        }
+		$viewer = $this->getViewer($request);
+		$recordModel = Vtiger_Record_Model::getCleanInstance('ProjectTask');
+
+		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceFromRecordModel($recordModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_DEFAULT);
+		$recordStructure = $recordStructureInstance->getStructure();
+		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
+		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+		$viewer->assign('RECORD_STRUCTURE_JSON', Vtiger_Functions::jsonEncode($recordStructure));
+
+		$moduleName = 'ProjectTask';
+		$moduleModel = Vtiger_Module_Model::getInstance($moduleName);
+
+		$fieldModel = Vtiger_Field_Model::getInstance('projecttasktype', $moduleModel);
+		$taskTypePicklistValues = $fieldModel->getPicklistValues();
+		$viewer->assign('PROJECT_TASK_TYPE_VALUES', $taskTypePicklistValues);
+
+		$fieldModel = Vtiger_Field_Model::getInstance('projecttaskstatus', $moduleModel);
+		$taskStatusPicklistValues = $fieldModel->getPicklistValues();
+		$viewer->assign('PROJECT_TASK_STATUS_VALUES', $taskStatusPicklistValues);
+
 		$currentModuleName = $request->get('currentNameModule');
 		$pipelineModule = !empty($currentModuleName) ? $currentModuleName : "Potentials";
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
-		$recordStructureInstance = Vtiger_RecordStructure_Model::getInstanceForModule($moduleModel, Vtiger_RecordStructure_Model::RECORD_STRUCTURE_MODE_FILTER);
-		$recordStructure = $recordStructureInstance->getStructure();
-		// Render view
-		$viewer = $this->getViewer($request);
+		$moduleName = $request->getModule(false);
 		$viewer->assign('MODULE_NAME', $moduleName);
-        $viewer->assign('ALL_MODULES', $allModules);
 		$viewer->assign('MODULE_MODEL',$moduleModel);
-		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
-		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+
+		$dateTimeFields = $moduleModel->getFieldsByType(array('date', 'datetime'));
+		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
+		
+		
 		// Modal send Update Data Field
 		$viewer->display('modules/Settings/PipelineConfig/tpls/CreateNewProjectTaskModal.tpl');
 	}

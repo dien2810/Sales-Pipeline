@@ -2969,6 +2969,7 @@ CustomView_BaseController_Js(
     },
 
     showCreateNewProjectTaskModal: function (targetBtn) {
+      var self = this;
       app.helper.showProgress();
       // Request modal content
       let params = {
@@ -2976,6 +2977,7 @@ CustomView_BaseController_Js(
         parent: "Settings",
         view: "EditPipelineAjax",
         mode: "getCreateNewProjectTaskModal",
+        currentNameModule: self.currentNameModule,
       };
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
@@ -2991,16 +2993,51 @@ CustomView_BaseController_Js(
           cb: function (modal) {
             modal.css("display", "block");
             var form = modal.find("#form-create-new-project-task");
+            vtUtils.initDatePickerFields(form);
+            self.registerToggleCheckboxEvent(form);
+            CustomOwnerField.initCustomOwnerFields(
+              form.find('input[name="assigned_user_id"]')
+            );
+            self.registerOwnerFieldEvent(form);
+            $("#fullInfo").click(function () {
+              $("#extraInfo").slideDown();
+              $(this).hide();
+            });
             var controller = Vtiger_Edit_Js.getInstance();
             controller.registerBasicEvents(form);
             vtUtils.applyFieldElementsView(form);
-
             // Form validation
             var params = {
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
                 console.log(params);
+                if (params.assign_parent_record_owners) {
+                  assigned_user_id = "copyParentOwner";
+                } else assigned_user_id = params.assigned_user_id;
+                let projectTaskInfo = {
+                  assigned_user_id: assigned_user_id,
+                  assign_parent_record_owners:
+                    params.assign_parent_record_owners ? 1 : null,
+                  description: params.description,
+                  endDateDirection: params.endDateDirection,
+                  endDatefield: params.endDatefield,
+                  endDays: parseInt(params.endDays),
+                  enddate: params.enddate,
+                  projectid: params.projectid,
+                  projecttaskname: params.projecttaskname,
+                  projecttaskstatus: params.projecttaskstatus,
+                  projecttasktype: params.projecttasktype,
+                  startdate: params.startdate,
+                };
+                self.action["projectTaskInfo"] = projectTaskInfo;
+                self.action["action_name"] = params.action_name;
+                self.action["action_type"] = "createNewProjectTask";
+                self.action["time"] = self.action["time"]
+                  ? parseInt(self.action["time"])
+                  : null;
+                self.targetController.pushAction(self.action, self.isEdit);
+                app.helper.hideModal();
                 return false;
               },
             };

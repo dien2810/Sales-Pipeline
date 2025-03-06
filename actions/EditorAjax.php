@@ -1,9 +1,9 @@
 <?php
 /*
-	Action SaveEdit
+	Action EditorAjax
 	Author: The Vi
 	Date: 24/1/2025
-	Purpose: Handle logic to save Edit Pipeline configuration
+	Purpose: Handle logic to page Edit Pipeline
 */
 require_once('include/utils/CustomConfigUtils.php');
 require_once ('include/utils/FileUtils.php');

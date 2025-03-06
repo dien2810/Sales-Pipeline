@@ -382,7 +382,7 @@ class PipelineAction
         return false;
     }
     // Implement by The Vi to check pipeline stage conditions
-    public static function checkPipelineStageConditions($potentialid, $conditions, $stageid, $module) {
+    public static function checkPipelineStageConditions($recordid, $conditions, $stageid, $module) {
         $moduleModel = Vtiger_Module_Model::getInstance($module);
         $moduleName = $moduleModel->getName();
 		
@@ -407,7 +407,7 @@ class PipelineAction
     
         if ($result && $adb->num_rows($result) > 0) {
             while ($row = $adb->fetchByAssoc($result)) {
-                if ($row[$idColumn] == $potentialid) {
+                if ($row[$idColumn] == $recordid) {
                     return true;
                 }
             }

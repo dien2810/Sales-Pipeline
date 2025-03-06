@@ -171,9 +171,6 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     public static function deletePipelineById($id) {
         $db = PearDatabase::getInstance();
 
-        if (empty($id)) {
-            throw new Exception("ID không được để trống");
-        }
         try {
             $db->startTransaction();
                 $queryStages = "SELECT stageid FROM vtiger_stage WHERE pipelineid = ?";
@@ -222,11 +219,7 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     // Implemented by The Vi to checks if a pipeline record exists. 
     public static function isPipelineRecordExist($pipelineId) {
         $db = PearDatabase::getInstance();
-        
-        if (empty($pipelineId)) {
-            throw new Exception("Pipeline ID không được để trống");
-        }
-        
+    
         $query = "SELECT 1 FROM vtiger_potential WHERE pipelineid = ? LIMIT 1";
         $params = [$pipelineId];
         $result = $db->pquery($query, $params);

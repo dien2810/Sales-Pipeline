@@ -1,9 +1,9 @@
 <?php
 /*
-	Action SaveEdit
+	Action : Detail
 	Author: The Vi
 	Date: 24/1/2025
-	Purpose: Handle logic to save Edit Pipeline configuration
+	Purpose: Handle logic to detail page
 */
 require_once('include/utils/CustomConfigUtils.php');
 require_once ('include/utils/FileUtils.php');

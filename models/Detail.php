@@ -7,10 +7,11 @@
 */
 class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
 
-    // Implemented by The Vi to retrieves detailed information about a pipeline
+    // Implemented by The Vi on 2025-02-20 to retrieves detailed information about a pipeline
     public static function getDetailPipeline($pipelineId) { 
         $db = PearDatabase::getInstance();
         
+        //Get pipeline data
         $pipelineQuery = "SELECT * 
                           FROM vtiger_pipeline 
                           WHERE pipelineid = ?";
@@ -19,6 +20,7 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
 
         $pipelineData = $db->fetchByAssoc($pipelineResult);
       
+        //Get role pipeline
         $rolesQuery = "SELECT rp.roleid, r.rolename 
                        FROM vtiger_rolepipeline rp 
                        JOIN vtiger_role r ON rp.roleid = r.roleid 
@@ -35,6 +37,7 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
             );
         }
     
+        //Get stages pipeline
         $stagesQuery = "SELECT * FROM vtiger_stage WHERE pipelineid = ? ORDER BY sequence ASC";
         $stagesResult = $db->pquery($stagesQuery, array($pipelineId));
         $stagesList = array();

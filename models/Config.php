@@ -217,14 +217,13 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         }
     }
     // Implemented by The Vi to checks if a pipeline record exists. 
-    public static function isPipelineRecordExist($pipelineId, $module) {
+    public static function isPipelineRecordExist($pipelineId, $sourceModule) {
         $db = PearDatabase::getInstance();
         
         // Get table name for module
-        $query = "SELECT tablename FROM vtiger_entityname WHERE modulename = ?";
-        $result = $db->pquery($query, [$module]);
+        $focus = CRMEntity::getInstance($sourceModule);
     
-        $tableName = $db->query_result($result, 0, 'tablename');
+        $tableName = $focus->table_name;   
         
         $query = "SELECT 1 FROM $tableName WHERE pipelineid = ? LIMIT 1";
         $result = $db->pquery($query, [$pipelineId]);

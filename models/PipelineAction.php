@@ -10,6 +10,7 @@ require_once('modules/com_vtiger_workflow/VTTaskManager.inc');
 require_once('modules/com_vtiger_workflow/VTTaskQueue.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateEventTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateTodoTask.inc');
+require_once('modules/Settings/PipelineConfig/models/VTCreateNewProjectTask.php');
 require_once('modules/com_vtiger_workflow/tasks/VTUpdateFieldsTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateEntityTask.inc');
 require_once('data/CRMEntity.php');
@@ -32,6 +33,9 @@ class PipelineAction
 						break;
 					case 'createNewTask':
 						self::processCreateNewTask($action, $idRecord, $moduleName);
+						break;
+					case 'createNewProjectTask':
+						self::processCreateNewProjectTask($action, $idRecord, $moduleName);
 						break;
 					case 'updateDataField':
                         // Implement by The Vi to process update data fields
@@ -196,7 +200,42 @@ class PipelineAction
 		}
 	}
 
-	// Implement by The Vi on 2025-03-01 to process send notifications
+	// Implement by Dien Nguyen on 2025-03-06 to process create new project task
+	public static function processCreateNewProjectTask($action, $idRecord, $moduleName) {
+		// Initialize workflow utilities and get admin user context
+		$util = new VTWorkflowUtils();
+		$adminUser = $util->adminUser();
+
+		// Retrieve the CRM entity using caching mechanism
+		$entityCache = new VTEntityCache($adminUser);
+		
+		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+		$entity = $entityCache->forId($wsEntityId);
+
+		// Build fields for create new task action
+		if (isset($action['projectTaskInfo'])){
+			$projectTaskInfo = $action['projectTaskInfo'];
+			$task = new VTCreateNewProjectTask();
+			$task->assigned_user_id = $projectTaskInfo['assigned_user_id'];
+			$task->assign_parent_record_owners = $projectTaskInfo['assign_parent_record_owners'];
+			$task->description = $projectTaskInfo['description'];
+			$task->endDateDirection = $projectTaskInfo['endDateDirection'];
+			$task->endDatefield = $projectTaskInfo['endDatefield'];
+			$task->endDays = $projectTaskInfo['endDays'];
+			$task->enddate = $projectTaskInfo['enddate'];
+			$task->projectid = $projectTaskInfo['projectid'];
+			$task->projecttaskname = $projectTaskInfo['projecttaskname'];
+			$task->projecttaskstatus = $projectTaskInfo['projecttaskstatus'];
+			$task->projecttasktype = $projectTaskInfo['projecttasktype'];
+			$task->startdate = $projectTaskInfo['startdate'];
+			
+			// Execute the task and revert the user context back
+			$task->doTask($entity);
+			$util->revertUser();
+		}
+	}
+
+	// Implement by The Vi to process send notifications
 	public static function processSendNotifications($action, $idRecord, $moduleName) {
 		$idNotification = null;
 

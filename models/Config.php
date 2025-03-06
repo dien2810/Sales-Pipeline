@@ -1,7 +1,7 @@
 <?php
 /*
 	Config_Model
-	Author: The Vi
+	Author: Team
 	Date: 22/1/2025
 	Purpose: Provide utility functions for managing pipeline configurations
 */

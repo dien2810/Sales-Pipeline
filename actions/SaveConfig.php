@@ -32,7 +32,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			return;
 		}
 	}
-    // Implemented by The Vi to update status of Pipeline
+    // Implemented by The Vi on 2025-03-05 to update status of Pipeline
 
 	function updateStatusPipeline(Vtiger_Request $request) {
 		$idPipeline = $request->get('idPipeline');
@@ -48,7 +48,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
         }
         $response->emit();
 	}
-	// Implemented by The Vi to get list of stages in a pipeline
+	// Implemented by The Vi on 2025-03-05 to get list of stages in a pipeline
 
 	function getStagePipeline(Vtiger_Request $request) {
 		$idPipeline = $request->get('pipelineId');
@@ -82,7 +82,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 		$response->emit();
 	}
-	// Implemented by The Vi to get list of pipelines
+	// Implemented by The Vi on 2025-03-05 to get list of pipelines
 
 	function getListPipeline(Vtiger_Request $request) {
 		$module = $request->get('moduleName');
@@ -117,7 +117,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 		$response->emit();
 	}
-	// Implemented by The Vi to get list of pipelines with status
+	// Implemented by The Vi on 2025-03-05 to get list of pipelines with status
 
     function getListPipelineStatus(Vtiger_Request $request) {
 		$module = $request->get('moduleName');
@@ -155,7 +155,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 		$response->emit();
 	}
-	// Implemented by The Vi to delete pipeline if it has no record
+	// Implemented by The Vi on 2025-03-05 to delete pipeline if it has no record
 	function deletePipelineEmpty(Vtiger_Request $request) {
 		$idPipeline = $request->get('pipelineId');
 

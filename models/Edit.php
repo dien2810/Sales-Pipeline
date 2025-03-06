@@ -1,13 +1,13 @@
 <?php
 /*
 	Edit_Model
-	Author: The Vi
+	Author: Team
 	Date: 22/1/2025
 	Purpose: Provide utility functions for managing pipeline edit
 */
 class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
-    // Implemented by The Vi to retrieves all stages for a given pipeline ID. 
+    // Implemented by The Vi on 2025-03-05 to retrieves all stages for a given pipeline ID. 
     public static function getStagesByPipelineId($pipelineId) {
         $db = PearDatabase::getInstance();
 
@@ -34,7 +34,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
         return $stages;
     }
 
-    //Implemented by The Vi to deletes a stage and updates related records. 
+    //Implemented by The Vi on 2025-03-05 to deletes a stage and updates related records. 
     public static function deleteStagePipeline($idStageDelete, $idStageReplace, $module) {
         $adb = PearDatabase::getInstance();
         $adb->startTransaction();
@@ -79,7 +79,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
         }
     }
 
-    //Implemented by The Vi to saves a new pipeline with its stages and roles. 
+    //Implemented by The Vi on 2025-03-05 to saves a new pipeline with its stages and roles. 
     public static function savePipeline($pipelineData, $currentUser) {
 
             // Save the pipeline information 
@@ -97,7 +97,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
             ];
 
     }  
-    //Implemented by The Vi to save the pipeline information into the database.
+    //Implemented by The Vi to on 2025-03-03 save the pipeline information into the database.
     
     public static function savePipelineInfo($pipelineData, $currentUser) {
         global $adb;
@@ -147,7 +147,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
         return array('pipelineId' => $newPipelineId, 'roleMapping' => $roleMapping);
     }
 
-    // Implemented by The Vi to save the pipeline stages along with their permissions and allowed transitions.
+    // Implemented by The Vi on 2025-03-01 to save the pipeline stages along with their permissions and allowed transitions.
     public static function savePipelineStages($pipelineData, $newPipelineId, $roleMapping) {
         global $adb;
         $stageIdMap = array(); 
@@ -220,7 +220,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
     }
 
 
-    // Implemented by The Vi to updates an existing pipeline and its related data.
+    // Implemented by The Vi on 2025-03-05 to updates an existing pipeline and its related data.
     public static function updatePipeline($pipelineData, $currentUser) {
         global $adb;
         $pipelineId = $pipelineData['id'];
@@ -251,7 +251,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
         }
     }
     
-    //Implemented by The Vi updates the pipeline's main information and its related roles.
+    //Implemented by The Vi on 2025-03-05 updates the pipeline's main information and its related roles.
      
     public static function updatePipelineInfo($adb, $pipelineData, $pipelineId) {
         // Determine stage count and status values.
@@ -293,9 +293,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
             $adb->pquery($sqlRole, [$roleId, $pipelineId]);
         }
     }
-    
-    
-     //Implemented by The Vi updates or creates pipeline stages including their actions, conditions, permissions, and allowed next transitions.
+     //Implemented by The Vi on 2025-03-05 updates or creates pipeline stages including their actions, conditions, permissions, and allowed next transitions.
   
     public static function updatePipelineStages($adb, $pipelineData, $pipelineId) {
         // Get all existing stage ids for the pipeline.

@@ -7,6 +7,7 @@
 */
 require_once('include/utils/CustomConfigUtils.php');
 require_once ('include/utils/FileUtils.php');
+require_once('modules/Settings/PipelineConfig/models/PipelineAction.php'); 
 
 class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
@@ -15,10 +16,8 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 		$this->exposeMethod('saveOther');
         $this->exposeMethod('savePipeline');
         $this->exposeMethod('updatePipeline');
-		$this->exposeMethod('getRoleList');
-        $this->exposeMethod('getIdFieldByModule');
-        $this->exposeMethod('getDetailPipeline');
-        $this->exposeMethod('deleteStagePipeline'); 
+        $this->exposeMethod('deleteStagePipeline');
+        // $this->exposeMethod('getPipelineStageInfo');
 	}
     public function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
@@ -56,9 +55,7 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
 
         $response->emit();
     }
-
     // Implemented by The Vi to add new stage of pipeline in edit pipeline page
-
 	public function addStagePipelineNew(Vtiger_Request $request) {
         $pickListName = $request->get('picklistName');
         $moduleName = $request->get('source_module');
@@ -110,27 +107,6 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
 
 	}
-    // Implemented by The Vi to get role list
-
-    public function getRoleList(Vtiger_Request $request) {
-        $roleList = Settings_Roles_Record_Model::getAll();
-                $result = [];
-        foreach ($roleList as $roleId => $roleRecord) {
-            $result[] = [
-                'roleid'   => $roleId,
-                'rolename' => $roleRecord->get('rolename'), 
-            ];
-        }
-
-        $response = new Vtiger_Response();
-
-        try {
-            $response->setResult($result);
-        } catch (Exception $e) {
-            $response->setError($e->getCode(), $e->getMessage());
-        }
-        $response->emit();
-    }
     // Implemented by The Vi to save information of pipeline
     public function savePipeline(Vtiger_Request $request) {
         
@@ -148,7 +124,6 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         $response->emit();
     }
     // Implemented by The Vi to update information of pipeline
-
     public function updatePipeline(Vtiger_Request $request) {
         $pipelineData = $request->get('dataPipeline');
         $currentUser = Users_Record_Model::getCurrentUserModel();
@@ -163,21 +138,23 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         }
         // $response->setResult($pipelineData);
         $response->emit();
-    }
-    // Implemented by The Vi to get detail of pipeline
-    public function getDetailPipeline(Vtiger_Request $request) {
-        $idPipeline = $request->get('id');
-       
-        $response = new Vtiger_Response();
-        
-        $result =  Settings_PipelineConfig_Detail_Model::getDetailPipeline($idPipeline);
-       
-        $result['request_id'] = $idPipeline;
-        
-        $response->setResult($result);
-        $response->emit();
-    
-    }
+    }   
+    // public function getPipelineStageInfo(Vtiger_Request $request) {
+    //     $response = new Vtiger_Response();
+    //     try {
+    //         $recordId = $request->get('record');
+    //         $moduleName = $request->get('module');
+           
+    //         $pipelineStageInfo = PipelineAction::getPipelineStageInfo($recordId, $moduleName);
+    //         $response->setResult(array(
+    //             'success' => true,
+    //             'data' =>$pipelineStageInfo
+    //         ));
+    //     } catch(Exception $e) {
+    //         $response->setError($e->getMessage());
+    //     }
+    //     $response->emit();
+    // }
     // public function getIdFieldByModule(Vtiger_Request $request) {
     //     $pipeLine = $request->get('dataPipeline');
     //     //Your code here

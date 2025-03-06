@@ -287,7 +287,7 @@ class PipelineAction
 		}
 	}
 	
-    // Implement by The Vi to process update data fields
+    // Implement by The Vi on 2025-03-01 to process update data fields
 	public static function processUpdateDataFields($action, $idRecord, $moduleName) 
 	{
 			// Initialize workflow utilities and get admin user context
@@ -321,7 +321,7 @@ class PipelineAction
 			$util->revertUser();
     }
 	
-	// Implement by The Vi to process create new records
+	// Implement by The Vi on 2025-03-01 to process create new records
 	public static function processCreateNewRecords($action, $idRecord, $moduleName) 
 	{
 		// Initialize workflow utilities and retrieve the admin user
@@ -368,7 +368,7 @@ class PipelineAction
 	}
 
     //End process Action
-    // Implement by The Vi to get actions
+    // Implement by The Vi on 2025-03-01 to get actions
 	public static function getActions($idStageNext) {
 		$db = PearDatabase::getInstance();
 		$query = "SELECT actions FROM vtiger_stage WHERE stageid = ?";
@@ -381,7 +381,7 @@ class PipelineAction
 		$actions = json_decode($actionsJson, true);
 		return $actions;
 	}
-	//Implement by The Vi to get conditions
+	//Implement by The Vi on 2025-03-01 to get conditions
 	public static function getConditions($idStageNext) {
 		$db = PearDatabase::getInstance();
 		$query = "SELECT conditions FROM vtiger_stage WHERE stageid = ?";
@@ -398,18 +398,13 @@ class PipelineAction
 		return $conditions;
 	}
 
-    //Implement by The Vi to check conditions
+    //Implement by The Vi on 2025-03-01 to check conditions
     public static function checkConditions($idRecord, $idStageNext, $moduleName) {
-
-    //    if(self::checkChangeStage($idRecord, $idStageNext)) {
-    //        return true;
-    //    }
-
        $conditions = self::getConditions($idStageNext);
        return self::checkPipelineStageConditions($idRecord, $conditions, $idStageNext, $moduleName);
     }
 
-    //Implement by The Vi to check change stage
+    //Implement by The Vi on 2025-03-01 to check change stage
     public static function checkChangeStage($idRecord, $idStageNext) {
         $db = PearDatabase::getInstance();
         $result = $db->pquery("SELECT stageid FROM vtiger_potential WHERE potentialid = ?", array($idRecord));
@@ -425,8 +420,8 @@ class PipelineAction
         }
         return false;
     }
-    // Implement by The Vi to check pipeline stage conditions
-    public static function checkPipelineStageConditions($potentialid, $conditions, $stageid, $module) {
+    // Implement by The Vi and Tran Dien on 2025-03-01 to check pipeline stage conditions
+    public static function checkPipelineStageConditions($recordid, $conditions, $stageid, $module) {
         $moduleModel = Vtiger_Module_Model::getInstance($module);
         $moduleName = $moduleModel->getName();
 		
@@ -451,14 +446,14 @@ class PipelineAction
     
         if ($result && $adb->num_rows($result) > 0) {
             while ($row = $adb->fetchByAssoc($result)) {
-                if ($row[$idColumn] == $potentialid) {
+                if ($row[$idColumn] == $recordid) {
                     return true;
                 }
             }
         }
         return false;
     }
-    // Implement by The Vi to get pipeline stage info
+    // Implement by The Vi on 2025-03-05 to get pipeline stage info
     public static function getPipelineStageInfo($recordId, $moduleName) {
         $db = PearDatabase::getInstance();
         $result = array();

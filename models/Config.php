@@ -1,7 +1,7 @@
 <?php
 /*
 	Config_Model
-	Author: The Vi
+	Author: Team
 	Date: 22/1/2025
 	Purpose: Provide utility functions for managing pipeline configurations
 */
@@ -164,16 +164,13 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                 }
             }
         }
-            $deleteResult = self::deletePipelineById($idPipeline);
+     $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
     }
     // Implemented by The Vi deletes a pipeline by ID with transaction handling. 
     public static function deletePipelineById($id) {
         $db = PearDatabase::getInstance();
 
-        if (empty($id)) {
-            throw new Exception("ID không được để trống");
-        }
         try {
             $db->startTransaction();
                 $queryStages = "SELECT stageid FROM vtiger_stage WHERE pipelineid = ?";
@@ -220,20 +217,18 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         }
     }
     // Implemented by The Vi to checks if a pipeline record exists. 
-    public static function isPipelineRecordExist($pipelineId) {
+    public static function isPipelineRecordExist($pipelineId, $module) {
         $db = PearDatabase::getInstance();
         
-        if (empty($pipelineId)) {
-            throw new Exception("Pipeline ID không được để trống");
-        }
+        // Get table name for module
+        $query = "SELECT tablename FROM vtiger_entityname WHERE modulename = ?";
+        $result = $db->pquery($query, [$module]);
+    
+        $tableName = $db->query_result($result, 0, 'tablename');
         
-        $query = "SELECT 1 FROM vtiger_potential WHERE pipelineid = ? LIMIT 1";
-        $params = [$pipelineId];
-        $result = $db->pquery($query, $params);
-                if ($result && $db->num_rows($result) > 0) {
-            return true;
-        }
-        return false;
-    } 
-  
+        $query = "SELECT 1 FROM $tableName WHERE pipelineid = ? LIMIT 1";
+        $result = $db->pquery($query, [$pipelineId]);
+        
+        return ($result && $db->num_rows($result) > 0);
+    }
 }

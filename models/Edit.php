@@ -7,32 +7,6 @@
 */
 class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
-    // Implemented by The Vi on 2025-03-05 to retrieves all stages for a given pipeline ID. 
-    public static function getStagesByPipelineId($pipelineId) {
-        $db = PearDatabase::getInstance();
-
-        $query = 'SELECT * FROM vtiger_stage WHERE pipelineid = ? ORDER BY sequence ASC';
-        $params = [$pipelineId];
-    
-        $result = $db->pquery($query, $params);
-        
-        $stages = [];
-        while ($row = $db->fetch_array($result)) {
-            $stages[] = [
-                'stageid'       => $row['stageid'],
-                'pipelineid'    => $row['pipelineid'],
-                'name'          => $row['name'],
-                'success_rate'  => $row['success_rate'],
-                'time'          => $row['time'],
-                'time_unit'     => $row['time_unit'],
-                'is_mandatory'  => $row['is_mandatory'],
-                'color_code'    => $row['color_code'],
-                'sequence'      => $row['sequence'],
-            ];
-        }
-    
-        return $stages;
-    }
 
     //Implemented by The Vi on 2025-03-05 to deletes a stage and updates related records. 
     public static function deleteStagePipeline($idStageDelete, $idStageReplace, $module) {
@@ -451,6 +425,7 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
             }
         }
     }
+    
     
     // Add by Dien Nguyen on 2025-03-03 to get field expressions on create new record modal
     static function getExpressions() {

@@ -56,14 +56,14 @@ CustomView_BaseController_Js(
       ).find(
         (el) =>
           el.querySelector("h5").textContent.trim() ===
-          "Hành động thực hiện một lần"
+          app.vtranslate("JS_ONCE_ACTION")
       );
       let actionTypeCondition = Array.from(
         actionBox.querySelectorAll(".action-type")
       ).find(
         (el) =>
           el.querySelector("h5").textContent.trim() ===
-          "Hành động thực hiện khi thỏa điều kiện"
+          app.vtranslate("JS_ACTION_WITH_CONDITION")
       );
 
       let iconMap = {
@@ -93,7 +93,9 @@ CustomView_BaseController_Js(
           let newActionType = document.createElement("div");
           newActionType.classList.add("action-type");
           newActionType.innerHTML = `
-                <h5 class="action-title">Hành động thực hiện một lần</h5>
+                <h5 class="action-title">${app.vtranslate(
+                  "JS_ONCE_ACTION"
+                )}</h5>
             `;
           actionBox.prepend(newActionType);
           actionTypeOnce = newActionType;
@@ -104,7 +106,9 @@ CustomView_BaseController_Js(
           let newActionType = document.createElement("div");
           newActionType.classList.add("action-type");
           newActionType.innerHTML = `
-                <h5 class="action-title">Hành động thực hiện khi thỏa điều kiện</h5>
+                <h5 class="action-title">${app.vtranslate(
+                  "JS_ACTION_WITH_CONDITION"
+                )}</h5>
             `;
           if (actionTypeOnce) {
             actionTypeOnce.after(newActionType);
@@ -148,7 +152,9 @@ CustomView_BaseController_Js(
               condition.stageid
             }" data-conditions='${JSON.stringify(condition)}'> 
                 <i class="fal fa-cogs ml-2"></i>
-                <p class="text-primary pt-3">Điều kiện chuyển bước</p>
+                <p class="text-primary pt-3">${app.vtranslate(
+                  "JS_STEP_TRANSITION_CONDITIONS"
+                )}</p>
                 <i class="fal fa-times removeCondition"></i>
             </div>
         `);
@@ -650,7 +656,10 @@ CustomView_BaseController_Js(
         jQuery("#tab2").addClass("active");
         let $button = jQuery(this);
         $button.off("click");
-        $button.removeClass("nextButton").addClass("savePipeline").text("Lưu");
+        $button
+          .removeClass("nextButton")
+          .addClass("savePipeline")
+          .text(app.vtranslate("JS_SAVE"));
         self.registerSavePipelineButtonClickEvent($button);
         //Begin Tran Dien
         console.log("Bước: ", self.stagesList);
@@ -1505,12 +1514,16 @@ CustomView_BaseController_Js(
         const actionBox = document.createElement("div");
         actionBox.classList.add("action-box");
         actionBox.dataset.stageid = stage.id;
-        actionBox.innerHTML = `<button type="button" class="btn text-primary btnAddAction" data-stageid="${stage.id}">+ Thêm thiết lập hành động</button>`;
+        actionBox.innerHTML = `<button type="button" class="btn text-primary btnAddAction" data-stageid="${
+          stage.id
+        }">+ ${app.vtranslate("JS_ADD_ACTION_SETTINGS")}</button>`;
 
         const conditionBox = document.createElement("div");
         conditionBox.classList.add("condition-box");
         conditionBox.dataset.stageid = stage.id;
-        conditionBox.innerHTML = `<button type="button" class="btn text-primary btnAddCondition" data-stageid="${stage.id}">+ Thêm điều kiện</button>`;
+        conditionBox.innerHTML = `<button type="button" class="btn text-primary btnAddCondition" data-stageid="${
+          stage.id
+        }">+ ${app.vtranslate("JS_ADD_CONDITION")}</button>`;
 
         stepItem.appendChild(actionBox);
         stepItem.appendChild(conditionBox);
@@ -1610,7 +1623,7 @@ CustomView_BaseController_Js(
         // Update UI of "Add condition" button
         let conditionBox = jQuery(`.condition-box[data-stageid='${stageId}']`);
         conditionBox.html(`
-            <button type="button" class="btn text-primary btnAddCondition" data-stageid="${stageId}">+ Thêm điều kiện</button>
+            <button type="button" class="btn text-primary btnAddCondition" data-stageid="${stageId}">+ ${app.vtranslate("JS_ADD_CONDITION")}</button>
         `);
 
         console.log("StagesList after remove condition:", self.stagesList);

@@ -239,7 +239,7 @@
 					{/if}
 					<div id="newAndRow" class="col-lg-12 col-md-12 col-sm-12 padding0"></div>
 					<div class="mt-3 addAndConditionBtn">
-						<button class="btn text-primary">+ Thêm điều kiện</button>
+						<button class="btn text-primary">+ {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}</button>
 					</div>
 					<div class="groupCondition">
 						{assign var=GROUP_CONDITION value=$ALL_CONDITION_CRITERIA['condition']}
@@ -443,7 +443,7 @@
 					{/if}
 					<div id="newOrRow" class="col-lg-12 col-md-12 col-sm-12 padding0"></div>
 					<div class="mt-3 addOrConditionBtn">
-						<button class="btn text-primary">+ Thêm điều kiện</button>
+						<button class="btn text-primary">+ {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}</button>
 					</div>
 				</div>
 			</div>

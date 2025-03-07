@@ -66,7 +66,7 @@
 				<i class="fal fa-envelope ml-2 text-primary"></i>
 				&nbsp;
 				&nbsp;
-				<p class="text-primary pt-3">Gửi Email</p>
+				<p class="text-primary pt-3">{vtranslate('LBL_SEND_EMAIL', 'Settings:Vtiger')}</p>
 			</div>
 			<div id="addNotification" class="actionTypeItem">
 				<i class="fal fa-bell ml-2 text-primary"></i>

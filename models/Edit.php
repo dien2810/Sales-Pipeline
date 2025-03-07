@@ -195,6 +195,13 @@ stageid, pipelineid, name, success_rate, time, time_unit, is_mandatory, color_co
         global $adb;
         // $userDisplayName = $currentUser->getDisplayName();
         $pipelineId = $pipelineData['id'];
+
+        // echo '<pre>';print_r($pipelineData['stagesList'][1]['actions']);exit;
+        
+        // $data = json_decode($pipelineData['stagesList'][1]['actions']);
+        // // echo '<pre>';print_r($pipelineData['stagesList'][1]['actions']);
+        // echo '<pre>';print_r($data);
+        // echo '<pre>';print_r($data['content']);exit;
     
         try {
             $adb->startTransaction();

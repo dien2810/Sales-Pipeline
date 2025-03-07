@@ -4,13 +4,13 @@
  * Helper methods to work with ShortURLs
  */
 class Settings_PipelineConfig_Util_Helper {
-    /**
-     * Trả về ID dựa vào tên module
-     * @param string $moduleName Tên module
-     * @return int|null ID của module hoặc null nếu không tìm thấy
+   /**
+     * Returns the ID based on the module name
+     * @param string $moduleName Module name
+     * @return int|null Module ID or null if not found
      */
     public static function getModuleIdByName($moduleName) {
-        // Danh sách các module và ID tương ứng
+          // List of modules and corresponding IDs
         $moduleIds = [
             'Leads' => 50,
             'Potentials' => 118,
@@ -18,7 +18,7 @@ class Settings_PipelineConfig_Util_Helper {
             'Project' => 652
         ];
 
-        // Kiểm tra moduleName có trong danh sách không và trả về ID
+         // Check if moduleName exists in the list and return its 
         return $moduleIds[$moduleName] ?? null;
     }
 }

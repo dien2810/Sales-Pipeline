@@ -10,22 +10,18 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
     //Implemented by The Vi on 2025-03-05 to deletes a stage and updates related records. 
     public static function deleteStagePipeline($idStageDelete, $idStageReplace, $module) {
+        
         $adb = PearDatabase::getInstance();
         $adb->startTransaction();
         try {
-            $query1 = "DELETE FROM vtiger_rolestage WHERE stageid = ?";
-            $adb->pquery($query1, array($idStageDelete));
-    
-            $query2 = "DELETE FROM vtiger_allowedmoveto WHERE stageid = ? OR allowedstageid = ?";
-            $adb->pquery($query2, array($idStageDelete, $idStageDelete));
+            $adb->pquery("DELETE FROM vtiger_rolestage WHERE stageid = ?", [$idStageDelete]);
+            $adb->pquery("DELETE FROM vtiger_allowedmoveto WHERE stageid = ? OR allowedstageid = ?", [$idStageDelete, $idStageDelete]);
     
             $allowedModules = ['potentials', 'leads', 'helpdesk', 'projects'];
             $currentModule = strtolower($module);
             
             if (in_array($currentModule, $allowedModules)) {
-                $queryReplace = "SELECT name, value FROM vtiger_stage WHERE stageid = ?";
-                $resultReplace = $adb->pquery($queryReplace, array($idStageReplace));
-                
+                $resultReplace = $adb->pquery("SELECT name, value FROM vtiger_stage WHERE stageid = ?", [$idStageReplace]);
                 if ($adb->num_rows($resultReplace) === 0) {
                     $adb->rollbackTransaction();
                     return false;
@@ -33,50 +29,35 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
                 
                 $repStageName = $adb->query_result($resultReplace, 0, 'name');
                 $repStageValue = $adb->query_result($resultReplace, 0, 'value');
-    
-                switch ($currentModule) {
-                    case 'potentials':
-                        $table = 'vtiger_potential';
-                        $statusField = 'sales_stage';
-                        break;
-                    case 'leads':
-                        $table = 'vtiger_leads';
-                        $statusField = 'leadstatus';
-                        break;
-                    case 'helpdesk':
-                        $table = 'vtiger_troubletickets';
-                        $statusField = 'ticketstatus';
-                        break;
-                    case 'projects':
-                        $table = 'vtiger_project';
-                        $statusField = 'projectstatus';
-                        break;
-                    default:
-                        $adb->rollbackTransaction();
-                        return false;
-                }
-    
-                $updateQuery = "UPDATE $table 
-                    SET stageid = ?, stagename = ?, $statusField = ? 
-                    WHERE stageid = ?";
-                $adb->pquery($updateQuery, array(
-                    $idStageReplace,
-                    $repStageName,
-                    $repStageValue,
-                    $idStageDelete
-                ));
+                $moduleEntity = CRMEntity::getInstance($module);
+                
+                $statusFieldMap = [
+                    'potentials' => 'sales_stage',
+                    'leads' => 'leadstatus',
+                    'helpdesk' => 'status', 
+                    'projects' => 'projectstatus'
+                ];
+                
+                $updateQuery = sprintf(
+                    "UPDATE %s SET stageid = ?, stagename = ?, %s = ? WHERE stageid = ?",
+                    $moduleEntity->table_name,
+                    $statusFieldMap[$currentModule]
+                );
+                
+                $adb->pquery($updateQuery, [$idStageReplace, $repStageName, $repStageValue, $idStageDelete]);
             }
-           // Delete the stage record
-            $query4 = "DELETE FROM vtiger_stage WHERE stageid = ?";
-            $adb->pquery($query4, array($idStageDelete));
-    
+            
+            $adb->pquery("DELETE FROM vtiger_stage WHERE stageid = ?", [$idStageDelete]);
             $adb->completeTransaction();
             return true;
+            
         } catch (Exception $ex) {
             $adb->rollbackTransaction();
             return false;
         }
     }
+
+
     //Implemented by The Vi on 2025-03-05 to saves a new pipeline with its stages and roles. 
     public static function savePipeline($pipelineData, $currentUser) {
 

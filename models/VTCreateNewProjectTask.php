@@ -19,7 +19,7 @@ require_once("modules/Users/Users.php");
 class VTCreateNewProjectTask extends VTTask{
 	public $executeImmediately = true;
 
-    // Modified by Hieu Nguyen on 2020-10-26 to add field assign_parent_record_owners
+    // Add by Dien Nguyen on 2025-03-03 to define fiels of a project task
 	public function getFieldNames(){
 		return [
             "assigned_user_id", "description", "projectid", "projecttaskname", 
@@ -73,18 +73,18 @@ class VTCreateNewProjectTask extends VTTask{
         $this->projectid = vtws_getWebserviceEntityId('Project', $this->projectid);
 		
 		$fields = array(
-			"assigned_user_id"   => $userId, // Ví dụ: "19x1"
+			"assigned_user_id"   => $userId, // Example: "19x1"
             "description"        => $this->description,
             "projectid"          => $this->projectid, // ID của dự án liên quan
             "projecttaskname"    => $this->projecttaskname,
             "projecttaskstatus"  => $this->projecttaskstatus,
             "projecttasktype"    => $this->projecttasktype,
-            "startdate"          => date("Y-m-d", strtotime($this->startdate)), // Chuyển sang format YYYY-MM-DD
-            "enddate"            => date("Y-m-d", strtotime($this->enddate)), // Chuyển sang format YYYY-MM-DD
-            "end_date_plan"      => date("Y-m-d", strtotime($endDate)) // Chuyển sang format YYYY-MM-DD
+            "startdate"          => date("Y-m-d", strtotime($this->startdate)), // Convert to format YYYY-MM-DD
+            "enddate"            => date("Y-m-d", strtotime($this->enddate)), // Convert to format YYYY-MM-DD
+            "end_date_plan"      => date("Y-m-d", strtotime($endDate)) // Convert to YYYY-MM-DD
 		);
 
-        // Modified by Hieu Nguyen on 2020-08-03 to handle save value for owner field
+        // handle save value for owner field
         $tempEntify = clone $entityData;
 
         if ($this->assign_parent_record_owners == 1) {

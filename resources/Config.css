@@ -141,7 +141,7 @@
   border-collapse: collapse;
   table-layout: fixed;
 }
-/* Gán cứng kích thước cho từng cột */
+/* Column size */
 .tableListPipeline th:nth-child(1),
 .tableListPipeline td:nth-child(1) {
   width: 200px !important;
@@ -175,12 +175,12 @@
 .tableListPipeline td:nth-child(7) {
   width: 150px;
 }
-/* Xử lý overflow và căn giữa cho các cột */
+/* Handling overflow and centering columns */
 .tableListPipeline td {
   padding: 16px !important;
   vertical-align: middle;
 }
-/* Giữ nguyên căn trái cho cột tên và mô tả */
+/* Keep left alignment for name and description columns */
 .tableListPipeline td:nth-child(1),
 .tableListPipeline td:nth-child(5) {
   text-align: left;
@@ -188,7 +188,7 @@
   word-wrap: break-word;
 }
 
-/* Căn giữa và cho phép xuống dòng cho các cột còn lại */
+/* Center and allow line breaks for remaining columns */
 .tableListPipeline td:nth-child(2),
 .tableListPipeline td:nth-child(3),
 .tableListPipeline td:nth-child(4),
@@ -200,20 +200,20 @@
   word-wrap: break-word;
 }
 
-/* Căn giữa text trong thead */
+/* Center text in thead */
 .tableListPipeline thead th {
   text-align: center;
   vertical-align: middle;
   padding: 8px;
 }
-/* Căn trái cho thead của cột đầu tiên */
+/* Left align thead of the first column */
 .tableListPipeline thead th:first-child {
   text-align: left;
 }
 .tableListPipeline td:nth-child(6) {
   text-align: left;
 }
-/* Điều chỉnh style cho các span bên trong */
+/* Adjust style for inner spans */
 .tableListPipeline .fieldValue,
 .tableListPipeline .value {
   display: block;

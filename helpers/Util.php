@@ -18,7 +18,7 @@ class Settings_PipelineConfig_Util_Helper {
      * @return int|null ID của module hoặc null nếu không tìm thấy
      */
     public static function getModuleIdByName($moduleName) {
-        // Danh sách các module và ID tương ứng
+        // List of modules and corresponding IDs
         $moduleIds = [
             'Leads' => 50,
             'Potentials' => 118,
@@ -26,7 +26,7 @@ class Settings_PipelineConfig_Util_Helper {
             'Project' => 652
         ];
 
-        // Kiểm tra moduleName có trong danh sách không và trả về ID
+        // Check if moduleName is in the list and return ID
         return $moduleIds[$moduleName] ?? null;
     }
 }

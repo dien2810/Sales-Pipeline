@@ -81,7 +81,6 @@ class Settings_PipelineConfig_Detail_Model extends Vtiger_Base_Model {
             $decodedActions = html_entity_decode($stageRow['actions']);
 			$actions = json_decode($decodedActions, true);
             $decodedConditions = html_entity_decode($stageRow['conditions']);
-			// $conditions = json_decode($decodedConditions, true);
             $conditions = json_decode($decodedConditions, false);
         
             $stageData = array(

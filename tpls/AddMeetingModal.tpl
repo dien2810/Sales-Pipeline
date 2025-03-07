@@ -3,6 +3,7 @@
 {strip}
 <div class="modal-dialog modal-content modal-width-1100">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_ADD_MEETING', $MODULE_NAME)}" }
+    
     <form id="form-add-meeting" class="form-horizontal addCallModal form-modal" method="POST">
         <div class="form-content">
             <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />
@@ -127,7 +128,6 @@
                         <span class="redColor">*</span>
                     </div>
                     <div class="controls col-sm-8">
-                        {* <input name="assigned_user_id" type="text" class="inputElement w40" data-rule-required="true"> *}
                         <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%" data-rule-required="true" data-rule-main-owner="true"
                             data-fieldtype="owner" data-fieldname="assigned_user_id" data-name="assigned_user_id" name="assigned_user_id"
                             {if $FOR_EVENT}
@@ -183,7 +183,7 @@
                 </div>
             </div>
         </div>
-        {* {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'} *}
+
         <div class="modal-footer ">
             <center>
                 {if $BUTTON_NAME neq null}

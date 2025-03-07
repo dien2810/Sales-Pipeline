@@ -3,11 +3,7 @@
 <div id="actionSettingModal" class="modal-dialog modal-content hide">
 	{assign var=HEADER_TITLE value={vtranslate('LBL_ACTION_SETTING_MODAL_TITLE', 'Settings:Vtiger')}}
 	{include file='ModalHeader.tpl'|vtemplate_path:$MODULE TITLE=$HEADER_TITLE}
-	{* <h1>{$ACTION.actionType}</h1>
-	<h1>{$ACTION.notification_type}</h1>
-	<h1>{$ACTION.stageId}</h1>
-	<h1>{$ACTION.time_unit}</h1>
-	<h1>{$ACTION.time_value}</h1> *}
+
 	<div class="actionTypeContainer">
 		<div class="actionTypeRow mt-3">
 			<div id="addCall" class="actionTypeItem">
@@ -80,6 +76,7 @@
 			</div>
 		</div>
 	</div>
+	
 	<div class="modal-footer">
 		<center>
 			{assign var=BUTTON_LABEL value={vtranslate('LBL_BACK', $MODULE)}}

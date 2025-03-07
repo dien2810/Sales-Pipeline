@@ -200,7 +200,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
         if (empty($id)) {
             throw new Exception("ID không được để trống");
         }        
-        // Clone record trong bảng vtiger_pipeline
+        // Clone record in vtiger_pipeline table
         $query = "SELECT * FROM vtiger_pipeline WHERE pipelineid = ?";
         $params = [$id];
         $result = $db->pquery($query, $params);
@@ -217,7 +217,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
             $row['duration'], $row['time_unit'], $row['description'], 0, 
             $row['create_by'], $row['created_at']);
         $db->pquery($query, $params);
-        // Clone record trong bảng vtiger_rolepipeline
+        // Clone record in vtiger_rolepipeline table
         $query = "SELECT * FROM vtiger_rolepipeline WHERE pipelineid = ?";
         $params = array($id);
         $result = $db->pquery($query, $params);
@@ -229,7 +229,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
             $params = array($row['roleid'], $newPipelineId);
             $db->pquery($query, $params);
         }                
-        // Clone các record liên quan trong bảng vtiger_stage
+        // Clone vtiger_stage
         $query = 'SELECT * FROM vtiger_stage
             WHERE pipelineid = ?';
         $params = array($id);
@@ -246,7 +246,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
                 $row['time'], $row['time_unit'], $row['is_mandatory'], $row['color_code'],
                 $row['sequence']);
             $db->pquery($query, $params);
-            // Clone các record liên quan trong bảng vtiger_allowedmoveto
+            // Clone vtiger_allowedmoveto table
             $query = 'SELECT * FROM vtiger_allowedmoveto WHERE stageid = ?';
             $params = array($oldStageId);
             $result = $db->pquery($query, $params);
@@ -258,37 +258,6 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
                 $query = 'INSERT INTO vtiger_allowedmoveto
                             VALUES (?, ?, ?)';
                 $params = array($newAllowedMovetoId, $newStageId, $row['allowedstageid']);
-                $db->pquery($query, $params);
-            }
-            // Clone các record liên quan trong bảng vtiger_stageaction
-            $query = 'SELECT * FROM vtiger_stageaction WHERE stageid = ?';
-            $params = array($oldStageId);
-            $result = $db->pquery($query, $params);
-            if ($result === false) {
-                throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_stageaction");
-            }
-            while ($row = $db->fetchByAssoc($result)) {
-                $newStageActionId = $db->getUniqueID('vtiger_stageaction');
-                $query = 'INSERT INTO vtiger_stageaction(actionid, stageid, action_name, frequency, 
-                    action_time_type, time, time_unit, action_type)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-                $params = array($newStageActionId, $newStageId, $row['action_name'], $row['frequency'], $row['action_time_type'],
-                    $row['time'], $row['time_unit'], $row['action_type']);
-                $db->pquery($query, $params);
-            }
-            // Clone các record liên quan trong bảng vtiger_stagefilter
-            $query = 'SELECT * FROM vtiger_stagefilter WHERE stageid = ?';
-            $params = array($oldStageId);
-            $result = $db->pquery($query, $params);
-            if ($result === false) {
-                throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_stagefilter");
-            }
-            while ($row = $db->fetchByAssoc($result)) {
-                $newFilterId = $db->getUniqueID('vtiger_stagefilter');
-                $query = 'INSERT INTO vtiger_stagefilter
-                            VALUES (?, ?, ?, ?, ?, ?)';
-                $params = array($newFilterId, $newStageId, $row['column_name'], $row['comparator'], 
-                    $row['value'], $row['condition_type']);
                 $db->pquery($query, $params);
             }
             // Clone các record liên quan trong bảng vtiger_rolestage

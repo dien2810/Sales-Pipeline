@@ -134,15 +134,15 @@ CustomView_BaseController_Js(
           );
 
           if (stage) {
-            // Đảm bảo stage có thuộc tính conditions là một object trước khi push
+            // Make sure the stage has an object conditions property before pushing
             stage.conditions = condition.filterInfo || {};
           }
           console.log(this.stagesList);
-          // Tìm tất cả các thẻ có class "condition-box" và kiểm tra điều kiện
+          // Find all tags with class "condition-box" and check the condition
           let conditionBox = document.querySelector(
             `.condition-box[data-stageid='${condition["stageid"]}']`
           );
-          // Nếu tồn tại thẻ phù hợp, cập nhật nội dung của nó
+          // If a matching tag exists, update its contents.
           jQuery(conditionBox).html(`
             <div class="action-item btnAddCondition" data-stageid="${
               condition.stageid
@@ -163,12 +163,8 @@ CustomView_BaseController_Js(
       this.registerCheckboxEvents();
     },
     registerEventFormInit: function () {
-      // alert("registerEventFormInitUpdate update3");
       let self = this;
       let form = this.getForm();
-      // alert(self.mode);
-      // alert(self.record);
-      // alert("Hello");
       //Begin The Vi
       this.registerModuleChangeEvent();
       this.registerCancelButtonClick();
@@ -256,9 +252,6 @@ CustomView_BaseController_Js(
       //End The Vi
 
       //  =================================================================================================
-
-      //Begin Tran Dien
-      //End Tran Dien
       if (mode == "Edit") {
         let params = {
           module: "PipelineConfig",
@@ -304,7 +297,6 @@ CustomView_BaseController_Js(
           console.log("RESPonse", response);
 
           const decodedResponse = decodeAllStrings(response);
-          console.log("Decoded Response:", decodedResponse);
 
           if (decodedResponse) {
             self.currentNameModule = decodedResponse.module;
@@ -442,15 +434,8 @@ CustomView_BaseController_Js(
           next_stages: stage.next_stages,
           permissions: stage.permissions,
         });
-
-        // const stageRow = self.createStageRow(stageData);
         jQuery("#stagesTable tbody").append(stageRow);
       });
-
-      // // Initialize drag & drop if needed
-      // if (this.currentNameModule !== "Potentials") {
-      //   this.initStageDragDrop();
-      // }
     },
     //Begin The Vi
     handleColumnVisibility: function () {
@@ -486,6 +471,7 @@ CustomView_BaseController_Js(
         });
       }
     },
+
     handleColumnVisibilityTimePipeline: function () {
       if (this.currentNameModule === "Potentials") {
         jQuery(".othermodule").hide();
@@ -495,6 +481,7 @@ CustomView_BaseController_Js(
         jQuery(".potentials").hide();
       }
     },
+
     registerGetRoleList: function () {
       let self = this;
       app.helper.hideModal();
@@ -527,6 +514,13 @@ CustomView_BaseController_Js(
     registerSavePipelineButtonClickEvent: function ($button) {
       let self = this;
       $button.on("click", function (e) {
+        // to Prevent submit if already submitted
+        e.preventDefault(); // Ngăn chặn hành vi mặc định
+
+        var $this = $(this);
+        if ($this.prop("disabled")) return; // Nếu nút đã bị disabled thì thoát luôn
+
+        $this.prop("disabled", true); // Vô hiệu hóa nút
         //Begin Tran Dien
         self.stagesList.forEach((stage) => {
           stage["actions"] = stage["actions"] || [];
@@ -537,7 +531,7 @@ CustomView_BaseController_Js(
         //End Tran Dien
         e.preventDefault();
         app.helper.showProgress();
-        // alert("Lưu");
+
         let pipelineData = {};
         let formDataArray = $("#editPipeline").serializeArray();
         formDataArray.forEach(function (field) {
@@ -619,6 +613,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     registerNextButtonClickEvent: function () {
       let self = this;
       let form = this.getForm();
@@ -657,7 +652,6 @@ CustomView_BaseController_Js(
         $button.off("click");
         $button.removeClass("nextButton").addClass("savePipeline").text("Lưu");
         self.registerSavePipelineButtonClickEvent($button);
-        // alert("Chuyển");
         //Begin Tran Dien
         console.log("Bước: ", self.stagesList);
         self.renderStageCrumbs(self.stagesList);
@@ -665,11 +659,10 @@ CustomView_BaseController_Js(
         self.registerAddActionSettingModal(form);
         self.registerAddCondition(form);
         self.registerRemoveCondition(form);
-        // self.registerSavePipelineButtonClickEvent(form.find(".savePipeline"));
-
         //End Tran Dien
       });
     },
+
     registerTimeUnitChangeEvent: function () {
       let self = this;
       jQuery(document).on("change", ".time-unit-select", function (e) {
@@ -685,6 +678,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     registerTimeValueChangeEvent: function () {
       let self = this;
       jQuery(document).on("input", ".time-value-input", function (e) {
@@ -703,6 +697,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     registerStagesSortableEvent: function () {
       var thisInstance = this;
       var tbody = jQuery("tbody", jQuery("#stagesTable"));
@@ -725,6 +720,7 @@ CustomView_BaseController_Js(
         },
       });
     },
+
     saveSequence: function () {
       var self = this;
       var stageRows = jQuery("#stagesTable").find(".stageRow");
@@ -746,9 +742,9 @@ CustomView_BaseController_Js(
       });
       console.log("Updated stagesList2:", self.stagesList);
     },
+
     registerSelectRolesEvent: function (data) {
       data.find('[name="rolesSelected[]"]').on("change", function (e) {
-        // alert("regiserSelectRolesEvent");
         var rolesSelectElement = jQuery(e.currentTarget);
         var selectedValue = rolesSelectElement.val();
         if (jQuery.inArray("all", selectedValue) != -1) {
@@ -773,6 +769,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     updateNextStagesOptions: function () {
       let self = this;
       const sortedStages = [...self.stagesList].sort(
@@ -804,6 +801,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     showStagePipelineModalNew: function (targetBtn) {
       app.helper.hideModal();
       let self = this;
@@ -839,6 +837,7 @@ CustomView_BaseController_Js(
         });
       });
     },
+
     registerCheckboxEvents: function () {
       let self = this;
 
@@ -916,7 +915,6 @@ CustomView_BaseController_Js(
                 return false;
               }
               const inputValue = formData.value.trim().toLowerCase();
-              // console.log("Check trùng", self.stagesList);
               const isDuplicate = self.stagesList.some(function (stage) {
                 return stage.value.trim().toLowerCase() === inputValue;
               });
@@ -980,15 +978,10 @@ CustomView_BaseController_Js(
               });
               console.log("Endxx", self.stagesList);
               self.sortStagesBySuccessRate();
-
-              // console.log("End", self.stagesList);
               app.helper.hideModal();
               app.helper.showSuccessNotification({
                 message: app.vtranslate("JS_ADD_STAGE_SUCCESS"),
               });
-              //Begin The Vi
-              // self.renderStageCrumbs(self.stagesList);
-              // self.renderStagesInfo(self.stagesList);
             });
           },
         });
@@ -1029,6 +1022,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     sortStagesBySuccessRate: function () {
       const self = this;
 
@@ -1286,6 +1280,7 @@ CustomView_BaseController_Js(
 
       return row;
     },
+
     deleteStage: function (stageId) {
       const self = this;
       if (self.mode != "Edit") {
@@ -1310,7 +1305,6 @@ CustomView_BaseController_Js(
             console.log("Updated stagesList after delete:", self.stagesList);
           });
       } else {
-        // console.log("Pipelineid", self.pipelineId);
         app.helper.hideModal();
 
         app.helper.showProgress();
@@ -1329,7 +1323,6 @@ CustomView_BaseController_Js(
             return;
           }
 
-          // console.log("Hello", stage.name);
           app.helper.showModal(res, {
             preShowCb: function (modal) {
               const form = modal.find("form#add-stage-pipeline-new");
@@ -1343,6 +1336,7 @@ CustomView_BaseController_Js(
         });
       }
     },
+
     registerCancelButtonClick: function () {
       jQuery(document).on(
         "click",
@@ -1355,15 +1349,13 @@ CustomView_BaseController_Js(
         }
       );
     },
+
     registerModuleChangeEvent: function () {
       let self = this;
 
       jQuery("#listModule").on("change", (e) => {
-        // alert(self.isFirstOpen);
-
         const newModule = jQuery(e.currentTarget).val();
         const confirmMessage = app.vtranslate("JS_CONFIRM_MODULE_CHANGE");
-        // alert(self.isFirstOpen);
 
         if (self.mode !== "Edit" || self.isFirstOpen !== 1) {
           app.helper
@@ -1389,6 +1381,7 @@ CustomView_BaseController_Js(
         }
       });
     },
+
     registerAddStageNewSaveEvent: function () {
       //Update by The Vi 3/4/2025
       let self = this;
@@ -1472,6 +1465,7 @@ CustomView_BaseController_Js(
         }
       );
     },
+
     calculateTotalTime: function () {
       let totalDays = 0;
 
@@ -1574,6 +1568,7 @@ CustomView_BaseController_Js(
         breadcrumb.appendChild(ul);
       }
     },
+
     registerAddActionSettingModal: function (form) {
       var self = this;
       form.on("click", ".btnAddAction", function () {
@@ -1606,13 +1601,13 @@ CustomView_BaseController_Js(
         e.stopPropagation();
         let stageId = jQuery(this).closest(".action-item").data("stageid");
 
-        // Tìm stage trong danh sách và đặt conditions thành {}
+        // Find stage in the list and set conditions to {}
         let stage = self.stagesList.find((stage) => stage.id === stageId);
         if (stage) {
           stage.conditions = {};
         }
 
-        // Cập nhật giao diện về nút "Thêm điều kiện"
+        // Update UI of "Add condition" button
         let conditionBox = jQuery(`.condition-box[data-stageid='${stageId}']`);
         conditionBox.html(`
             <button type="button" class="btn text-primary btnAddCondition" data-stageid="${stageId}">+ Thêm điều kiện</button>
@@ -1774,6 +1769,7 @@ CustomView_BaseController_Js(
     },
   }
 );
+
 //Begin Tran Dien
 CustomView_BaseController_Js(
   "Settings_PipelineConfig_AddActionSetting_Js",
@@ -1826,7 +1822,7 @@ CustomView_BaseController_Js(
               submitHandler: function (form) {
                 var form = jQuery(form);
                 var params = form.serializeFormData();
-                // Kiểm tra nếu action_time_type là "scheduled" thì bắt buộc nhập time
+                // Check if action_time_type is "scheduled" then time is required
                 if (params.action_time_type === "scheduled" && !params.time) {
                   app.helper.showErrorNotification({
                     message: app.vtranslate("JS_ERROR_ENTER_TIME_VALUE"),
@@ -1880,7 +1876,6 @@ CustomView_BaseController_Js(
   {},
   {
     targetController: null,
-
     // Initialize CKEditor instance
     ckEditorInstance: false,
     currentNameModule: "Potentials",
@@ -1986,9 +1981,7 @@ CustomView_BaseController_Js(
     },
 
     initialize: function () {
-      // this.changeFieldElementsView(this.getFilterContainer());
       this.initializeOperationMappingDetails();
-      // this.loadFieldSpecificUiForAll();
     },
 
     registerShowDataUpdateFieldsModalEvents: function () {
@@ -2400,7 +2393,6 @@ CustomView_BaseController_Js(
                 rowValues[field] = value.join(",");
               }
             } else {
-              console.log("GAN VALUE");
               rowValues[field] = jQuery(
                 '[name="' + field + '"]',
                 rowElement
@@ -3051,6 +3043,7 @@ CustomView_BaseController_Js(
         });
       });
     },
+
     // Add by Dien Nguyen on 2025-03-03 to show create new record modal
     showCreateNewRecordModal: function (targetBtn) {
       var self = this;
@@ -3265,10 +3258,8 @@ CustomView_BaseController_Js(
           .val();
         fieldInfo.type = "string";
       }
-
-      // var moduleName = this.getModuleName();
+      // Reuse Workflows fields to get specific UI
       var moduleName = "Workflows";
-
       var fieldModel = Workflows_Field_Js.getInstance(fieldInfo, moduleName);
       this.fieldModelInstance = fieldModel;
       var fieldSpecificUi = this.getFieldSpecificUi(fieldSelect);
@@ -3729,10 +3720,8 @@ CustomView_BaseController_Js(
 
     showDataFieldUpdateModal: function (targetBtn) {
       let self = this;
-
       // Show loading
       app.helper.showProgress();
-
       // Request modal content
       let params = {
         module: "PipelineConfig",
@@ -3770,7 +3759,7 @@ CustomView_BaseController_Js(
 
               newRowElement.find("select.select2").select2();
             });
-            // Xóa phần tử khi nhấn vào icon thùng rác
+            // Delete element by clicking on trash icon
             form.on("click", ".removeField", function () {
               $(this).closest(".form-group").remove();
             });
@@ -3831,15 +3820,11 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
-
         // Show modal
         app.helper.showModal(res, {
           preShowCb: function (modal) {
             modal.off("hidden.bs.modal");
-
             const form = modal.find("form#form-send-sms");
-            // var textAreaElement = modal.find("#content");
-
             // Register events
             self.registerFillContentEvent(
               "#form-send-sms",
@@ -3855,10 +3840,7 @@ CustomView_BaseController_Js(
           },
           cb: function (modal) {
             modal.css("display", "block");
-
-            // var form = modal.find(".sendSMSModal");
             const form = modal.find("form#form-send-sms");
-
             // Form validation
             var params = {
               submitHandler: function (form) {
@@ -3885,7 +3867,6 @@ CustomView_BaseController_Js(
 
     showSendZNSModal: function (targetBtn) {
       app.helper.showProgress();
-
       // Request modal content
       let params = {
         module: "PipelineConfig",
@@ -4413,13 +4394,11 @@ CustomView_BaseController_Js(
 
     initialize: function () {
       this.registerEvents();
-      // this.changeFieldElementsView(this.getFilterContainer());
       this.initializeOperationMappingDetails();
       this.loadFieldSpecificUiForAll();
     },
 
     registerEvents: function () {
-      // this.registerAddCondition();
       this.registerFieldChange();
       this.registerDeleteCondition();
       this.registerConditionChange();

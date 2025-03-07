@@ -52,10 +52,6 @@
                             <option value="before">{vtranslate('LBL_BEFORE', $MODULE_NAME)}</option>
                         </select>
                         <select name="startDateField" class="inputElement select2 w40" tabindex="-1">
-                            {* <option value="create">{vtranslate('LBL_DAY_CREATION', $MODULE_NAME)}</option>
-                            <option value="update">{vtranslate('LBL_REPAIR_DATE', $MODULE_NAME)}</option> *}
-                            {* <option value="update">Các field datetime có trong module được áp dụng pipeline</option>
-                            *}
                             {foreach from=$DATETIME_FIELDS item=DATETIME_FIELD}
                             <option {if $TASK_OBJECT->startDatefield eq $DATETIME_FIELD->get('name')}selected{/if}
                                 value="{$DATETIME_FIELD->get('name')}">{vtranslate($DATETIME_FIELD->get('label'),
@@ -94,26 +90,6 @@
                     </div>
                 </div>
             </div>
-            {* <div class="form-group">
-                <div class="fieldLabel col-sm-3 text-left ml-3">
-                    {vtranslate('LBL_END_DATE', $MODULE_NAME)}
-                </div>
-                <div class="controls col-sm-8">
-                    <div class="d-flex align-item-center justify-content-center">
-                        <input type="text" class="inputElement w10">
-                        <span class="ml-3 mr-3">{vtranslate('LBL_DATE', $MODULE_NAME)}</span>
-                        <select class="inputElement select2 mr-3 w20" tabindex="-1">
-                            <option value="after">{vtranslate('LBL_AFTER', $MODULE_NAME)}</option>
-                            <option value="before">{vtranslate('LBL_BEFORE', $MODULE_NAME)}</option>
-                        </select>
-                        <select class="inputElement select2 w40" tabindex="-1">
-                            <option value="create">{vtranslate('LBL_DAY_CREATION', $MODULE_NAME)}</option>
-                            <option value="update">{vtranslate('LBL_REPAIR_DATE', $MODULE_NAME)}</option>
-                            <option value="update">Các field datetime có trong module được áp dụng pipeline</option>
-                        </select>
-                    </div>
-                </div>
-            </div> *}
             <div id="extraInfo" style="display: none;">
                 <div class="form-group">
                     <div class="fieldLabel col-sm-3 text-left ml-3">
@@ -153,25 +129,12 @@
                         </select>
                     </div>
                 </div>
-                {* <div class="form-group">
-                    <div class="fieldLabel col-sm-3 text-left ml-3">
-                        {vtranslate('LBL_KIND', $MODULE_NAME)}
-                    </div>
-                    <div class="controls col-sm-8">
-                        <select class="inputElement text-left select2 w40" data-rule-required="true">
-                            <option value="call">{vtranslate('LBL_CALL', $MODULE_NAME)}</option>
-                            <option value="meeting">{vtranslate('LBL_MEETING', $MODULE_NAME)}</option>
-                        </select>
-                    </div>
-                </div> *}
                 <div class="form-group">
                     <div class="fieldLabel col-sm-3 text-left ml-3">
                         {vtranslate('LBL_DELIVER', $MODULE_NAME)}
                         <span class="redColor">*</span>
                     </div>
                     <div class="controls col-sm-8">
-                        {* <input name="assigned_user_id" type="text" class="inputElement w40"
-                            data-rule-required="true"> *}
                         <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%"
                             data-rule-required="true" data-rule-main-owner="true" data-fieldtype="owner"
                             data-fieldname="assigned_user_id" data-name="assigned_user_id" name="assigned_user_id" {if
@@ -185,20 +148,6 @@
                         </div>
                     </div>
                 </div>
-                {* <div class="form-group">
-                    <div class="fieldLabel col-sm-3 text-left ml-3">
-                        {vtranslate('LBL_END_TIME', $MODULE_NAME)}
-                    </div>
-                    <div class="controls col-sm-6">
-                        <div class="input-group inputElement time w60">
-                            <input type="text" name="typeTime" class="timepicker-default form-control" data-format="12"
-                                data-rule-required="true" />
-                            <span class="input-group-addon">
-                                <i class="fa fa-clock-o"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div> *}
                 <div class="form-group">
                     <div class="fieldLabel col-sm-3 text-left ml-3">
                         {vtranslate('LBL_DESCRIBE', $MODULE_NAME)}
@@ -239,7 +188,7 @@
                 </div>
             </div>
         </div>
-        {* {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'} *}
+        
         <div class="modal-footer ">
             <center>
                 {if $BUTTON_NAME neq null}

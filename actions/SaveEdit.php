@@ -139,24 +139,5 @@ class Settings_PipelineConfig_SaveEdit_Action extends Vtiger_Action_Controller {
         // $response->setResult($pipelineData);
         $response->emit();
     }   
-    // public function getPipelineStageInfo(Vtiger_Request $request) {
-    //     $response = new Vtiger_Response();
-    //     try {
-    //         $recordId = $request->get('record');
-    //         $moduleName = $request->get('module');
-           
-    //         $pipelineStageInfo = PipelineAction::getPipelineStageInfo($recordId, $moduleName);
-    //         $response->setResult(array(
-    //             'success' => true,
-    //             'data' =>$pipelineStageInfo
-    //         ));
-    //     } catch(Exception $e) {
-    //         $response->setError($e->getMessage());
-    //     }
-    //     $response->emit();
-    // }
-    // public function getIdFieldByModule(Vtiger_Request $request) {
-    //     $pipeLine = $request->get('dataPipeline');
-    //     //Your code here
-    // }
+    
 }

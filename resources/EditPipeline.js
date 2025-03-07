@@ -2590,7 +2590,7 @@ CustomView_BaseController_Js(
       var modal = jQuery("#form-send-email");
 
       values.titleEmail = modal.find('input[name="titleEmail"]').val();
-      values.fromEmail = modal.find('input[name="fromEmail"]').val();
+      values.fromEmail = btoa(modal.find('input[name="fromEmail"]').val());
       values.replyTo = modal.find('input[name="replyTo"]').val();
       values.recepient = modal.find('input[name="recepient"]').val();
       values.emailcc = modal.find('input[name="emailcc"]').val();

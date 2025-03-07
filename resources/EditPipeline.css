@@ -107,7 +107,6 @@ table {
 .row-one {
   display: flex;
   align-items: center;
-  /* justify-content: space-between; */
   padding: 8px 12px;
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
@@ -202,10 +201,6 @@ i.icon {
   border-top-color: #3399ff;
   border-bottom-color: #3399ff;
 }
-/* #editPipeline-page #tab2 .breadcrumb .crumbs.stepOdd li:before {
-  border-top: 25px solid var(--primary-1);
-  border-bottom: 25px solid var(--primary-1);
-} */
 #editPipeline-page #tab2 .breadcrumb .crumbs li:after {
   top: -20px;
   border-top: 26px solid white;
@@ -576,7 +571,6 @@ i.icon {
 
 .send-content-header {
   margin-top: 10px;
-  /* font-weight: 700; */
   text-transform: uppercase;
   font-weight: bold;
 }

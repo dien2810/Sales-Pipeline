@@ -10,7 +10,7 @@ class Settings_PipelineConfig_Util_Helper {
      * @return int|null Module ID or null if not found
      */
     public static function getModuleIdByName($moduleName) {
-          // List of modules and corresponding IDs
+
         $moduleIds = [
             'Leads' => 50,
             'Potentials' => 118,
@@ -18,7 +18,6 @@ class Settings_PipelineConfig_Util_Helper {
             'Project' => 652
         ];
 
-         // Check if moduleName exists in the list and return its 
         return $moduleIds[$moduleName] ?? null;
     }
 }

@@ -10,11 +10,6 @@ Purpose: Modal add Action
 	{include file='ModalHeader.tpl'|@vtemplate_path:'Vtiger' TITLE=$HEADER_TITLE}
 	{assign var="isActionWithCondition" value=($ACTION.frequency == "actionWithCondition")}
 	{assign var="isScheduled" value=($ACTION.action_time_type == "scheduled")}
-	{* <h1>{$ACTION.actionType}</h1>
-	<h1>{$ACTION.notification_type}</h1>
-	<h1>{$ACTION.stageId}</h1>
-	<h1>{$ACTION.time_unit}</h1>
-	<h1>{$ACTION.time}</h1> *}
 	<form class="form-horizontal addActionSettingForm" method="POST">
 		<div class="form-group mt-3">
 			<label class="control-label fieldLabel col-sm-5" for="frequency">
@@ -58,13 +53,6 @@ Purpose: Modal add Action
 			<div class="col-sm-5"></div>
 			<div id="scheduled_fields" class="col-sm-6 {if !$isScheduled}hide{/if}" style="margin-top: 10px;">
 				<div class="row">
-					{* <div class="form-select form-select-lg col-sm-5 padding0 mr-1">
-						<select name="time_condition" class="inputElement select2" data-fieldtype="picklist"
-							data-rule-required="true" style="margin-bottom: 10px; display: none;">
-							<option value="before">{vtranslate('LBL_BEFORE_MOVING', 'Settings:Vtiger')}</option>
-							<option value="after">{vtranslate('LBL_AFTER_MOVING', 'Settings:Vtiger')}</option>
-						</select>
-					</div> *}
 					<div class="lblAfterMoving col-sm-5 mr-1">
 						<p>{vtranslate('LBL_AFTER_MOVING', 'Settings:Vtiger')}</p>
 					</div>

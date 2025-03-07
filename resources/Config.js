@@ -392,7 +392,6 @@ CustomView_BaseController_Js(
       jQuery("#pickListModules").on("change", (e) => {
         self.currentNameModule = jQuery(e.currentTarget).val();
         let form = self.getForm();
-        // alert(self.currentNameModule);
         self.loadPipelineList(
           form,
           self.currentNameModule,

@@ -149,7 +149,7 @@
                             </div>
                         </div>
                     </div>
-                    {* Tab tự động hóa *}
+                    {* Automatic Tab*}
                     <div class="tab-pane" id="tab2">
                         <div id="breadcrumb" class="breadcrumb text-center">
                             {if $MODE eq "EDIT"}

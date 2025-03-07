@@ -52,7 +52,6 @@ class StagePipelineCondition extends CRMEntity {
                     $columnInfo = explode(":", $columnCondition);
                     $fieldName = $columnInfo[2];
                     $moduleName = $this->module;
-                    // $moduleName = "Potentials";
                     $moduleModel = Vtiger_Module_Model::getInstance($moduleName);
                     preg_match('/(\w+) ; \((\w+)\) (\w+)/', $fieldName, $matches);
 
@@ -104,7 +103,6 @@ class StagePipelineCondition extends CRMEntity {
                         $conditionVal = implode(",", $val);
                     }
                     $condition['value'] = $conditionVal;
-                    // $condition['column_condition'] = $conditionRow["column_condition"];
 
                     $conditions[$i]['columns'][$j] = $condition;
                     $conditions[$i]['condition'] = $i == 1 ? "and" : "or";

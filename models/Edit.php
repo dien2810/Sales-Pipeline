@@ -425,8 +425,6 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
             }
         }
     }
-    
-    
     // Add by Dien Nguyen on 2025-03-03 to get field expressions on create new record modal
     static function getExpressions() {
 		return array('concat' => 'concat(a,b)', 'time_diffdays(a,b)' => 'time_diffdays(a,b)', 'time_diffdays(a)' => 'time_diffdays(a)', 'time_diff(a,b)' => 'time_diff(a,b)','time_diff(a)' => 'time_diff(a)',

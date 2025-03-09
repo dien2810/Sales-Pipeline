@@ -14,6 +14,8 @@ require_once('modules/Settings/PipelineConfig/models/VTCreateNewProjectTask.php'
 require_once('modules/com_vtiger_workflow/tasks/VTUpdateFieldsTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateEntityTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTEmailTask.inc');
+require_once('modules/com_vtiger_workflow/tasks/VTSMSTask.inc');
+// require_once('modules/SMSNotifier/workflow/VTSMSTask.php');
 require_once('data/CRMEntity.php');
 
 class PipelineAction 
@@ -52,6 +54,9 @@ class PipelineAction
 						break;
 					case 'sendEmail':
 						self::processSendEmail($action, $idRecord,  $moduleName);
+						break;
+					case 'sendSMS':
+						self::processSendSMS($action, $idRecord,  $moduleName);
 						break;
 				}
 				
@@ -412,7 +417,38 @@ class PipelineAction
 		$task->pdf = $pdf;
 		$task->pdfTemplateId = $pdfTemplateId;
 		$task->signature = $signature;
+		$task->relatedInfo = "{}";
 	
+		// Execute the task to create a new record
+		$task->doTask($entity);
+		
+		// Revert to the original user
+		$util->revertUser();
+	}
+
+	// Implement by Minh Hoàng to process send sms
+	public static function processSendSMS($action, $idRecord, $moduleName) 
+	{
+		// Initialize workflow utilities and retrieve the admin user
+		$util = new VTWorkflowUtils();
+		$adminUser = $util->adminUser();
+
+		// Retrieve the entity from the cache
+		$entityCache = new VTEntityCache($adminUser);
+		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+		$entity = $entityCache->forId($wsEntityId);
+
+		// Extract record creation information from the action
+		$createInfo = $action['sendSMSData'];
+		$content = $createInfo['content'];
+		$smsRecepient = $createInfo['sms_recepient'];
+
+		// Initialize and configure the task
+		$task = new VTSMSTask();
+		$task->content = $content;
+		$task->sms_recepient = $smsRecepient;
+		// $task->relatedInfo = "{}";
+		
 		// Execute the task to create a new record
 		$task->doTask($entity);
 		

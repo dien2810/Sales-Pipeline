@@ -376,48 +376,57 @@ class PipelineAction
 	// Implement by Minh Hoàng to process send email
 	public static function processSendEmail($action, $idRecord, $moduleName) 
 	{
-		// Initialize workflow utilities and retrieve the admin user
-		$util = new VTWorkflowUtils();
-		$adminUser = $util->adminUser();
+		try{
+			// Initialize workflow utilities and retrieve the admin user
+			$util = new VTWorkflowUtils();
+			$adminUser = $util->adminUser();
 
-		// Retrieve the entity from the cache
-		$entityCache = new VTEntityCache($adminUser);
-		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
-		$entity = $entityCache->forId($wsEntityId);
+			// Retrieve the entity from the cache
+			$entityCache = new VTEntityCache($adminUser);
+			$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+			$entity = $entityCache->forId($wsEntityId);
 
-		// Extract record creation information from the action
-		$createInfo = $action['sendEmailData'];
-		$subject = $createInfo['subject'];
-		$safeContent = isset($createInfo['safe_content']) ? $createInfo['safe_content'] : 0;
-		$content = $createInfo['content'];
-		$recepient = $createInfo['recepient'];
-		$emailcc = isset($createInfo['emailcc']) ? $createInfo['emailcc'] : "";
-		$emailbcc = isset($createInfo['emailbcc']) ? $createInfo['emailbcc'] : "";
-		$fromEmail = base64_decode($createInfo['fromEmail']);
-		$replyTo = $createInfo['replyTo'];
-		$pdf = isset($createInfo['pdf']) ? $createInfo['pdf'] : '';
-		$pdfTemplateId = isset($createInfo['pdfTemplateId']) ? $createInfo['pdfTemplateId'] : "";
-		$signature = isset($createInfo['signature']) ? $createInfo['signature'] : "";
+			// Extract record creation information from the action
+			$createInfo = $action['sendEmailData'];
+			$subject = $createInfo['subject'];
+			$safeContent = isset($createInfo['safe_content']) ? $createInfo['safe_content'] : 0;
+			$content = $createInfo['content'];
+			$recepient = $createInfo['recepient'];
+			$emailcc = isset($createInfo['emailcc']) ? $createInfo['emailcc'] : "";
+			$emailbcc = isset($createInfo['emailbcc']) ? $createInfo['emailbcc'] : "";
+			$fromEmail = base64_decode($createInfo['fromEmail']);
+			$replyTo = $createInfo['replyTo'];
+			$pdf = isset($createInfo['pdf']) ? $createInfo['pdf'] : '';
+			$pdfTemplateId = isset($createInfo['pdfTemplateId']) ? $createInfo['pdfTemplateId'] : "";
+			$signature = isset($createInfo['signature']) ? $createInfo['signature'] : "";
 
-		// Initialize and configure the task
-		$task = new VTEmailTask();
-		$task->subject = $subject;
-		$task->safe_content = $safeContent;
-		$task->content = $content;
-		$task->recepient = $recepient;
-		$task->emailcc = $emailcc;
-		$task->emailbcc = $emailbcc;
-		$task->fromEmail = $fromEmail;
-		$task->replyTo = $replyTo;
-		$task->pdf = $pdf;
-		$task->pdfTemplateId = $pdfTemplateId;
-		$task->signature = $signature;
-	
-		// Execute the task to create a new record
-		$task->doTask($entity);
+			// Initialize and configure the task
+			$task = new VTEmailTask();
+			$task->subject = $subject;
+			$task->safe_content = $safeContent;
+			$task->content = $content;
+			$task->recepient = $recepient;
+			$task->emailcc = $emailcc;
+			$task->emailbcc = $emailbcc;
+			$task->fromEmail = $fromEmail;
+			$task->replyTo = $replyTo;
+			$task->pdf = $pdf;
+			$task->pdfTemplateId = $pdfTemplateId;
+			$task->signature = $signature;
+			$task->relatedInfo = "";
 		
-		// Revert to the original user
-		$util->revertUser();
+			// Execute the task to create a new record
+			$task->doTask($entity);
+			
+			// Revert to the original user
+			$util->revertUser();
+		}
+		catch (DuplicateException $e) {
+			echo "D".$e;
+		}
+		 catch (Exception $e) {
+			echo "".$e;
+		}
 	}
 
     //End process Action
@@ -452,9 +461,9 @@ class PipelineAction
 	}
 
     //Implement by The Vi on 2025-03-01 to check conditions
-    public static function checkConditions($idRecord, $idStageNext, $moduleName) {
-       $conditions = self::getConditions($idStageNext);
-       return self::checkPipelineStageConditions($idRecord, $conditions, $idStageNext, $moduleName);
+    public static function checkConditions($idRecord, $idStage, $moduleName) {
+       $conditions = self::getConditions($idStage);
+       return self::checkPipelineStageConditions($idRecord, $conditions, $idStage, $moduleName);
     }
 
     //Implement by The Vi on 2025-03-01 to check change stage
@@ -492,15 +501,16 @@ class PipelineAction
         $fieldArray = array_keys($moduleFieldNames);
         $fieldArray[] = 'id';
         $queryGenerator->setFields($fieldArray);
-    
+		// get all record having $stageid
         $queryGenerator->initForStageChangingConditionByStageId($stageid, $conditions);
         $query = $queryGenerator->getQuery();
         $result = $adb->pquery($query, []);
-    
+		// check if current record having $stageid?
         if ($result && $adb->num_rows($result) > 0) {
             while ($row = $adb->fetchByAssoc($result)) {
                 if ($row[$idColumn] == $recordid) {
                     return true;
+					
                 }
             }
         }
@@ -555,5 +565,37 @@ class PipelineAction
     
         return $result;
     }
+	// Add by Dien Nguyen on 2025-03-09 to get next stage id
+	public static function getNextStageId($stageId){
+		global $adb;
+		// get pipelineid and sequence of old stage
+		$query = "SELECT pipelineid, sequence FROM vtiger_stage WHERE stageid = ?";
+		$result = $adb->pquery($query, array($stageId));
+		if ($adb->num_rows($result) == 0) {
+           return $stageId;
+        }
+        $row = $adb->fetchByAssoc($result);
+		$pipelineId = $row['pipelineid'];
+		$sequence = $row['sequence'];
+		$query = "SELECT stageid, name FROM vtiger_stage WHERE pipelineid = ? AND sequence = ?";
+		$result = $adb->pquery($query, array($pipelineId, $sequence + 1));
+		$row = $adb->fetchByAssoc($result);
+		if ($adb->num_rows($result) == 0 || $row['stageid'] === null) {
+			return $stageId;
+		}
+		return $row['stageid'];
+	}
+
+	// Implement by Dien Nguyen on 2025-03-09 to get stage name from id
+	public static function getStageName($stageId){
+		global $adb;
+		$query = "SELECT * FROM vtiger_stage WHERE stageid = ?";
+		$result = $adb->pquery($query, array($stageId));
+		if ($adb->num_rows($result) == 0){
+			return '';
+		}
+		$row = $adb->fetchByAssoc($result);
+		return $row['name'];
+	}
 }
 ?>

@@ -52,12 +52,7 @@
 					{if count($ALL_CONDITION_CRITERIA['columns']) > 0}
 						{foreach item=CONDITION_INFO from=$ALL_CONDITION_CRITERIA['columns']}
 							<div class="padding0 mt-2 andConditionRow conditionRow">
-								{* <select name="columnname" class="inputElement select2 mr-2 columnname" data-fieldtype="picklist" style="display: none; width: 200px;" data-rule-required="true">
-									<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-									<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-								</select> *}
 								{assign var=source_module value=$SOURCE_MODULE}
-								{* <h1>{$SOURCE_MODULE}</h1> *}
 								<select class="{if empty($NOCHOSEN)}select2{/if} col-lg-12 inputElement mr-2 columnname" name="columnname" data-fieldtype="picklist" style="display: none; width: 200px;" data-rule-required="true">
 									<option value="none">{vtranslate('LBL_SELECT_FIELD',$MODULE)}</option>
 									{foreach key=BLOCK_LABEL item=BLOCK_FIELDS from=$RECORD_STRUCTURE}
@@ -133,10 +128,6 @@
 										</optgroup>
 									{/foreach}
 								</select>
-								{* <select name="compareType" class="inputElement select2 mr-2 compareType" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
-									<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-									<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-								</select> *}
 								<div class="conditionComparator">
 									<select class="{if empty($NOCHOSEN)}select2{/if} inputElement mr-2 compareType" name="compareType" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
 										<option value="none">{vtranslate('LBL_NONE',$MODULE)}</option>
@@ -154,10 +145,6 @@
 										{/foreach}
 									</select>
 								</div>
-								{* <select name="compareValue" class="inputElement select2 mr-2 compareValue" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
-									<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-									<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-								</select> *}
 								<span class="col-lg-4 col-md-4 col-sm-4 fieldUiHolder">
 									<input name="{if $SELECTED_FIELD_MODEL}{$SELECTED_FIELD_MODEL->get('name')}{/if}" data-value="value" class="col-lg-12 col-md-12 col-sm-12" type="text" value="{$CONDITION_INFO['value']|escape}" />
 								</span>
@@ -171,12 +158,7 @@
 						{/foreach}
 					{else}
 						<div class="padding0 mt-2 andConditionRow conditionRow">
-							{* <select name="columnname" class="inputElement select2 mr-2 columnname" data-fieldtype="picklist" style="display: none; width: 200px;" data-rule-required="true">
-								<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-								<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-							</select> *}
 							{assign var=source_module value=$SOURCE_MODULE}
-							{* <h1>{$SOURCE_MODULE}</h1> *}
 							<select class="{if empty($NOCHOSEN)}select2{/if} col-lg-12 inputElement mr-2 columnname" name="columnname" data-fieldtype="picklist" style="display: none; width: 200px;" data-rule-required="true">
 								<option value="none">{vtranslate('LBL_SELECT_FIELD',$MODULE)}</option>
 								{foreach key=BLOCK_LABEL item=BLOCK_FIELDS from=$RECORD_STRUCTURE}
@@ -230,10 +212,6 @@
 									</optgroup>
 								{/foreach}
 							</select>
-							{* <select name="compareType" class="inputElement select2 mr-2 compareType" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
-								<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-								<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-							</select> *}
 							<div class="conditionComparator">
 								<select class="{if empty($NOCHOSEN)}select2{/if} inputElement mr-2 compareType" name="compareType" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
 									<option value="none">{vtranslate('LBL_NONE',$MODULE)}</option>
@@ -248,10 +226,6 @@
 									{/foreach}
 								</select>
 							</div>
-							{* <select name="compareValue" class="inputElement select2 mr-2 compareValue" data-fieldtype="picklist" style="display: none; width: 150px;" data-rule-required="true">
-								<option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-								<option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-							</select> *}
 							<span class="col-lg-4 col-md-4 col-sm-4 fieldUiHolder">
 								<input name="{if $SELECTED_FIELD_MODEL}{$SELECTED_FIELD_MODEL->get('name')}{/if}" data-value="value" class="col-lg-12 col-md-12 col-sm-12" type="text" value="" />
 							</span>
@@ -265,7 +239,7 @@
 					{/if}
 					<div id="newAndRow" class="col-lg-12 col-md-12 col-sm-12 padding0"></div>
 					<div class="mt-3 addAndConditionBtn">
-						<button class="btn text-primary">+ Thêm điều kiện</button>
+						<button class="btn text-primary">+ {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}</button>
 					</div>
 					<div class="groupCondition">
 						{assign var=GROUP_CONDITION value=$ALL_CONDITION_CRITERIA['condition']}
@@ -469,7 +443,7 @@
 					{/if}
 					<div id="newOrRow" class="col-lg-12 col-md-12 col-sm-12 padding0"></div>
 					<div class="mt-3 addOrConditionBtn">
-						<button class="btn text-primary">+ Thêm điều kiện</button>
+						<button class="btn text-primary">+ {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}</button>
 					</div>
 				</div>
 			</div>

@@ -15,7 +15,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$this->exposeMethod('getDeleteStageModal');
 		$this->exposeMethod('getStagePipelineList');
 		//End The Vi 3/3/2025
-		//Begin Tran Dien
+		//Begin Dien Nguyen
 		$this->exposeMethod('getAddActionSettingModal');
 		$this->exposeMethod('getAddConditionModal');
 		$this->exposeMethod('getActionSettingModal');
@@ -29,7 +29,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$this->exposeMethod('getCreateEntity');
 		$this->exposeMethod('getUpdateDataFieldModal');
 		$this->exposeMethod('getAddNotificationModal');
-		//End Tran Dien
+		//End Dien Nguyen
 
 		//Begin Minh Hoang 3/3/2025
 		$this->exposeMethod('getSendModal');
@@ -148,7 +148,6 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		
 		// Respond
 		$module = 'CustomView';
-		// $moduleModel = Vtiger_Module_Model::getInstance($moduleName);
 		$moduleModel = Vtiger_Module_Model::getInstance($pipelineModule);
 		$viewer = $this->getViewer($request);
 		$conditions = $request->get('conditions');
@@ -188,7 +187,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getAddCallModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -216,7 +215,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getAddMeetingModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -244,7 +243,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getCreateNewTaskModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -325,7 +324,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getCreateNewRecordModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -339,7 +338,6 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$recordStructure = $recordStructureInstance->getStructure();
 		$RELATED_MODULES_INFO = $this->getDependentModules();
 		$RELATED_MODULES = array_keys($RELATED_MODULES_INFO);
-		// $RELATED_MODULE_MODEL_NAME = $TASK_OBJECT->entity_type;
 
 		// Render view
 		$viewer = $this->getViewer($request);
@@ -358,7 +356,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getSetValuePopup(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -388,7 +386,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('SOURCE_MODULE', $moduleName);
 		$viewer->assign('QUALIFIED_MODULE', 'Settings:Workflows');
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {
@@ -460,7 +458,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	function getUpdateDataFieldModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
 		$allModules = getModulesTranslatedSingleLabel();
-		// Chỉ giữ lại các module cụ thể
+		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
         foreach ($allModules as $name => $label) {
             if (!in_array($name, $allowedModules)) {

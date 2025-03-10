@@ -96,20 +96,20 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     public static function updatePipelineStatus($id, $status) {
         $db = PearDatabase::getInstance();
         if (empty($id)) {
-            throw new Exception("ID không được để trống");
+            throw new Exception("ID cannot be empty");
         }
         $query = 'UPDATE vtiger_pipeline SET status = ? WHERE pipelineid = ?';
         $params = [$status, $id];
         $result = $db->pquery($query, $params);
         if ($result === false) {
-            throw new Exception("Lỗi thực thi câu lệnh SQL");
+            throw new Exception("Error executing SQL query");
         }
         $affectedRows = $db->getAffectedRowCount($result);
     
         if ($affectedRows > 0) {
             return [
                 'success' => true,
-                'message' => 'Cập nhật thành công',
+                'message' => 'Update successful',
                 'affectedRows' => $affectedRows,
                 'data' => [
                     'id' => $id,
@@ -119,7 +119,7 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         } else {
             return [
                 'success' => false, 
-                'message' => 'Không tìm thấy bản ghi để cập nhật',
+                'message' => 'No record found to update',
                 'affectedRows' => 0,
                 'data' => [
                     'id' => $id,
@@ -128,25 +128,26 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
             ];
         }
     }
+    
 
     //Implemented by The Vi to deletes a pipeline and updates related records.
     public static function deletePipelineRecordExist($idPipeline, $idPipelineReplace, $stageReplace) {
         $db = PearDatabase::getInstance();
     
         $resultPipeline = $db->pquery("SELECT name FROM vtiger_pipeline WHERE pipelineid = ?", array($idPipelineReplace));
-        if($db->num_rows($resultPipeline) > 0) {
+        if ($db->num_rows($resultPipeline) > 0) {
             $pipelineNameReplace = $db->query_result($resultPipeline, 0, 'name');
         } else {
-            throw new Exception("Không tìm thấy pipeline thay thế với id: " . $idPipelineReplace);
+            throw new Exception("Replacement pipeline not found with ID: " . $idPipelineReplace);
         }
-    
     
         $updatePipelineSQL = "UPDATE vtiger_potential 
                               SET pipelineid = ?, pipelinename = ? 
                               WHERE pipelineid = ?";
         $db->pquery($updatePipelineSQL, array($idPipelineReplace, $pipelineNameReplace, $idPipeline));
+    
         if (is_array($stageReplace) && count($stageReplace) > 0) {
-            foreach($stageReplace as $map) {
+            foreach ($stageReplace as $map) {
                 $idCurrently = $map['idCurrently'];
                 $idReplace = $map['idReplace'];
     
@@ -164,23 +165,26 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                 }
             }
         }
-     $deleteResult = self::deletePipelineById($idPipeline);
+    
+        $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
     }
+    
     // Implemented by The Vi deletes a pipeline by ID with transaction handling. 
     public static function deletePipelineById($id) {
         $db = PearDatabase::getInstance();
-
+    
         try {
             $db->startTransaction();
-                $queryStages = "SELECT stageid FROM vtiger_stage WHERE pipelineid = ?";
+            
+            $queryStages = "SELECT stageid FROM vtiger_stage WHERE pipelineid = ?";
             $resultStages = $db->pquery($queryStages, [$id]);
             $stageIds = [];
-
+    
             while ($row = $db->fetch_array($resultStages)) {
                 $stageIds[] = $row['stageid'];
             }
-
+    
             if (!empty($stageIds)) {
                 $stageIdsPlaceholder = implode(',', array_fill(0, count($stageIds), '?'));
     
@@ -196,26 +200,29 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                 $queryUpdatePotential = "UPDATE vtiger_potential SET pipelineid = NULL, stageid = NULL WHERE pipelineid = ?";
                 $db->pquery($queryUpdatePotential, [$id]);
             }
-
+    
             $queryDeleteRolePipeline = "DELETE FROM vtiger_rolepipeline WHERE pipelineid = ?";
             $db->pquery($queryDeleteRolePipeline, [$id]);
+    
             $queryDeletePipeline = "DELETE FROM vtiger_pipeline WHERE pipelineid = ?";
             $db->pquery($queryDeletePipeline, [$id]);
+    
             $db->completeTransaction();
-
+    
             return [
                 'success' => true,
-                'message' => 'Xóa Pipeline thành công',
+                'message' => 'Pipeline deleted successfully',
                 'deletedPipelineId' => $id
             ];
         } catch (Exception $e) {
             $db->rollbackTransaction();
             return [
                 'success' => false,
-                'message' => 'Lỗi khi xóa Pipeline: ' . $e->getMessage()
+                'message' => 'Error deleting pipeline: ' . $e->getMessage()
             ];
         }
     }
+    
     // Implemented by The Vi to checks if a pipeline record exists. 
     public static function isPipelineRecordExist($pipelineId, $sourceModule) {
         $db = PearDatabase::getInstance();

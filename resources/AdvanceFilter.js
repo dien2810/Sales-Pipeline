@@ -41,7 +41,6 @@ Vtiger_AdvanceFilter_Js(
     },
 
     getModuleName: function () {
-      // return app.getModuleName();
       // Add by Dien Nguyen on 2025-03-03 to reuse workflows fields ui
       return "Workflows";
     },
@@ -321,7 +320,6 @@ Vtiger_AdvanceFilter_Js(
 
         if (!jQuery.isEmptyObject(iterationValues)) {
           values[index + 1] = {};
-          //values[index+1]['columns'] = {};
           values[index + 1]["columns"] = iterationValues;
         }
         if (
@@ -368,8 +366,6 @@ Vtiger_Field_Js(
     },
 
     getModuleName: function () {
-      //   var currentModule = app.getModuleName();
-      //   return currentModule;
       // Add by Dien Nguyen on 2025-03-03 to reuse workflows fields ui
       return "Workflows";
     },

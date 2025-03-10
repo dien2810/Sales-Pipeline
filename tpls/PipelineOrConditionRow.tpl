@@ -1,18 +1,5 @@
 {strip}
     <div class="padding0 mt-2 orConditionRow conditionRow">
-        {* <select name="columnname" class="inputElement select2 mr-2 columnname" data-fieldtype="picklist" style="width: 200px;" data-rule-required="true">
-            <option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-            <option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-        </select>
-        <select name="compareType" class="inputElement select2 mr-2 compareType" data-fieldtype="picklist" style="width: 150px;" data-rule-required="true">
-            <option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-            <option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-        </select>
-        <select name="compareValue" class="inputElement select2 mr-2 compareValue" data-fieldtype="picklist" style="width: 150px;" data-rule-required="true">
-            <option value="immediate">{vtranslate('LBL_IMMEDIATE', 'Settings:Vtiger')}</option>
-            <option value="scheduled">{vtranslate('LBL_SCHEDULED', 'Settings:Vtiger')}</option>
-        </select>
-        <i class="far fa-trash-alt"></i> *}
         <select class="{if empty($NOCHOSEN)}select2{/if} col-lg-12 inputElement mr-2 columnname" name="columnname" data-fieldtype="picklist" style="width: 200px;" data-rule-required="true">
             <option value="none">{vtranslate('LBL_SELECT_FIELD',$MODULE)}</option>
             {foreach key=BLOCK_LABEL item=BLOCK_FIELDS from=$RECORD_STRUCTURE}

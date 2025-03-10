@@ -11,7 +11,6 @@ table {
 .row-one {
   display: flex;
   align-items: center;
-  /* justify-content: space-between; */
   padding: 8px 12px;
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;

@@ -3,6 +3,7 @@
 {strip}
 <div class="modal-dialog modal-content modal-width-1100">
     {include file="ModalHeader.tpl"|vtemplate_path:'Vtiger' TITLE="{vtranslate('LBL_ADD_MEETING', $MODULE_NAME)}" }
+    
     <form id="form-add-meeting" class="form-horizontal addCallModal form-modal" method="POST">
         <div class="form-content">
             <input type="hidden" name="leftSideModule" value="{$SELECTED_MODULE_NAME}" />
@@ -61,7 +62,7 @@
             </div>
             <div class="form-group">
                 <div class="fieldLabel col-sm-3 text-left ml-3">
-                    Thời lượng cuộc họp
+                    {vtranslate('LBL_MEETING_DURATION', $MODULE_NAME)}
                 </div>
                 <div class="controls col-sm-8">
                     <div class="d-flex align-item-center justify-content-center">
@@ -88,7 +89,7 @@
             </div>
             <div class="form-group">
                 <div class="fieldLabel col-sm-3 text-left ml-3">
-                    Địa điểm
+                    {vtranslate('LBL_LOCATION', $MODULE_NAME)}
                 </div>
                 <div class="controls col-sm-6">
                     <div class="input-group inputElement w60">
@@ -127,7 +128,6 @@
                         <span class="redColor">*</span>
                     </div>
                     <div class="controls col-sm-8">
-                        {* <input name="assigned_user_id" type="text" class="inputElement w40" data-rule-required="true"> *}
                         <input type="text" autocomplete="off" class="inputElement select2" style="width: 100%" data-rule-required="true" data-rule-main-owner="true"
                             data-fieldtype="owner" data-fieldname="assigned_user_id" data-name="assigned_user_id" name="assigned_user_id"
                             {if $FOR_EVENT}
@@ -183,16 +183,16 @@
                 </div>
             </div>
         </div>
-        {* {include file="ModalFooter.tpl"|@vtemplate_path:'Vtiger'} *}
+
         <div class="modal-footer ">
             <center>
                 {if $BUTTON_NAME neq null}
                     {assign var=BUTTON_LABEL value=$BUTTON_NAME}
                 {else}
-                    {assign var=BUTTON_LABEL value={vtranslate('LBL_SAVE', $MODULE)}}
+                    {assign var=BUTTON_LABEL value={vtranslate('LBL_SAVE', $MODULE_NAME)}}
                 {/if}
-                <button href="#" class="btn cancelLink" type="reset" data-dismiss="modal">Hủy</button>
-                <button class="btn btn-default" id="fullInfo" type="button"><strong>Toàn bộ thông tin</strong></button>
+                <button href="#" class="btn cancelLink" type="reset" data-dismiss="modal">{vtranslate('LBL_CANCEL', $MODULE_NAME)}</button>
+                <button class="btn btn-default" id="fullInfo" type="button"><strong>{vtranslate('LBL_FULL_INFO', $MODULE_NAME)}</strong></button>
                 <button {if $BUTTON_ID neq null} id="{$BUTTON_ID}" {/if} class="btn btn-primary" type="submit" name="saveButton"><strong>{$BUTTON_LABEL}</strong></button>
             </center>
         </div>

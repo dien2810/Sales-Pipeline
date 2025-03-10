@@ -488,10 +488,51 @@ class PipelineAction
 	}
 
     //Implement by The Vi on 2025-03-01 to check conditions
-    public static function checkConditions($idRecord, $idStage, $moduleName) {
-       $conditions = self::getConditions($idStage);
-       return self::checkPipelineStageConditions($idRecord, $conditions, $idStage, $moduleName);
-    }
+	public static function checkConditions($idRecord, $idStage, $moduleName, $nextStageId = null) {
+		// Check pipeline stage conditions first
+		$conditions = self::getConditions($idStage);
+		$isPipelineConditionsMet = self::checkPipelineStageConditions($idRecord, $conditions, $idStage, $moduleName);
+		
+		// Return 3 if pipeline conditions are not met
+		if (!$isPipelineConditionsMet) {
+			return 3;
+		}
+		
+		// If pipeline conditions are met, check move allowed status
+		if ($nextStageId !== null) {
+			$isMoveAllowed = self::isMoveAllowed($idStage, $nextStageId);
+			// Return 2 if pipeline conditions are met but move is not allowed
+			if (!$isMoveAllowed) {
+				return 2; 
+			}
+			// Return 1 if both conditions are met (pipeline conditions and move allowed)
+			return 1;
+		}
+
+		return 1;
+	}
+	
+	// Implement by The Vi on 2025-03-10 to check if move is allowed
+
+	public function isMoveAllowed($stageIdCurrent, $stageIdMove) {
+		$db = PearDatabase::getInstance();
+		
+		// Query for permitted transitions from current stage
+		$sql = "SELECT allowedstageid FROM vtiger_allowedmoveto WHERE stageid = ?";
+		$result = $db->pquery($sql, array($stageIdCurrent));
+		$allowedStages = array();
+		
+		// No restrictions exist if no rules are defined for current stage
+		if ($db->num_rows($result) === 0) {
+			return true;
+		}
+	    while ($row = $db->fetchByAssoc($result)) {
+			$allowedStages[] = $row['allowedstageid'];
+		}
+		return in_array($stageIdMove, $allowedStages);
+	}
+
+
 
     //Implement by The Vi on 2025-03-01 to check change stage
     public static function checkChangeStage($idRecord, $idStageNext) {

@@ -55,7 +55,7 @@ class PipelineAction
 					case 'sendEmail':
 						self::processSendEmail($action, $idRecord,  $moduleName);
 						break;
-					case 'sendSMS':
+          case 'sendSMS':
 						self::processSendSMS($action, $idRecord,  $moduleName);
 						break;
 				}

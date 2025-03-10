@@ -82,7 +82,12 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
             // End edit by The Vi 3/4/2025
             $result = true;
             if($stageId != $stageIdNext) {
+<<<<<<< HEAD
                 $result = PipelineAction::checkConditions($recordId, $stageId, $moduleName, $stageIdNext);
+=======
+                // $result = PipelineAction::checkConditions($recordId, $stageId, $moduleName);
+                $result = false;
+>>>>>>> ab3d46696160f0eed48521788f52e1421aeebfd1
             }
             if ($result) {
                 $response->setResult([

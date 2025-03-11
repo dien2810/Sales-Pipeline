@@ -413,7 +413,7 @@ class PipelineAction
 			$task->pdf = $pdf;
 			$task->pdfTemplateId = $pdfTemplateId;
 			$task->signature = $signature;
-			$task->relatedInfo = "";
+			$task->relatedInfo = "{}";
 		
 			// Execute the task to create a new record
 			$task->doTask($entity);
@@ -596,6 +596,24 @@ class PipelineAction
 		}
 		$row = $adb->fetchByAssoc($result);
 		return $row['name'];
+	}
+
+	// Implement by Dien Nguyen on 2025-03-09 to get active pipeline
+	static function getActivePipeline() {
+		global $adb;
+		$query = 'SELECT * FROM vtiger_pipeline INNER JOIN vtiger_tab ON vtiger_tab.name = vtiger_pipeline.module WHERE vtiger_tab.presence IN (0,2) AND status=?';
+		$params = array(1);
+		$result = $adb->pquery($query, $params);
+		return $adb->fetchByAssoc($result);
+	}
+	
+	// Implement by Dien Nguyen on 2025-03-09 to get stage by pipeline id
+	static function getStageForPipeline($pipelineid){
+		global $adb;
+		$query = 'SELECT * FROM vtiger_stage WHERE pipelineid = ?';
+		$params = array($pipelineid);
+		$result = $adb->pquery($query, $params);
+		return $adb->fetchByAssoc($result);
 	}
 }
 ?>

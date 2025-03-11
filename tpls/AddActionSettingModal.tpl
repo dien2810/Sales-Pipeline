@@ -58,7 +58,7 @@ Purpose: Modal add Action
 					</div>
 					<div class="col-sm-2 padding0 mr-1">
 						<input id="time" type="number" name="time" value="{$ACTION.time}" class="form-control"
-							style="margin-bottom: 10px;" />
+							style="margin-bottom: 10px;" min="1"/>
 					</div>
 					<div class="form-select form-select-lg col-sm-4 padding0 mr-1">
 						<select name="time_unit" class="inputElement select2" data-fieldtype="picklist"

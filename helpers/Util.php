@@ -96,5 +96,4 @@ class Settings_PipelineConfig_Util_Helper {
         
         return  $overdueDays;
     }
-
 }

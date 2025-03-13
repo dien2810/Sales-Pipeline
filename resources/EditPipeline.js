@@ -533,6 +533,8 @@ CustomView_BaseController_Js(
           stage["actions"] = JSON.stringify(stage["actions"]);
           stage["conditions"] = stage["conditions"] || {};
           stage["conditions"] = JSON.stringify(stage["conditions"]);
+          console.log(stage["conditions"]);
+          console.log(JSON.stringify(stage["conditions"]));
         });
         //End Tran Dien
         e.preventDefault();

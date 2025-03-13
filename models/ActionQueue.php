@@ -5,7 +5,12 @@ class ActionQueue{
     public function queueAction($action, $entityId, $when=0){
         global $adb;
         $actionContents = json_encode($action);
-        if ($entityId) {
+        $query = "SELECT COUNT(*) as count FROM vtiger_pipelineaction_queue WHERE entity_id = ? AND do_after = ? AND action_contents = ?";
+        $params = array($entityId, $when, $actionContents);
+        $result = $adb->pquery($query, $params);
+        $row = $adb->fetchByAssoc($result);
+
+        if ($row['count'] == 0 && $entityId) {
             $adb->pquery('INSERT INTO vtiger_pipelineaction_queue(entity_id, do_after, action_contents) VALUES(?, ?, ?)', array($entityId, $when, $actionContents));
         }
         return true;
@@ -17,7 +22,7 @@ class ActionQueue{
      * The method fetches action/entity id where the when timestamp
      * is less than the current time when the method was called.
      */
-    public function getReadyTasks(){
+    public function getReadyActions(){
         global $adb;
         $time = time();
         $result = $adb->pquery('SELECT entity_id, do_after, action_contents FROM vtiger_pipelineaction_queue WHERE do_after<?', array($time));

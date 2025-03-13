@@ -5,54 +5,98 @@ class PipelineConfig_Service_Model {
 
     // Implemented by The Vi to send repeat notifications
     public static function sendNotications() {
+          self::sendRepeatNotifications();
+    }
+
+    /**
+     * Send repeat notifications based on notification_repeat table
+     * Duplicates existing notifications at specified times
+     */
+    public static function sendRepeatNotifications() {
         $db = PearDatabase::getInstance();
         $log = LoggerManager::getLogger('PLATFORM');
-        $log->info('[CRON] Started sendNotications');
+        $log->info('[CRON] Started sendRepeatNotifications');
+        
         $currentTime = date('Y-m-d H:i');
-        $queryRepeat = "SELECT * FROM vtiger_notification_repeat 
-                        WHERE DATE_FORMAT(notification_send_time, '%Y-%m-%d %H:%i') = ?";
-        $resultRepeat = $db->pquery($queryRepeat, array($currentTime));
-        if($resultRepeat && $db->num_rows($resultRepeat) > 0) {
-            while($repeatRecord = $db->fetch_array($resultRepeat)) {
-                $notificationId = $repeatRecord['notification_id'];
-                $queryNotification = "SELECT * FROM vtiger_notifications 
-                                      WHERE id = ? AND `read` = 0";
-                $resultNotification = $db->pquery($queryNotification, array($notificationId));
-                if($resultNotification && $db->num_rows($resultNotification) > 0) {
-                    while($notificationRecord = $db->fetch_array($resultNotification)) {
-                
-                        $receiver_id         = $notificationRecord['receiver_id'];
-                        $category            = $notificationRecord['category'];
-                        $image               = $notificationRecord['image'];
-                        $related_record_id   = $notificationRecord['related_record_id'];
-                        $related_record_name = $notificationRecord['related_record_name'];
-                        $related_module_name = $notificationRecord['related_module_name'];
-                        $created_time        = date('Y-m-d H:i:s'); 
-                        $read                = $notificationRecord['read']; 
-                        $extra_data          = $notificationRecord['extra_data'];
-                        $queryInsert = "INSERT INTO vtiger_notifications 
-                            (receiver_id, category, image, related_record_id, related_record_name, related_module_name, created_time, `read`, extra_data) 
-                            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                        $db->pquery($queryInsert, array(
-                            $receiver_id,
-                            $category,
-                            $image,
-                            $related_record_id,
-                            $related_record_name,
-                            $related_module_name,
-                            $created_time,
-                            $read,
-                            $extra_data
-                        ));
-
-                        $log->info("[CRON] Duplicated notification record (notification_id: $notificationId) as new id $newId");
-                    }
+        
+        // Join query to reduce number of database calls
+        $query = "SELECT n.* 
+                FROM vtiger_notification_repeat r
+                INNER JOIN vtiger_notifications n 
+                    ON r.notification_id = n.id
+                WHERE 
+                    DATE_FORMAT(r.notification_send_time, '%Y-%m-%d %H:%i') = ?
+                    AND n.read = 0";
+        
+        $result = $db->pquery($query, array($currentTime));
+        
+        if ($result && $db->num_rows($result) > 0) {
+            while ($record = $db->fetch_array($result)) {
+                try {
+                    // Execute insert and get new ID in single transaction
+                    $db->startTransaction();
+                    
+                    $insertParams = array(
+                        $record['receiver_id'],
+                        $record['category'],
+                        $record['image'],
+                        $record['related_record_id'],
+                        $record['related_record_name'],
+                        $record['related_module_name'], 
+                        date('Y-m-d H:i:s'),
+                        0, // Default unread
+                        $record['extra_data']
+                    );
+                    
+                    $db->pquery(
+                        "INSERT INTO vtiger_notifications 
+                        (receiver_id, category, image, related_record_id, related_record_name, 
+                         related_module_name, created_time, `read`, extra_data) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        $insertParams
+                    );
+                    
+                    $newId = $db->getLastInsertID();
+                    $db->completeTransaction();
+                    
+                    $log->info("[CRON] Duplicated notification {$record['id']} as new id $newId");
+                } catch (Exception $e) {
+                    $db->rollbackTransaction();
+                    $log->error("Error duplicating notification: " . $e->getMessage());
                 }
             }
         } else {
-            $log->info("[CRON] No notification repeat record found for current time: $currentTime");
+            $log->info("[CRON] No notifications to repeat at $currentTime");
         }
-        $log->info('[CRON] Finished sendNotications');
+        
+        $log->info('[CRON] Finished sendRepeatNotifications');
+    }
+
+    /**
+     * Send notifications for overdue pipeline stage transitions
+     * Notifies relevant users when a stage transition is past due
+     */
+    public static function sendOverdueStageNotifications() {
+        // Empty function for overdue stage notifications
+        // TODO: Implement notification logic for overdue pipeline stages
+    }
+
+    /**
+     * Send notifications for upcoming pipeline stage deadlines
+     * Alerts users about stages that are approaching their deadline
+     */
+    public static function sendUpcomingStageNotifications() {
+        // Empty function for upcoming stage deadline notifications
+        // TODO: Implement notification logic for upcoming stage deadlines
+    }
+
+    /**
+     * Send notifications when conditions are met for stage transition
+     * Notifies users when all requirements are fulfilled to move to next stage
+     */
+    public static function sendStageReadyNotifications() {
+        // Empty function for stage transition readiness notifications
+        // TODO: Implement notification logic for stage transition readiness
     }
 }
 ?>

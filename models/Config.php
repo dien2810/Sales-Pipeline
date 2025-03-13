@@ -169,6 +169,56 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
     }
+
+    //Implemented by Minh Hoang to replace pipeline in records.
+    public static function replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace) {
+        try {
+            $db = PearDatabase::getInstance();
+    
+            $resultPipeline = $db->pquery("SELECT name FROM vtiger_pipeline WHERE pipelineid = ?", array($idPipelineReplace));
+
+            if ($db->num_rows($resultPipeline) > 0) {
+                $pipelineNameReplace = $db->query_result($resultPipeline, 0, 'name');
+            } else {
+                throw new Exception("Pipeline not found with ID: " . $idPipelineReplace);
+            }
+
+            $resultStage = $db->pquery("SELECT name, success_rate, value FROM vtiger_stage WHERE stageid = ?", array($idStageReplace));
+
+            if ($db->num_rows($resultStage) > 0) {
+                $stageNameReplace = $db->query_result($resultStage, 0, 'name');
+                $successRate = $db->query_result($resultStage, 0, 'success_rate');
+                $stageValueReplace = $db->query_result($resultStage, 0, 'value');
+            } else {
+                throw new Exception("Stage not found with ID: " . $idStageReplace);
+            }
+        
+            $updateSQL = "UPDATE vtiger_potential 
+                        SET pipelineid = ?, pipelinename = ?, stageid = ?, stagename = ?, probability = ?, sales_stage = ? 
+                        WHERE potentialid = ?";
+            $db->pquery($updateSQL, array($idPipelineReplace, $pipelineNameReplace, $idStageReplace, $stageNameReplace, $successRate, $stageValueReplace, $idRecord));
+            
+            return [
+                'success' => true,
+                'message' => 'Pipeline and stage updated successfully',
+                'data' => [
+                    'idRecord' => $idRecord,
+                    'idPipelineReplace' => $idPipelineReplace,
+                    'pipelineNameReplace' => $pipelineNameReplace,
+                    'idStageReplace' => $idStageReplace,
+                    'stageNameReplace' => $stageNameReplace,
+                    'successRate' => $successRate,
+                    'stageValueReplace' => $stageValueReplace
+                ]
+            ];
+        } catch(Throwable $th) {
+            // throw $th;
+            return [
+                'success' => false,
+                'message' => 'Error updating pipeline and stage: ' . $th->getMessage()
+            ];
+        }
+    }
     
     // Implemented by The Vi deletes a pipeline by ID with transaction handling. 
     public static function deletePipelineById($id) {

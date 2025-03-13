@@ -183,19 +183,20 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                 throw new Exception("Pipeline not found with ID: " . $idPipelineReplace);
             }
 
-            $resultStage = $db->pquery("SELECT name, success_rate FROM vtiger_stage WHERE stageid = ?", array($idStageReplace));
+            $resultStage = $db->pquery("SELECT name, success_rate, value FROM vtiger_stage WHERE stageid = ?", array($idStageReplace));
 
             if ($db->num_rows($resultStage) > 0) {
                 $stageNameReplace = $db->query_result($resultStage, 0, 'name');
                 $successRate = $db->query_result($resultStage, 0, 'success_rate');
+                $stageValueReplace = $db->query_result($resultStage, 0, 'value');
             } else {
                 throw new Exception("Stage not found with ID: " . $idStageReplace);
             }
         
             $updateSQL = "UPDATE vtiger_potential 
-                        SET pipelineid = ?, pipelinename = ?, stageid = ?, stagename = ?, probability = ? 
+                        SET pipelineid = ?, pipelinename = ?, stageid = ?, stagename = ?, probability = ?, sales_stage = ? 
                         WHERE potentialid = ?";
-            $db->pquery($updateSQL, array($idPipelineReplace, $pipelineNameReplace, $idStageReplace, $stageNameReplace, $successRate, $idRecord));
+            $db->pquery($updateSQL, array($idPipelineReplace, $pipelineNameReplace, $idStageReplace, $stageNameReplace, $successRate, $stageValueReplace, $idRecord));
             
             return [
                 'success' => true,
@@ -206,7 +207,8 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
                     'pipelineNameReplace' => $pipelineNameReplace,
                     'idStageReplace' => $idStageReplace,
                     'stageNameReplace' => $stageNameReplace,
-                    'successRate' => $successRate
+                    'successRate' => $successRate,
+                    'stageValueReplace' => $stageValueReplace
                 ]
             ];
         } catch(Throwable $th) {

@@ -233,3 +233,7 @@
 .btn-success {
   background-color: #008ecf !important;
 }
+/* Add by The Vi 10/3/2025 */
+.btn-outline-danger {
+  border: #ffffff !important;
+}

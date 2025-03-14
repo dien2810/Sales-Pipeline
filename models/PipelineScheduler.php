@@ -22,21 +22,18 @@ class PipelineScheduler{
 
 		$activePipelines = PipelineAction::getActivePipeline();
 		$noOfActivePipelines = count($activePipelines);
-        echo "p".$noOfActivePipelines;
 		for ($i = 0; $i < $noOfActivePipelines; $i++) {
 			$pipeline = $activePipelines[$i];
             $moduleName = $pipeline['module'];
 			$stages = PipelineAction::getStageForPipeline($pipeline['pipelineid']);
 			if ($stages) {
                 $noOfStages = count($stages);
-                echo "s".$noOfStages;
                 for ($s = 0; $s < $noOfStages; ++$s) {
                     $stage = $stages[$s];
                     $page = 0;
                     do {
                         $records = $this->getEligibleStageRecords($stage, $page++, 100, $moduleName);
                         $noOfRecords = count($records);
-                        echo "r".$noOfRecords;
                         if ($noOfRecords < 1) break;
                         for ($j = 0; $j < $noOfRecords; ++$j) {
                             $recordId = $records[$j];
@@ -88,7 +85,7 @@ class PipelineScheduler{
                                 $time = time();
                                 if($delay > 0 && $delay >= $time){
                                     $scheduleDates[] = gmdate('Y-m-d H:i:s',$delay);
-                                    $actionQueue->queueAction($action, $entityData->getId(), $delay);
+                                    $actionQueue->queueAction($action, $wsEntityId, $delay);
                                 } else{
                                     $delay = 0;
                                 }

@@ -2,6 +2,8 @@
 require_once('include/SMSer.php');
 require_once('include/Mailer.php');
 require_once 'modules/com_vtiger_workflow/VTEntityCache.inc';
+require_once 'modules/Settings/PipelineConfig/models/PipelineScheduler.php';
+require_once 'modules/Settings/PipelineConfig/models/ActionQueue.php';
 class PipelineConfig_Service_Model {
 
     // Implemented by The Vi to send repeat notifications
@@ -102,10 +104,11 @@ class PipelineConfig_Service_Model {
 
     // Add by Dien Nguyen on 2025-03-11 to create cron for pipeline action
     public static function processPipelineActions(){
+        $log = LoggerManager::getLogger('PLATFORM');
+        $log->info('[CRON] Started process pipeline actions');
         $adb = PearDatabase::getInstance();
-        require_once 'modules/Settings/PipelineConfig/models/PipelineScheduler.php';
-        require_once 'modules/Settings/PipelineConfig/models/ActionQueue.php';
         $pipelineScheduler = new PipelineScheduler();
+        
         $pipelineScheduler->queuePipelineActions();
 
         $util = new VTWorkflowUtils();
@@ -113,7 +116,6 @@ class PipelineConfig_Service_Model {
         $actionQueue = new ActionQueue();
         // get all actions that do_after is less than current time
         $readyActions = $actionQueue->getReadyActions();
-        // echo "c".count($readyActions);
         foreach($readyActions as $actionDetails){
             list($entity_id, $do_after, $action_contents) = $actionDetails;
             $entity = VTEntityCache::getCachedEntity($entity_id);
@@ -132,9 +134,10 @@ class PipelineConfig_Service_Model {
                 PipelineAction::processActions($action_contents, $recordId, $entity->getModuleName());
             }
             catch (Throwable $ex) {
-                echo '[vtRunTaskJob::doTask] Error: ' . $ex->getMessage();
+                echo '[vtRunPipelineActionJob::doTask] Error: ' . $ex->getMessage();
             }
         }
+        $log->info('[CRON] Finished process pipeline actions');
     }
 }
 ?>

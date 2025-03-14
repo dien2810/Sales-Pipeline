@@ -4,6 +4,7 @@ require_once('include/events/SqlResultIterator.inc');
 class ActionQueue{
     public function queueAction($action, $entityId, $when=0){
         global $adb;
+        
         $actionContents = json_encode($action);
         $query = "SELECT COUNT(*) as count FROM vtiger_pipelineaction_queue WHERE entity_id = ? AND do_after = ? AND action_contents = ?";
         $params = array($entityId, $when, $actionContents);
@@ -52,4 +53,3 @@ class ActionQueue{
 		return false;
 	}
 }
-?>

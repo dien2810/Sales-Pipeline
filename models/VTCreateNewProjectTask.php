@@ -178,7 +178,6 @@ class VTCreateNewProjectTask extends VTTask{
 		try {
 			$fields['source'] = 'PIPELINE';
 			$projectTask = vtws_create($moduleName, $fields, $adminUser);
-            echo "b";
 		} catch (Exception $e) {
             echo "".$e;
             // Added by Hieu nguyen on 2020-10-26 to save error log

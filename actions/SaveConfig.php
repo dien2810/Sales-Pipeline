@@ -17,6 +17,10 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		//Begin The Vi 28-02-2025
 		$this->exposeMethod('deletePipelineRecordExist');
 		//End The Vi 28-02-2025
+
+		// Begin Minh Hoang 2025-03-12
+		$this->exposeMethod('replacePipelineAndStageInRecord');
+		// End Minh Hoang 2025-03-12
 	}
 	function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
@@ -180,9 +184,9 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	function deletePipelineRecordExist(Vtiger_Request $request) {
 		$idPipeline = $request->get('pipelineId');
 		$idPipelineReplace = $request->get('pipelineIdReplace');
-		$stageReplace = $request->get('stageReplace');
+		$idStageReplace = $request->get('stageReplace');
 		
-		$deleteResult = Settings_PipelineConfig_Config_Model::deletePipelineRecordExist($idPipeline, $idPipelineReplace, $stageReplace);
+		$deleteResult = Settings_PipelineConfig_Config_Model::deletePipelineRecordExist($idPipeline, $idPipelineReplace, $idStageReplace);
 		$response = new Vtiger_Response();
 		$response->setResult([
 			'success' => $deleteResult['success'],
@@ -193,6 +197,24 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	}
 
 	//End The Vi 28-02-2025
+
+	// Begin Minh Hoang 2025-03-11
+	function replacePipelineAndStageInRecord(Vtiger_Request $request) {
+		$idRecord = $request->get('recordId');
+		$idPipelineReplace = $request->get('pipelineIdReplace');
+		$idStageReplace = $request->get('stageIdReplace');
+
+		$editResult = Settings_PipelineConfig_Config_Model::replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace);
+		$response = new Vtiger_Response();
+		$response->setResult([
+			'success' => $editResult['success'],
+			'data' => $idPipelineReplace,
+			'message' => $editResult['message']
+		]);
+	
+		$response->emit();
+	}
+	// End Minh Hoang 2025-03-11
 
 	// Begin Dien Nguyen
 	public static function clonePipeline($id) {

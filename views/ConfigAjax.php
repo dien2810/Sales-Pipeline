@@ -30,10 +30,15 @@ class Settings_PipelineConfig_ConfigAjax_View extends CustomView_Base_View {
 	function getPipelineList(Vtiger_Request $request) {
             $nameModule = $request->get('nameModule');
             $namePipeline = $request->get('namePipeline');
-            $pipleList =  Settings_PipelineConfig_Config_Model::getPipelineList($nameModule, $namePipeline);
+			$moduleName = $request->getModule(false);
+			$currentUserModel = Users_Record_Model::getCurrentUserModel();
+			$roleId = $currentUserModel->get('roleid');
+
+            $pipelineList =  Settings_PipelineConfig_Config_Model::getPipelineList($nameModule, $namePipeline, $roleId);
 	
 			$viewer = $this->getViewer($request);
-            $viewer->assign('PIPELINE_LIST', $pipleList);
+            $viewer->assign('PIPELINE_LIST', $pipelineList);
+			$viewer->assign('MODULE_NAME', $moduleName);
             $result = $viewer->fetch('modules/Settings/PipelineConfig/tpls/PipelineList.tpl');
             echo $result;
 	}

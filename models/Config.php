@@ -8,24 +8,43 @@
 class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
 
     // Implemented by The Vi to retrieves a list of pipelines with optional filtering. 
-    public static function getPipelineList($nameModule = null, $name = null) {
+    public static function getPipelineList($nameModule = null, $name = null, $roleId = null) {
         $db = PearDatabase::getInstance();
-        $query = 'SELECT * FROM vtiger_pipeline';
+        $query = 'SELECT vtiger_pipeline.* FROM vtiger_pipeline'; 
         $params = [];
+        $whereClauses = [];
+        $joins = [];
+    
+        // Check and add JOIN if roleId is provided
+        if (!empty($roleId)) {
+            $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
+            $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
+            $params[] = $roleId;
+        }
+    
+        // Add condition for module filtering
         if (!empty($nameModule)) {
-            $query .= ' WHERE module = ?';
+            $whereClauses[] = 'vtiger_pipeline.module = ?';
             $params[] = $nameModule;
         }
+    
+        // Add condition for pipeline name search
         if (!empty($name)) {
-            if (!empty($params)) {
-                $query .= ' AND';
-            } else {
-                $query .= ' WHERE';
-            }
-            $query .= ' name LIKE ?';
-            $params[] = '%' . $name . '%'; 
+            $whereClauses[] = 'vtiger_pipeline.name LIKE ?';
+            $params[] = '%' . $name . '%';
         }
-        $query .= ' ORDER BY pipelineid ASC';
+    
+        // Combine JOINs into query
+        if (!empty($joins)) {
+            $query .= ' ' . implode(' ', $joins);
+        }
+    
+        // Combine WHERE conditions
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+    
+        $query .= ' ORDER BY vtiger_pipeline.pipelineid ASC';
         $result = $db->pquery($query, $params);
         return $result;
     }
@@ -168,6 +187,56 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     
         $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
+    }
+
+    //Implemented by Minh Hoang to replace pipeline in records.
+    public static function replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace) {
+        try {
+            $db = PearDatabase::getInstance();
+    
+            $resultPipeline = $db->pquery("SELECT name FROM vtiger_pipeline WHERE pipelineid = ?", array($idPipelineReplace));
+
+            if ($db->num_rows($resultPipeline) > 0) {
+                $pipelineNameReplace = $db->query_result($resultPipeline, 0, 'name');
+            } else {
+                throw new Exception("Pipeline not found with ID: " . $idPipelineReplace);
+            }
+
+            $resultStage = $db->pquery("SELECT name, success_rate, value FROM vtiger_stage WHERE stageid = ?", array($idStageReplace));
+
+            if ($db->num_rows($resultStage) > 0) {
+                $stageNameReplace = $db->query_result($resultStage, 0, 'name');
+                $successRate = $db->query_result($resultStage, 0, 'success_rate');
+                $stageValueReplace = $db->query_result($resultStage, 0, 'value');
+            } else {
+                throw new Exception("Stage not found with ID: " . $idStageReplace);
+            }
+        
+            $updateSQL = "UPDATE vtiger_potential 
+                        SET pipelineid = ?, pipelinename = ?, stageid = ?, stagename = ?, probability = ?, sales_stage = ? 
+                        WHERE potentialid = ?";
+            $db->pquery($updateSQL, array($idPipelineReplace, $pipelineNameReplace, $idStageReplace, $stageNameReplace, $successRate, $stageValueReplace, $idRecord));
+            
+            return [
+                'success' => true,
+                'message' => 'Pipeline and stage updated successfully',
+                'data' => [
+                    'idRecord' => $idRecord,
+                    'idPipelineReplace' => $idPipelineReplace,
+                    'pipelineNameReplace' => $pipelineNameReplace,
+                    'idStageReplace' => $idStageReplace,
+                    'stageNameReplace' => $stageNameReplace,
+                    'successRate' => $successRate,
+                    'stageValueReplace' => $stageValueReplace
+                ]
+            ];
+        } catch(Throwable $th) {
+            // throw $th;
+            return [
+                'success' => false,
+                'message' => 'Error updating pipeline and stage: ' . $th->getMessage()
+            ];
+        }
     }
     
     // Implemented by The Vi deletes a pipeline by ID with transaction handling. 

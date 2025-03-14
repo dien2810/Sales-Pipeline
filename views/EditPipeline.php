@@ -9,6 +9,28 @@ class Settings_PipelineConfig_EditPipeline_View extends Settings_Vtiger_BaseConf
     function __construct() {
         parent::__construct();
     }
+	function checkPermission(Vtiger_Request $request) {
+		$currentUserModel = Users_Record_Model::getCurrentUserModel();
+		$recordId = $request->get('record');
+		if (!empty($recordId)) {
+			$roleId = $currentUserModel->get('roleid');
+			if ($this->checkPermissionPipeline($recordId, $roleId) === 0) {
+				throw new AppException(vtranslate('LBL_PERMISSION_DENIED', 'Vtiger'));
+			}
+		}
+
+		// if ($currentUserModel->isAdminUser()) {
+		// 	return; 
+		// }
+	}
+	public function checkPermissionPipeline($recordId, $roleId){
+
+		$db = PearDatabase::getInstance();
+		$query = "SELECT 1 FROM vtiger_rolepipeline WHERE roleid = ? AND pipelineid = ?";
+		$result = $db->pquery($query, array($roleId, $recordId));
+
+		return $db->num_rows($result);
+	}
 	public function process(Vtiger_Request $request)
 	{
 		$sourceModule = $request->get('source_module');

@@ -20,41 +20,39 @@ class PipelineAction
 {
     //Begin process Actions
     //Implement by Team to process actions
-	public static function processActions($idRecord, $idStageNext, $moduleName) {
+	public static function processActions($action, $idRecord, $moduleName, $convertAction=true) {
 		try {
-			$actions = self::getActions($idStageNext);			
-			if (!$actions) return true;
-			foreach ($actions as $action) {
-				if (!isset($action['action_type'])) continue;
-				switch ($action['action_type']) {
-					case 'addCall':
-						self::processAddCall($action, $idRecord, $moduleName);
-						break;
-					case 'addMeeting':
-						self::processAddMeeting($action, $idRecord, $moduleName);
-						break;
-					case 'createNewTask':
-						self::processCreateNewTask($action, $idRecord, $moduleName);
-						break;
-					case 'createNewProjectTask':
-						self::processCreateNewProjectTask($action, $idRecord, $moduleName);
-						break;
-					case 'updateDataField':
-                        // Implement by The Vi to process update data fields
-					    self::processUpdateDataFields($action, $idRecord,   $moduleName);
-						break;
-					case 'notification':
-                        // Implement by The Vi to process send notifications
-						self::processSendNotifications($action, $idRecord,  $moduleName);
-						break;
-					case 'createNewRecord':
-						self::processCreateNewRecords($action, $idRecord,  $moduleName);
-						break;
-					case 'sendEmail':
-						self::processSendEmail($action, $idRecord,  $moduleName);
-						break;
-				}
-				
+			if ($convertAction){
+				$action = html_entity_decode($action, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+				$action = json_decode($action, true);
+			}
+			switch ($action['action_type']) {
+				case 'addCall':
+					self::processAddCall($action, $idRecord, $moduleName);
+					break;
+				case 'addMeeting':
+					self::processAddMeeting($action, $idRecord, $moduleName);
+					break;
+				case 'createNewTask':
+					self::processCreateNewTask($action, $idRecord, $moduleName);
+					break;
+				case 'createNewProjectTask':
+					self::processCreateNewProjectTask($action, $idRecord, $moduleName);
+					break;
+				case 'updateDataField':
+					// Implement by The Vi to process update data fields
+					self::processUpdateDataFields($action, $idRecord,   $moduleName);
+					break;
+				case 'notification':
+					// Implement by The Vi to process send notifications
+					self::processSendNotifications($action, $idRecord,  $moduleName);
+					break;
+				case 'createNewRecord':
+					self::processCreateNewRecords($action, $idRecord,  $moduleName);
+					break;
+				case 'sendEmail':
+					self::processSendEmail($action, $idRecord,  $moduleName);
+					break;
 			}
 			return true;
 		} catch (Exception $e) {
@@ -217,7 +215,7 @@ class PipelineAction
 		
 		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
 		$entity = $entityCache->forId($wsEntityId);
-
+		
 		// Build fields for create new task action
 		if (isset($action['projectTaskInfo'])){
 			$projectTaskInfo = $action['projectTaskInfo'];
@@ -234,9 +232,9 @@ class PipelineAction
 			$task->projecttaskstatus = $projectTaskInfo['projecttaskstatus'];
 			$task->projecttasktype = $projectTaskInfo['projecttasktype'];
 			$task->startdate = $projectTaskInfo['startdate'];
-			
 			// Execute the task and revert the user context back
 			$task->doTask($entity);
+			
 			$util->revertUser();
 		}
 	}
@@ -413,7 +411,7 @@ class PipelineAction
 			$task->pdf = $pdf;
 			$task->pdfTemplateId = $pdfTemplateId;
 			$task->signature = $signature;
-			$task->relatedInfo = "";
+			$task->relatedInfo = "{}";
 		
 			// Execute the task to create a new record
 			$task->doTask($entity);
@@ -443,6 +441,7 @@ class PipelineAction
 		$actions = json_decode($actionsJson, true);
 		return $actions;
 	}
+
 	//Implement by The Vi on 2025-03-01 to get conditions
 	public static function getConditions($idStageNext) {
 		$db = PearDatabase::getInstance();
@@ -465,7 +464,6 @@ class PipelineAction
 		// Check pipeline stage conditions first
 		$conditions = self::getConditions($idStage);
 		$isPipelineConditionsMet = self::checkPipelineStageConditions($idRecord, $conditions, $idStage, $moduleName);
-		
 		// Return 3 if pipeline conditions are not met
 		if (!$isPipelineConditionsMet) {
 			return 3;
@@ -486,8 +484,7 @@ class PipelineAction
 	}
 	
 	// Implement by The Vi on 2025-03-10 to check if move is allowed
-
-	public function isMoveAllowed($stageIdCurrent, $stageIdMove) {
+	public static function isMoveAllowed($stageIdCurrent, $stageIdMove) {
 		$db = PearDatabase::getInstance();
 		
 		// Query for permitted transitions from current stage
@@ -505,8 +502,6 @@ class PipelineAction
 		return in_array($stageIdMove, $allowedStages);
 	}
 
-
-
     //Implement by The Vi on 2025-03-01 to check change stage
     public static function checkChangeStage($idRecord, $idStageNext) {
         $db = PearDatabase::getInstance();
@@ -523,6 +518,7 @@ class PipelineAction
         }
         return false;
     }
+
     // Implement by The Vi and Tran Dien on 2025-03-01 to check pipeline stage conditions
     public static function checkPipelineStageConditions($recordid, $conditions, $stageid, $module) {
         $moduleModel = Vtiger_Module_Model::getInstance($module);
@@ -557,6 +553,7 @@ class PipelineAction
         }
         return false;
     }
+
     // Implement by The Vi on 2025-03-05 to get pipeline stage info
     public static function getPipelineStageInfo($recordId, $moduleName) {
         $db = PearDatabase::getInstance();
@@ -606,6 +603,10 @@ class PipelineAction
     
         return $result;
     }
+
+
+
+	
 	// Add by Dien Nguyen on 2025-03-09 to get next stage id
 	public static function getNextStageId($stageId){
 		global $adb;
@@ -637,6 +638,44 @@ class PipelineAction
 		}
 		$row = $adb->fetchByAssoc($result);
 		return $row['name'];
+	}
+
+	// Implement by Dien Nguyen on 2025-03-09 to get active pipeline
+	static function getActivePipeline() {
+		global $adb;
+		$query = 'SELECT * FROM vtiger_pipeline INNER JOIN vtiger_tab ON vtiger_tab.name = vtiger_pipeline.module WHERE vtiger_tab.presence IN (0,2) AND status=?';
+		$activeValue = 1;
+		$params = array($activeValue);
+		$result = $adb->pquery($query, $params);
+
+		$data = [];
+		while ($row = $adb->fetchByAssoc($result)) {
+			$data[] = $row;
+		}
+		return $data;
+	}
+	
+	// Implement by Dien Nguyen on 2025-03-09 to get stage by pipeline id
+	static function getStageForPipeline($pipelineid){
+		global $adb;
+		$query = 'SELECT * FROM vtiger_stage WHERE pipelineid = ?';
+		$params = array($pipelineid);
+		$result = $adb->pquery($query, $params);
+
+		$data = [];
+		while ($row = $adb->fetchByAssoc($result)) {
+			$data[] = $row;
+		}
+		return $data;
+	}
+
+	// Add by Dien Nguyen on 2025-03-13 to check if condition is null
+	static function isConditionExist($stageid){
+		$conditions = self::getConditions($stageid);
+		if ($conditions === null || count($conditions) == 0) {
+			return false;
+		}
+		return true;
 	}
 }
 ?>

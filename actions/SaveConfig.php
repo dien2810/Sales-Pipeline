@@ -21,6 +21,8 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		// Begin Minh Hoang 2025-03-12
 		$this->exposeMethod('replacePipelineAndStageInRecord');
 		// End Minh Hoang 2025-03-12
+    // Add by Dien Nguyen on 2025-03-14
+		$this->exposeMethod('clonePipeline');
 	}
 	function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
@@ -217,90 +219,141 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	// End Minh Hoang 2025-03-11
 
 	// Begin Dien Nguyen
-	public static function clonePipeline($id) {
-        $db = PearDatabase::getInstance();
-        if (empty($id)) {
-            throw new Exception("ID không được để trống");
-        }        
-        // Clone record in vtiger_pipeline table
-        $query = "SELECT * FROM vtiger_pipeline WHERE pipelineid = ?";
-        $params = [$id];
-        $result = $db->pquery($query, $params);
-        if ($result === false) {
-            throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy vtiger_pipeline");
-        }
-        $row = $db->fetchByAssoc($result);
-        $newPipelineId = $db->getUniqueID('vtiger_pipeline');
-        $query = "INSERT INTO vtiger_pipeline(pipelineid,module,name,
-            stage,status,auto_move, duration,time_unit,description, 
-            is_default, create_by, created_at) values(?,?,?,?,?,?,?,?,?,?,?,?)";        
-        $params = array($newPipelineId, $row['module'], $row['name'], 
-            $row['stage'], $row['status'], $row['auto_move'],
-            $row['duration'], $row['time_unit'], $row['description'], 0, 
-            $row['create_by'], $row['created_at']);
-        $db->pquery($query, $params);
-        // Clone record in vtiger_rolepipeline table
-        $query = "SELECT * FROM vtiger_rolepipeline WHERE pipelineid = ?";
-        $params = array($id);
-        $result = $db->pquery($query, $params);
-        if ($result === false) {
-            throw new Exception("Lỗi thực thi câu lệnh SQL khi clone vtiger_rolepipeline");
-        }
-        while ($row = $db->fetchByAssoc($result)){
-            $query = 'INSERT INTO vtiger_rolepipeline values(?,?)';
-            $params = array($row['roleid'], $newPipelineId);
-            $db->pquery($query, $params);
-        }                
-        // Clone vtiger_stage
-        $query = 'SELECT * FROM vtiger_stage
-            WHERE pipelineid = ?';
-        $params = array($id);
-        $stageResult = $db->pquery($query, $params);
-        if ($stageResult === false) {
-            throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_stage");
-        }
-        while ($row = $db->fetchByAssoc($stageResult)) {
-            $oldStageId = $row['stageid'];
-            $newStageId = $db->getUniqueID('vtiger_stage');
-            $query = 'INSERT INTO vtiger_stage
-                VALUES(?,?,?,?,?,?,?,?,?)';
-            $params = array($newStageId, $newPipelineId, $row['name'], $row['success_rate'], 
-                $row['time'], $row['time_unit'], $row['is_mandatory'], $row['color_code'],
-                $row['sequence']);
-            $db->pquery($query, $params);
-            // Clone vtiger_allowedmoveto table
-            $query = 'SELECT * FROM vtiger_allowedmoveto WHERE stageid = ?';
-            $params = array($oldStageId);
-            $result = $db->pquery($query, $params);
-            if ($result === false) {
-                throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_allowedmoveto");
-            }
-            while ($row = $db->fetchByAssoc($result)) {
-                $newAllowedMovetoId = $db->getUniqueID('vtiger_allowedmoveto');
-                $query = 'INSERT INTO vtiger_allowedmoveto
-                            VALUES (?, ?, ?)';
-                $params = array($newAllowedMovetoId, $newStageId, $row['allowedstageid']);
-                $db->pquery($query, $params);
-            }
-            // Clone các record liên quan trong bảng vtiger_rolestage
-            $query = 'SELECT * FROM vtiger_rolestage WHERE stageid = ?';
-            $params = array($oldStageId);
-            $result = $db->pquery($query, $params);
-            if ($result === false) {
-                throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_rolestage");
-            }
-            while ($row = $db->fetchByAssoc($result)) {
-                $query = 'INSERT INTO vtiger_rolestage
-                            VALUES (?, ?)';
-                $params = array($newStageId, $row['roleid']);
-                $db->pquery($query, $params);
-            }
-        }
-        return [
-            'success' => true,
-            'message' => 'Clone thành công',
-            'newPipelineId' => $newPipelineId,
-        ];
+	function clonePipeline(Vtiger_Request $request) {
+		try{
+			$id = $request->get('pipelineId');
+			$db = PearDatabase::getInstance();
+			if (empty($id)) {
+				throw new Exception("ID không được để trống");
+			}
+
+			// Clone record in vtiger_pipeline table
+			$query = "SELECT * FROM vtiger_pipeline WHERE pipelineid = ?";
+			$params = [$id];
+			$result = $db->pquery($query, $params);
+			if ($result === false) {
+				throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy vtiger_pipeline");
+			}
+			$row = $db->fetchByAssoc($result);
+			$currentTime = date('Y-m-d H:i:s');
+			$newPipelineId = $db->getUniqueID('vtiger_pipeline');
+			$query = "INSERT INTO vtiger_pipeline(pipelineid,module,name,
+				stage,status,auto_move, duration,time_unit,description, 
+				is_default, create_by, created_at) values(?,?,?,?,?,?,?,?,?,?,?,?)";
+			$params = array($newPipelineId, $row['module'], $row['name'], 
+				$row['stage'], $row['status'], $row['auto_move'],
+				$row['duration'], $row['time_unit'], $row['description'], 0, 
+				$row['create_by'], $currentTime);
+			$db->pquery($query, $params);
+
+			// Clone record in vtiger_rolepipeline table
+			$query = "SELECT * FROM vtiger_rolepipeline WHERE pipelineid = ?";
+			$params = array($id);
+			$result = $db->pquery($query, $params);
+			if ($result === false) {
+				throw new Exception("Lỗi thực thi câu lệnh SQL khi clone vtiger_rolepipeline");
+			}
+			while ($row = $db->fetchByAssoc($result)){
+				$query = 'INSERT INTO vtiger_rolepipeline values(?,?)';
+				$params = array($row['roleid'], $newPipelineId);
+				$db->pquery($query, $params);
+			}
+
+			// Clone vtiger_stage
+			$query = 'SELECT * FROM vtiger_stage
+				WHERE pipelineid = ?';
+			$params = array($id);
+			$stageResult = $db->pquery($query, $params);
+			if ($stageResult === false) {
+				throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_stage");
+			}
+			$allowedMovetoIdInfo = array();
+			while ($row = $db->fetchByAssoc($stageResult)) {
+				// Clone vtiger_stage
+				$oldStageId = $row['stageid'];
+				$newStageId = $db->getUniqueID('vtiger_stage');
+				$query = 'INSERT INTO vtiger_stage
+					VALUES(?,?,?,?,?,?,?,?,?,?,?,?)';
+				$stageName = html_entity_decode($row['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+				// convert actions
+				$actionsJson = html_entity_decode($row['actions'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+				$actions = json_decode($actionsJson, true);
+				foreach ($actions as $key => $action) {
+					$actions[$key]['stageId'] = $newStageId;
+				}				
+				$actions = json_encode($actions);
+				// convert conditions
+				$conditions = html_entity_decode($row['conditions'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+				$params = array($newStageId, $newPipelineId, $stageName, $row['success_rate'], 
+					$row['time'], $row['time_unit'], $row['is_mandatory'], $row['color_code'],
+					$row['sequence'], $row['value'], $actions, $conditions);
+				$db->pquery($query, $params);
+
+				// Prepare for cloning vtiger_allowedmoveto table
+				$query = 'SELECT * FROM vtiger_allowedmoveto WHERE stageid = ?';
+				$params = array($oldStageId);
+				$result = $db->pquery($query, $params);
+				if ($result === false) {
+					throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_allowedmoveto");
+				}
+				$allowedMovetoSequence = array();
+				while ($row = $db->fetchByAssoc($result)) {
+					// get all sequence of allowedstageids
+					$query = 'SELECT sequence FROM vtiger_stage WHERE stageid = ?';
+					$params = array($row['allowedstageid']);
+					$result = $db->pquery($query, $params);
+					$row = $db->fetchByAssoc($result);
+					$allowedMovetoSequence[] = $row['sequence'];
+				}
+				$allowedMovetoIdInfo[] = array(
+					$newStageId => $allowedMovetoSequence
+				);
+
+				// Clone vtiger_rolestage
+				$query = 'SELECT * FROM vtiger_rolestage WHERE stageid = ?';
+				$params = array($oldStageId);
+				$result = $db->pquery($query, $params);
+				if ($result === false) {
+					throw new Exception("Lỗi thực thi câu lệnh SQL khi lấy dữ liệu từ vtiger_rolestage");
+				}
+				while ($row = $db->fetchByAssoc($result)) {
+					$query = 'INSERT INTO vtiger_rolestage
+								VALUES (?, ?)';
+					$params = array($newStageId, $row['roleid']);
+					$db->pquery($query, $params);
+				}
+			}
+
+			// Clone vtiger_allowedmoveto
+			foreach($allowedMovetoIdInfo as $stageInfo){
+				foreach($stageInfo as $newStageId => $sequenceArr){
+					foreach($sequenceArr as $sequence){
+						// get stageid from allowedstageid
+						$query = 'SELECT stageid FROM vtiger_stage WHERE pipelineid = ? AND sequence = ?';
+						$params = array($newPipelineId, $sequence);
+						$result = $db->pquery($query, $params);
+						// insert into vtiger_allowedmoveto
+						$row = $db->fetchByAssoc($result);
+						$newAllowedMovetoId = $db->getUniqueID('vtiger_allowedmoveto');
+						$query = 'INSERT INTO vtiger_allowedmoveto
+									VALUES (?, ?, ?)';
+						$params = array($newAllowedMovetoId, $newStageId, $row['stageid']);
+						$db->pquery($query, $params);
+					}
+				}
+			}
+			
+			$response = new Vtiger_Response();
+			$response->setResult([
+				'success' => true,
+				'message' => vtranslate('LBL_CLONE_SUCCESS'),
+				'newPipelineId' => $newPipelineId,
+			]);
+		
+			$response->emit();
+		} catch (Exception $e){
+			echo "".$e;
+		}
     }
 	// End Dien Nguyen
 

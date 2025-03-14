@@ -604,9 +604,6 @@ class PipelineAction
         return $result;
     }
 
-
-
-	
 	// Add by Dien Nguyen on 2025-03-09 to get next stage id
 	public static function getNextStageId($stageId){
 		global $adb;

@@ -483,7 +483,6 @@ CustomView_BaseController_Js(
     // Begin Dien Nguyen
     clonePipeline: function (targetBtn) {
       let btn = $(targetBtn);
-      console.log(btn);
       let pipelineId = btn.closest("tr").attr("data-id");
       app.helper.showProgress();
 
@@ -515,7 +514,7 @@ CustomView_BaseController_Js(
           });
         } else {
           app.helper.showErrorNotification({
-            message: response.message,
+            message: response,
           });
         }
         app.helper.hideProgress();

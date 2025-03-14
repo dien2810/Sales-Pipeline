@@ -8,24 +8,43 @@
 class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
 
     // Implemented by The Vi to retrieves a list of pipelines with optional filtering. 
-    public static function getPipelineList($nameModule = null, $name = null) {
+    public static function getPipelineList($nameModule = null, $name = null, $roleId = null) {
         $db = PearDatabase::getInstance();
-        $query = 'SELECT * FROM vtiger_pipeline';
+        $query = 'SELECT vtiger_pipeline.* FROM vtiger_pipeline'; 
         $params = [];
+        $whereClauses = [];
+        $joins = [];
+    
+        // Check and add JOIN if roleId is provided
+        if (!empty($roleId)) {
+            $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
+            $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
+            $params[] = $roleId;
+        }
+    
+        // Add condition for module filtering
         if (!empty($nameModule)) {
-            $query .= ' WHERE module = ?';
+            $whereClauses[] = 'vtiger_pipeline.module = ?';
             $params[] = $nameModule;
         }
+    
+        // Add condition for pipeline name search
         if (!empty($name)) {
-            if (!empty($params)) {
-                $query .= ' AND';
-            } else {
-                $query .= ' WHERE';
-            }
-            $query .= ' name LIKE ?';
-            $params[] = '%' . $name . '%'; 
+            $whereClauses[] = 'vtiger_pipeline.name LIKE ?';
+            $params[] = '%' . $name . '%';
         }
-        $query .= ' ORDER BY pipelineid ASC';
+    
+        // Combine JOINs into query
+        if (!empty($joins)) {
+            $query .= ' ' . implode(' ', $joins);
+        }
+    
+        // Combine WHERE conditions
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+    
+        $query .= ' ORDER BY vtiger_pipeline.pipelineid ASC';
         $result = $db->pquery($query, $params);
         return $result;
     }

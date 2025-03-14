@@ -21,10 +21,8 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		// Begin Minh Hoang 2025-03-12
 		$this->exposeMethod('replacePipelineAndStageInRecord');
 		// End Minh Hoang 2025-03-12
-
-		// Add by Dien Nguyen on 2025-03-14
+    // Add by Dien Nguyen on 2025-03-14
 		$this->exposeMethod('clonePipeline');
-		// End by Dien Nguyen
 	}
 	function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;

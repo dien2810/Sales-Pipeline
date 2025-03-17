@@ -211,11 +211,6 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
             } else {
                 throw new Exception("Stage not found with ID: " . $idStageReplace);
             }
-        
-            $updateSQL = "UPDATE vtiger_potential 
-                        SET pipelineid = ?, pipelinename = ?, stageid = ?, stagename = ?, probability = ?, sales_stage = ? 
-                        WHERE potentialid = ?";
-            $db->pquery($updateSQL, array($idPipelineReplace, $pipelineNameReplace, $idStageReplace, $stageNameReplace, $successRate, $stageValueReplace, $idRecord));
             
             return [
                 'success' => true,

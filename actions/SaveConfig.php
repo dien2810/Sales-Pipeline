@@ -201,22 +201,47 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	//End The Vi 28-02-2025
 
 	// Begin Minh Hoang 2025-03-11
-	function replacePipelineAndStageInRecord(Vtiger_Request $request) {
+	function replacePipelineAndStageInRecord(Vtiger_Request $request) { 
 		$idRecord = $request->get('recordId');
 		$idPipelineReplace = $request->get('pipelineIdReplace');
 		$idStageReplace = $request->get('stageIdReplace');
-
+	
 		$editResult = Settings_PipelineConfig_Config_Model::replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace);
-		$response = new Vtiger_Response();
-		$response->setResult([
-			'success' => $editResult['success'],
-			'data' => $idPipelineReplace,
-			'message' => $editResult['message']
+	
+		if (!$editResult['success']) {
+			$response = new Vtiger_Response();
+			$response->setResult([
+				'success' => false,
+				'message' => $editResult['message']
+			]);
+			$response->emit();
+			return;
+		}
+	
+		$requestData = new Vtiger_Request([
+			'module' => 'Potentials',
+			'record' => $idRecord,
+			'pipelineid' => $editResult['data']['idPipelineReplace'],
+			'pipelinename' => $editResult['data']['pipelineNameReplace'],
+			'stageid' => $editResult['data']['idStageReplace'],
+			'stagename' => $editResult['data']['stageNameReplace'],
+			'sales_stage' => $editResult['data']['stageValueReplace'],
+			'probability' => $editResult['data']['successRate']
 		]);
 	
+		ob_start();
+		$saveAction = new Potentials_SaveAjax_Action();
+		$saveAction->process($requestData);
+		ob_end_clean();
+	
+		$response = new Vtiger_Response();
+		$response->setResult([
+			'success' => true,
+			'data' => $editResult['data'],
+		]);
 		$response->emit();
 	}
-	// End Minh Hoang 2025-03-11
+	// End Minh Hoang 2025-03-17
 
 	// Begin Dien Nguyen
 	function clonePipeline(Vtiger_Request $request) {

@@ -14,6 +14,7 @@ require_once('modules/Settings/PipelineConfig/models/VTCreateNewProjectTask.php'
 require_once('modules/com_vtiger_workflow/tasks/VTUpdateFieldsTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTCreateEntityTask.inc');
 require_once('modules/com_vtiger_workflow/tasks/VTEmailTask.inc');
+require_once('modules/com_vtiger_workflow/tasks/VTSMSTask.inc');
 require_once('data/CRMEntity.php');
 
 class PipelineAction 
@@ -51,7 +52,12 @@ class PipelineAction
 					self::processCreateNewRecords($action, $idRecord,  $moduleName);
 					break;
 				case 'sendEmail':
+					// Implement by Minh Hoang to process send email
 					self::processSendEmail($action, $idRecord,  $moduleName);
+					break;
+				case 'sendSMS':
+					// Implement by Minh Hoang to process send sms
+					self::processSendSMS($action, $idRecord,  $moduleName);
 					break;
 			}
 			return true;
@@ -373,60 +379,80 @@ class PipelineAction
 
 	// Implement by Minh Hoàng to process send email
 	public static function processSendEmail($action, $idRecord, $moduleName) 
+ 	{
+ 		// Initialize workflow utilities and retrieve the admin user
+ 		$util = new VTWorkflowUtils();
+ 		$adminUser = $util->adminUser();
+ 
+ 		// Retrieve the entity from the cache
+ 		$entityCache = new VTEntityCache($adminUser);
+ 		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+ 		$entity = $entityCache->forId($wsEntityId);
+ 
+ 		// Extract record creation information from the action
+ 		$createInfo = $action['sendEmailData'];
+ 		$subject = $createInfo['subject'];
+ 		$safeContent = isset($createInfo['safe_content']) ? $createInfo['safe_content'] : 0;
+ 		$content = $createInfo['content'];
+ 		$recepient = $createInfo['recepient'];
+ 		$emailcc = isset($createInfo['emailcc']) ? $createInfo['emailcc'] : "";
+ 		$emailbcc = isset($createInfo['emailbcc']) ? $createInfo['emailbcc'] : "";
+ 		$fromEmail = base64_decode($createInfo['fromEmail']);
+ 		$replyTo = $createInfo['replyTo'];
+ 		$pdf = isset($createInfo['pdf']) ? $createInfo['pdf'] : '';
+ 		$pdfTemplateId = isset($createInfo['pdfTemplateId']) ? $createInfo['pdfTemplateId'] : "";
+ 		$signature = isset($createInfo['signature']) ? $createInfo['signature'] : "";
+ 
+ 		// Initialize and configure the task
+ 		$task = new VTEmailTask();
+ 		$task->subject = $subject;
+ 		$task->safe_content = $safeContent;
+ 		$task->content = $content;
+ 		$task->recepient = $recepient;
+ 		$task->emailcc = $emailcc;
+ 		$task->emailbcc = $emailbcc;
+ 		$task->fromEmail = $fromEmail;
+ 		$task->replyTo = $replyTo;
+ 		$task->pdf = $pdf;
+ 		$task->pdfTemplateId = $pdfTemplateId;
+ 		$task->signature = $signature;
+ 		$task->relatedInfo = "{}";
+ 
+ 		// Execute the task to create a new record
+ 		$task->doTask($entity);
+ 
+ 		// Revert to the original user
+ 		$util->revertUser();
+ 	}
+
+	// Implement by Minh Hoàng to process send sms
+	public static function processSendSMS($action, $idRecord, $moduleName) 
 	{
-		try{
-			// Initialize workflow utilities and retrieve the admin user
-			$util = new VTWorkflowUtils();
-			$adminUser = $util->adminUser();
+		// Initialize workflow utilities and retrieve the admin user
+		$util = new VTWorkflowUtils();
+		$adminUser = $util->adminUser();
 
-			// Retrieve the entity from the cache
-			$entityCache = new VTEntityCache($adminUser);
-			$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
-			$entity = $entityCache->forId($wsEntityId);
+		// Retrieve the entity from the cache
+		$entityCache = new VTEntityCache($adminUser);
+		$wsEntityId = vtws_getWebserviceEntityId($moduleName, $idRecord);
+		$entity = $entityCache->forId($wsEntityId);
 
-			// Extract record creation information from the action
-			$createInfo = $action['sendEmailData'];
-			$subject = $createInfo['subject'];
-			$safeContent = isset($createInfo['safe_content']) ? $createInfo['safe_content'] : 0;
-			$content = $createInfo['content'];
-			$recepient = $createInfo['recepient'];
-			$emailcc = isset($createInfo['emailcc']) ? $createInfo['emailcc'] : "";
-			$emailbcc = isset($createInfo['emailbcc']) ? $createInfo['emailbcc'] : "";
-			$fromEmail = base64_decode($createInfo['fromEmail']);
-			$replyTo = $createInfo['replyTo'];
-			$pdf = isset($createInfo['pdf']) ? $createInfo['pdf'] : '';
-			$pdfTemplateId = isset($createInfo['pdfTemplateId']) ? $createInfo['pdfTemplateId'] : "";
-			$signature = isset($createInfo['signature']) ? $createInfo['signature'] : "";
+		// Extract record creation information from the action
+		$createInfo = $action['sendSMSData'];
+		$content = $createInfo['content'];
+		$smsRecepient = $createInfo['sms_recepient'];
 
-			// Initialize and configure the task
-			$task = new VTEmailTask();
-			$task->subject = $subject;
-			$task->safe_content = $safeContent;
-			$task->content = $content;
-			$task->recepient = $recepient;
-			$task->emailcc = $emailcc;
-			$task->emailbcc = $emailbcc;
-			$task->fromEmail = $fromEmail;
-			$task->replyTo = $replyTo;
-			$task->pdf = $pdf;
-			$task->pdfTemplateId = $pdfTemplateId;
-			$task->signature = $signature;
-			$task->relatedInfo = "{}";
+		// Initialize and configure the task
+		$task = new VTSMSTask();
+		$task->content = $content;
+		$task->sms_recepient = $smsRecepient;
 		
-			// Execute the task to create a new record
-			$task->doTask($entity);
-			
-			// Revert to the original user
-			$util->revertUser();
-		}
-		catch (DuplicateException $e) {
-			echo "D".$e;
-		}
-		 catch (Exception $e) {
-			echo "".$e;
-		}
+		// Execute the task to create a new record
+		$task->doTask($entity);
+		
+		// Revert to the original user
+		$util->revertUser();
 	}
-
     //End process Action
     // Implement by The Vi on 2025-03-01 to get actions
 	public static function getActions($idStageNext) {

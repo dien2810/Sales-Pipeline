@@ -50,25 +50,38 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     }
     // Implemented by The Vi to retrieves active pipelines with optional filtering. 
 
-    public static function getPipelineStatusList($nameModule = null, $name = null) {
+    public static function getPipelineStatusList($roleId, $nameModule = null, $name = null) {
         $db = PearDatabase::getInstance();
-        $query = 'SELECT * FROM vtiger_pipeline WHERE status = 1';
-        $params = []; 
+        
+     
+        $query = 'SELECT p.* 
+                  FROM vtiger_pipeline p
+                  INNER JOIN vtiger_rolepipeline rp 
+                      ON p.pipelineid = rp.pipelineid 
+                  WHERE p.status = 1 
+                      AND rp.roleid = ?';
+                      
+        $params = [$roleId];
     
+       
         if (!empty($nameModule)) {
-            $query .= ' AND module = ?';
+            $query .= ' AND p.module = ?';
             $params[] = $nameModule;
         }
     
+    
         if (!empty($name)) {
-            $query .= ' AND name LIKE ?';
+            $query .= ' AND p.name LIKE ?';
             $params[] = '%' . $name . '%';
         }
     
-        $query .= ' ORDER BY pipelineid ASC';
+        $query .= ' ORDER BY p.pipelineid ASC';
+        
         $result = $db->pquery($query, $params);
         return $result;
     }
+    
+   
 
     // Implemented by The Vi to retrieves pipelines excluding a specified pipeline ID. 
     public static function getPipelineListExcluding($nameModule = null, $name = null, $idpipeline = null) {

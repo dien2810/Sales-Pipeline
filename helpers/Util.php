@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Helper methods to work with ShortURLs
- */
+
 class Settings_PipelineConfig_Util_Helper {
    /**
      * Returns the ID based on the module name

@@ -15,12 +15,12 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $whereClauses = [];
         $joins = [];
     
-        // Check and add JOIN if roleId is provided
-        if (!empty($roleId)) {
-            $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
-            $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
-            $params[] = $roleId;
-        }
+        // // Check and add JOIN if roleId is provided
+        // if (!empty($roleId)) {
+        //     $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
+        //     $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
+        //     $params[] = $roleId;
+        // }
     
         // Add condition for module filtering
         if (!empty($nameModule)) {
@@ -298,6 +298,22 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         
         $query = "SELECT 1 FROM $tableName WHERE pipelineid = ? LIMIT 1";
         $result = $db->pquery($query, [$pipelineId]);
+        
+        return ($result && $db->num_rows($result) > 0);
+    }
+
+    
+    // Implemented by The Vi to checks if a pipeline is the default pipeline.
+    public static function checkPipelineDefault($pipelineId) {
+        $db = PearDatabase::getInstance();
+        
+        $query = "SELECT 1 FROM vtiger_pipeline 
+                  WHERE pipelineid = ? 
+                  AND is_default = 1 
+                  AND status = 1 
+                  LIMIT 1";
+                  
+        $result = $db->pquery($query, array($pipelineId));
         
         return ($result && $db->num_rows($result) > 0);
     }

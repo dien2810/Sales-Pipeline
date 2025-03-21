@@ -38,7 +38,7 @@ CustomView_BaseController_Js(
         let errorMessages = [];
         let pipelineReplaceValue = jQuery("#pipeline-list-replace").val();
         if (!pipelineReplaceValue) {
-          errorMessages.push("Vui lòng chọn một Pipeline thay thế.");
+          errorMessages.push(app.vtranslate("JS_CHOOSE_VALUE"));
           valid = false;
         }
         jQuery('select[name^="swap_status"]')
@@ -224,7 +224,11 @@ CustomView_BaseController_Js(
           stageSelects.each(function () {
             let select = jQuery(this);
             select.empty();
-            select.append('<option value="">Chọn một tùy chọn</option>');
+            select.append(
+              '<option value="">' +
+                app.vtranslate("JS_CHOOSE_VALUE") +
+                "</option>"
+            );
             select.val("").trigger("change.select2");
           });
           return;
@@ -261,7 +265,11 @@ CustomView_BaseController_Js(
               select.select2("destroy");
             }
             select.empty();
-            select.append('<option value="">Chọn một tùy chọn</option>');
+            select.append(
+              '<option value="">' +
+                app.vtranslate("JS_CHOOSE_VALUE") +
+                "</option>"
+            );
           });
           if (response.data && response.data.length > 0) {
             stageSelects.each(function () {
@@ -273,7 +281,7 @@ CustomView_BaseController_Js(
               });
               select.select2({
                 width: "100%",
-                placeholder: "Chọn một tùy chọn",
+                placeholder: app.vtranslate("JS_CHOOSE_VALUE"),
               });
               select.val("").trigger("change.select2");
             });
@@ -288,10 +296,7 @@ CustomView_BaseController_Js(
           e.preventDefault();
           const form = jQuery(this);
           const idPipeline = form.find('input[name="pipelineId"]').val();
-          if (!idPipeline) {
-            alert("Không tìm thấy Pipeline để xóa.");
-            return;
-          }
+
           const params = {
             module: "PipelineConfig",
             parent: "Settings",
@@ -336,49 +341,76 @@ CustomView_BaseController_Js(
 
       app.helper.showProgress();
       self.modulePipelineDelete = moduleName;
-      let params = {
+
+      //Check Pipeline default;
+      let params1 = {
         module: "PipelineConfig",
         parent: "Settings",
-        view: "ConfigAjax",
-        mode: "getDeletePipelineModal",
+        action: "SaveConfig",
+        mode: "checkPipelineDefault",
         pipelineId: pipelineId,
-        moduleName: moduleName,
       };
-      app.request.post({ data: params }).then((err, res) => {
+      app.request.post({ data: params1 }).then((err, res) => {
         app.helper.hideProgress();
-
         if (err) {
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
-        app.helper.showModal(res, {
-          preShowCb: function (modal) {
-            const form = modal.find("form#add-stage-pipeline-new");
-            form.find('[name="color"]').customColorPicker();
-            form.vtValidate({
-              submitHandler: function () {
-                const formData = form.serializeFormData();
+        if (res.result) {
+          app.helper.showErrorNotification({
+            message: app.vtranslate("JS_NOT_DELETE_PIPELINE_DEFAULT"),
+          });
+          return;
+        } else {
+          let params2 = {
+            module: "PipelineConfig",
+            parent: "Settings",
+            view: "ConfigAjax",
+            mode: "getDeletePipelineModal",
+            pipelineId: pipelineId,
+            moduleName: moduleName,
+          };
+          app.request.post({ data: params2 }).then((err, res) => {
+            app.helper.hideProgress();
 
-                self.savePipelineStage(formData).then(() => {
-                  form.find(".cancelLink").trigger("click");
+            if (err) {
+              app.helper.showErrorNotification({ message: err.message });
+              return;
+            }
+            app.helper.showModal(res, {
+              preShowCb: function (modal) {
+                const form = modal.find("form#add-stage-pipeline-new");
+                form.find('[name="color"]').customColorPicker();
+                form.vtValidate({
+                  submitHandler: function () {
+                    const formData = form.serializeFormData();
+
+                    self.savePipelineStage(formData).then(() => {
+                      form.find(".cancelLink").trigger("click");
+                    });
+
+                    return false;
+                  },
                 });
-
-                return false;
+                let stageSelects = jQuery(
+                  ".deletePipelineModal select.select2"
+                ).not("#pipeline-list-replace");
+                stageSelects.prop("disabled", true);
+                stageSelects.each(function () {
+                  let select = jQuery(this);
+                  select.empty();
+                  select.append(
+                    '<option value="">' +
+                      app.vtranslate("JS_CHOOSE_VALUE") +
+                      "</option>"
+                  );
+                  select.val("").trigger("change.select2");
+                });
+                self.registerPipelineStageReplaceMapping();
               },
             });
-            let stageSelects = jQuery(
-              ".deletePipelineModal select.select2"
-            ).not("#pipeline-list-replace");
-            stageSelects.prop("disabled", true);
-            stageSelects.each(function () {
-              let select = jQuery(this);
-              select.empty();
-              select.append('<option value="">Chọn một tùy chọn</option>');
-              select.val("").trigger("change.select2");
-            });
-            self.registerPipelineStageReplaceMapping();
-          },
-        });
+          });
+        }
       });
     },
     registerModuleChangeEvent: function () {

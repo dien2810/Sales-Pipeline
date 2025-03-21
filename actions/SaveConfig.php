@@ -23,6 +23,9 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		// End Minh Hoang 2025-03-12
     // Add by Dien Nguyen on 2025-03-14
 		$this->exposeMethod('clonePipeline');
+
+		//Add by The Vi 21-3-2025
+		$this->exposeMethod('checkPipelineDefault');
 	}
 	function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
@@ -90,8 +93,24 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 		$response->emit();
 	}
-	// Implemented by The Vi on 2025-03-05 to get list of pipelines
+	function checkPipelineDefault(Vtiger_Request $request) {
+		$idPipeline = $request->get('pipelineId');
 
+		$response = new Vtiger_Response();
+		try {
+			$result = Settings_PipelineConfig_Config_Model::checkPipelineDefault($idPipeline);
+			
+			$response->setResult([
+				'result' => $result,
+			]);
+			
+		} catch (Exception $e) {
+			$response->setError('Error: ' . $e->getMessage());
+		}
+		$response->emit();
+	}
+
+	// Implemented by The Vi on 2025-03-05 to get list of pipelines
 	function getListPipeline(Vtiger_Request $request) {
 		$module = $request->get('moduleName');
 
@@ -125,15 +144,17 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 		$response->emit();
 	}
+	
 	// Implemented by The Vi on 2025-03-05 to get list of pipelines with status
-
     function getListPipelineStatus(Vtiger_Request $request) {
+		global $current_user;
+$roleId = $current_user->roleid;
 		$module = $request->get('moduleName');
 
 		$response = new Vtiger_Response();
 
 		try {
-			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList($module);
+			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList( $roleId, $module);
 			$db = PearDatabase::getInstance();
 
 			$pipelines = [];
@@ -207,6 +228,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$idRecord = $request->get('recordId');
 		$idPipelineReplace = $request->get('pipelineIdReplace');
 		$idStageReplace = $request->get('stageIdReplace');
+		$moduleName = $request->get('moduleName');
 	
 		$editResult = Settings_PipelineConfig_Config_Model::replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace);
 	
@@ -220,16 +242,27 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			return;
 		}
 	
-		$requestData = new Vtiger_Request([
-			'module' => 'Potentials',
-			'record' => $idRecord,
-			'pipelineid' => $editResult['data']['idPipelineReplace'],
-			'pipelinename' => $editResult['data']['pipelineNameReplace'],
-			'stageid' => $editResult['data']['idStageReplace'],
-			'stagename' => $editResult['data']['stageNameReplace'],
-			'sales_stage' => $editResult['data']['stageValueReplace'],
-			'probability' => $editResult['data']['successRate']
-		]);
+		if ($moduleName === 'Potentials') {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace'],
+				'sales_stage' => $editResult['data']['stageValueReplace'],
+				'probability' => $editResult['data']['successRate']
+			]);
+		} else {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace']
+			]);
+		}
 	
 		ob_start();
 		$saveAction = new Potentials_SaveAjax_Action();

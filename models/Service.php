@@ -75,33 +75,6 @@ class PipelineConfig_Service_Model {
         $log->info('[CRON] Finished sendRepeatNotifications');
     }
 
-    /**
-     * Send notifications for overdue pipeline stage transitions
-     * Notifies relevant users when a stage transition is past due
-     */
-    public static function sendOverdueStageNotifications() {
-        // Empty function for overdue stage notifications
-        // TODO: Implement notification logic for overdue pipeline stages
-    }
-
-    /**
-     * Send notifications for upcoming pipeline stage deadlines
-     * Alerts users about stages that are approaching their deadline
-     */
-    public static function sendUpcomingStageNotifications() {
-        // Empty function for upcoming stage deadline notifications
-        // TODO: Implement notification logic for upcoming stage deadlines
-    }
-
-    /**
-     * Send notifications when conditions are met for stage transition
-     * Notifies users when all requirements are fulfilled to move to next stage
-     */
-    public static function sendStageReadyNotifications() {
-        // Empty function for stage transition readiness notifications
-        // TODO: Implement notification logic for stage transition readiness
-    }
-
     // Add by Dien Nguyen on 2025-03-11 to create cron for pipeline action
     public static function processPipelineActions(){
         $log = LoggerManager::getLogger('PLATFORM');

@@ -23,6 +23,9 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		// End Minh Hoang 2025-03-12
     // Add by Dien Nguyen on 2025-03-14
 		$this->exposeMethod('clonePipeline');
+
+		//Add by The Vi 21-3-2025
+		$this->exposeMethod('checkPipelineDefault');
 	}
 	function checkPermission(Vtiger_Request $request) {
 		$hasPermission = true;
@@ -85,6 +88,22 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			
 		} catch (Exception $e) {
 			$response->setError('Lỗi: ' . $e->getMessage());
+		}
+		$response->emit();
+	}
+	function checkPipelineDefault(Vtiger_Request $request) {
+		$idPipeline = $request->get('pipelineId');
+
+		$response = new Vtiger_Response();
+		try {
+			$result = Settings_PipelineConfig_Config_Model::checkPipelineDefault($idPipeline);
+			
+			$response->setResult([
+				'result' => $result,
+			]);
+			
+		} catch (Exception $e) {
+			$response->setError('Error: ' . $e->getMessage());
 		}
 		$response->emit();
 	}

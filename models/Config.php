@@ -15,12 +15,12 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $whereClauses = [];
         $joins = [];
     
-        // Check and add JOIN if roleId is provided
-        if (!empty($roleId)) {
-            $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
-            $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
-            $params[] = $roleId;
-        }
+        // // Check and add JOIN if roleId is provided
+        // if (!empty($roleId)) {
+        //     $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
+        //     $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
+        //     $params[] = $roleId;
+        // }
     
         // Add condition for module filtering
         if (!empty($nameModule)) {
@@ -50,38 +50,25 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     }
     // Implemented by The Vi to retrieves active pipelines with optional filtering. 
 
-    public static function getPipelineStatusList($roleId, $nameModule = null, $name = null) {
+    public static function getPipelineStatusList($nameModule = null, $name = null) {
         $db = PearDatabase::getInstance();
-        
-     
-        $query = 'SELECT p.* 
-                  FROM vtiger_pipeline p
-                  INNER JOIN vtiger_rolepipeline rp 
-                      ON p.pipelineid = rp.pipelineid 
-                  WHERE p.status = 1 
-                      AND rp.roleid = ?';
-                      
-        $params = [$roleId];
+        $query = 'SELECT * FROM vtiger_pipeline WHERE status = 1';
+        $params = []; 
     
-       
         if (!empty($nameModule)) {
-            $query .= ' AND p.module = ?';
+            $query .= ' AND module = ?';
             $params[] = $nameModule;
         }
     
-    
         if (!empty($name)) {
-            $query .= ' AND p.name LIKE ?';
+            $query .= ' AND name LIKE ?';
             $params[] = '%' . $name . '%';
         }
     
-        $query .= ' ORDER BY p.pipelineid ASC';
-        
+        $query .= ' ORDER BY pipelineid ASC';
         $result = $db->pquery($query, $params);
         return $result;
     }
-    
-   
 
     // Implemented by The Vi to retrieves pipelines excluding a specified pipeline ID. 
     public static function getPipelineListExcluding($nameModule = null, $name = null, $idpipeline = null) {
@@ -311,6 +298,22 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         
         $query = "SELECT 1 FROM $tableName WHERE pipelineid = ? LIMIT 1";
         $result = $db->pquery($query, [$pipelineId]);
+        
+        return ($result && $db->num_rows($result) > 0);
+    }
+
+    
+    // Implemented by The Vi to checks if a pipeline is the default pipeline.
+    public static function checkPipelineDefault($pipelineId) {
+        $db = PearDatabase::getInstance();
+        
+        $query = "SELECT 1 FROM vtiger_pipeline 
+                  WHERE pipelineid = ? 
+                  AND is_default = 1 
+                  AND status = 1 
+                  LIMIT 1";
+                  
+        $result = $db->pquery($query, array($pipelineId));
         
         return ($result && $db->num_rows($result) > 0);
     }

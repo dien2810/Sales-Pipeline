@@ -205,6 +205,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$idRecord = $request->get('recordId');
 		$idPipelineReplace = $request->get('pipelineIdReplace');
 		$idStageReplace = $request->get('stageIdReplace');
+		$moduleName = $request->get('moduleName');
 	
 		$editResult = Settings_PipelineConfig_Config_Model::replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace);
 	
@@ -218,16 +219,27 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			return;
 		}
 	
-		$requestData = new Vtiger_Request([
-			'module' => 'Potentials',
-			'record' => $idRecord,
-			'pipelineid' => $editResult['data']['idPipelineReplace'],
-			'pipelinename' => $editResult['data']['pipelineNameReplace'],
-			'stageid' => $editResult['data']['idStageReplace'],
-			'stagename' => $editResult['data']['stageNameReplace'],
-			'sales_stage' => $editResult['data']['stageValueReplace'],
-			'probability' => $editResult['data']['successRate']
-		]);
+		if ($moduleName === 'Potentials') {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace'],
+				'sales_stage' => $editResult['data']['stageValueReplace'],
+				'probability' => $editResult['data']['successRate']
+			]);
+		} else {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace']
+			]);
+		}
 	
 		ob_start();
 		$saveAction = new Potentials_SaveAjax_Action();

@@ -64,10 +64,12 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			$result = Settings_PipelineConfig_Config_Model::getStageList($idPipeline);
 			$stages = array();
 			while($row = PearDatabase::getInstance()->fetchByAssoc($result)) {
+				// Modified by Dien Nguyen on 2025-03-19 to fix language error
+				$name = html_entity_decode($row['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 				$stages[] = array(
 					'stageid' => $row['stageid'],
 					'pipelineid' => $row['pipelineid'],
-					'name' => $row['name'], 
+					'name' => $name,
 					'success_rate' => $row['success_rate'],
 					'time' => $row['time'],
 					'time_unit' => $row['time_unit'],

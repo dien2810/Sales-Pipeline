@@ -660,7 +660,19 @@ class PipelineAction
 			return '';
 		}
 		$row = $adb->fetchByAssoc($result);
-		return $row['name'];
+		return html_entity_decode($row['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+	}
+
+	// Implement by Dien Nguyen on 2025-03-21 to get stage from id
+	public static function getStageById($stageId){
+		global $adb;
+		$query = "SELECT * FROM vtiger_stage WHERE stageid = ?";
+		$result = $adb->pquery($query, array($stageId));
+		if ($adb->num_rows($result) == 0){
+			return false;
+		}
+		$row = $adb->fetchByAssoc($result);
+		return $row;
 	}
 
 	// Implement by Dien Nguyen on 2025-03-09 to get active pipeline
@@ -699,6 +711,16 @@ class PipelineAction
 			return false;
 		}
 		return true;
+	}
+
+	static function getStageIdFromValue($pipelineid, $value){
+		global $adb;
+		$query = 'SELECT stageid FROM vtiger_stage WHERE pipelineid = ? AND value = ?';
+		$params = array($pipelineid, $value);
+		$result = $adb->pquery($query, $params);
+
+		$stageid = $adb->query_result($result, 0, 'stageid');
+		return $stageid;
 	}
 }
 ?>

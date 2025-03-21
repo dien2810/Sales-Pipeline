@@ -126,7 +126,6 @@ CustomView_BaseController_Js(
               idReplace: "",
             });
           }
-          console.log("Bước pipeline replace", self.pipelineReplaceMapping);
         });
 
       jQuery('.deletePipelineModal select[name^="swap_status"]')
@@ -144,10 +143,6 @@ CustomView_BaseController_Js(
               item.idReplace = newVal;
             }
           });
-          console.log(
-            "Updated pipelineReplaceMapping:",
-            self.pipelineReplaceMapping
-          );
         });
     },
     registerPipelineReplaceChangeEvent: function () {
@@ -211,7 +206,6 @@ CustomView_BaseController_Js(
               .select2();
           }
         });
-        console.log("Pipeline replace:", self.pipelineReplaceMapping);
       });
     },
     registerDeletePipelineEvent: function (pipelineId) {
@@ -402,7 +396,6 @@ CustomView_BaseController_Js(
     registerSearchInputEvent: function () {
       let self = this;
       jQuery(".searchWorkflows").on("input", function () {
-        console.log("Search input");
         let searchText = jQuery(this).val();
         self.currentSeachText = searchText;
         let form = self.getForm();
@@ -442,7 +435,6 @@ CustomView_BaseController_Js(
           });
           return;
         }
-        console.log(response);
         if (response.success) {
           if (status === 1) {
             toggleElement.addClass("active");
@@ -501,7 +493,6 @@ CustomView_BaseController_Js(
           });
           return;
         }
-        console.log(response);
         if (response.success) {
           let form = this.getForm();
           this.loadPipelineList(

@@ -112,11 +112,13 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 
 	// Implemented by The Vi on 2025-03-05 to get list of pipelines
 	function getListPipeline(Vtiger_Request $request) {
+		global $current_user;
+        $roleId = $current_user->roleid;
 		$module = $request->get('moduleName');
-
+        
 		$response = new Vtiger_Response();
 		try {
-			$result = Settings_PipelineConfig_Config_Model::getPipelineList($module);
+			$result = Settings_PipelineConfig_Config_Model::getPipelineList($module, null, $roleId);
 			$db = PearDatabase::getInstance();
 			$pipelines = [];
 			while ($row = $db->fetchByAssoc($result)) {
@@ -148,13 +150,13 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 	// Implemented by The Vi on 2025-03-05 to get list of pipelines with status
     function getListPipelineStatus(Vtiger_Request $request) {
 		global $current_user;
-$roleId = $current_user->roleid;
+        $roleId = $current_user->roleid;
 		$module = $request->get('moduleName');
 
 		$response = new Vtiger_Response();
 
 		try {
-			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList( $roleId, $module);
+			$result = Settings_PipelineConfig_Config_Model::getPipelineStatusList($roleId, $module);
 			$db = PearDatabase::getInstance();
 
 			$pipelines = [];

@@ -18,7 +18,7 @@ class Settings_PipelineConfig_Detail_View extends Settings_Vtiger_BaseConfig_Vie
 		
         $pipeline = Settings_PipelineConfig_Detail_Model::getDetailPipeline($recordId);
     //    var_dump(value: $pipeline);
-	// echo '<pre>' . json_encode($pipeline, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+	echo '<pre>' . json_encode($pipeline, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
 	    $viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('PIPELINE_DETAIL', $pipeline);
 		$viewer->display('modules/Settings/PipelineConfig/tpls/DetailPipeline.tpl');

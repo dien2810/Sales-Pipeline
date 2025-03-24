@@ -243,32 +243,39 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			$response->emit();
 			return;
 		}
-	
-		if ($moduleName === 'Potentials') {
-			$requestData = new Vtiger_Request([
-				'module' => $moduleName,
-				'record' => $idRecord,
-				'pipelineid' => $editResult['data']['idPipelineReplace'],
-				'pipelinename' => $editResult['data']['pipelineNameReplace'],
-				'stageid' => $editResult['data']['idStageReplace'],
-				'stagename' => $editResult['data']['stageNameReplace'],
+
+		$extraFields = [
+			'Potentials' => [
 				'sales_stage' => $editResult['data']['stageValueReplace'],
 				'probability' => $editResult['data']['successRate']
-			]);
-		} else {
-			$requestData = new Vtiger_Request([
-				'module' => $moduleName,
-				'record' => $idRecord,
-				'pipelineid' => $editResult['data']['idPipelineReplace'],
-				'pipelinename' => $editResult['data']['pipelineNameReplace'],
-				'stageid' => $editResult['data']['idStageReplace'],
-				'stagename' => $editResult['data']['stageNameReplace']
-			]);
+			],
+			'Leads' => [
+				'leadstatus' => $editResult['data']['stageValueReplace']
+			],
+			'Project' => [
+				'projectstatus' => $editResult['data']['stageValueReplace']
+			],
+			'HelpDesk' => [
+				'ticketstatus' => $editResult['data']['stageValueReplace']
+			]
+		];
+
+		$requestData = [
+			'module' => $moduleName,
+			'record' => $idRecord,
+			'pipelineid' => $editResult['data']['idPipelineReplace'],
+			'pipelinename' => $editResult['data']['pipelineNameReplace'],
+			'stageid' => $editResult['data']['idStageReplace'],
+			'stagename' => $editResult['data']['stageNameReplace']
+		];
+
+		if (isset($extraFields[$moduleName])) {
+			$requestData = array_merge($requestData, $extraFields[$moduleName]);
 		}
 	
 		ob_start();
 		$saveAction = new Potentials_SaveAjax_Action();
-		$saveAction->process($requestData);
+		$saveAction->process(new Vtiger_Request($requestData));
 		ob_end_clean();
 	
 		$response = new Vtiger_Response();

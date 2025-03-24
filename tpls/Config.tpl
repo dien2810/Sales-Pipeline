@@ -3,6 +3,10 @@
 <link rel="stylesheet" href="{vresource_url('modules/Settings/PipelineConfig/resources/Config.css')}">
 </link>
 <script src="{vresource_url('resources/CustomColorPicker.js')}"></script>
+<link rel="stylesheet" href="{vresource_url('layouts/v7/resources/custom.css')}">
+</link>
+<script src="{vresource_url('resources/CustomPopover.js')}"></script>
+
 <form autocomplete="off" id="pipeline" name="pipeline">
     <div class="listPipeline" id="listPipeline">
         <div class="header">
@@ -101,4 +105,7 @@
         </a>
     </div>
 </form>
+<script>
+
+</script>
 {/strip}

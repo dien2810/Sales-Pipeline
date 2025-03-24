@@ -11,9 +11,6 @@
     <div class="listPipeline" id="listPipeline">
         <div class="header">
             <h5 class="fieldBlockHeader">{vtranslate('LBL_PIPELINE_CONFIG', $MODULE_NAME)}</h5>
-            <button class="btn btn-default configButton" type="button">
-                <i class="far fa-cog"></i>&nbsp;&nbsp;{vtranslate('LBL_CONFIG_PIPELINE_MODULE', $MODULE_NAME)}
-            </button>
         </div>
         <div style="margin-bottom:20px">
             <div class="row form-group">
@@ -33,7 +30,7 @@
             </div>
         </div>
         <hr />
-        <!-- Tìm kiếm pipeline -->
+        <!-- Search Pipeline -->
         <div class="search-bar">
             <div class="search-link hidden-xs searchPipeline" style="margin-top: 0px;">
                 <input class="searchWorkflows" type="text" value=""
@@ -78,7 +75,7 @@
             </div>
         </div>
         <div class="content">
-            <!-- Hiển thị danh sách pipeline -->
+            <!-- Show List Pipeline -->
             <table class=" tableListPipeline table fieldBlockContainer" id="pipeline-table">
                 <thead>
                     <tr>
@@ -97,7 +94,7 @@
                 </tbody>
             </table>
         </div>
-        <!-- Thêm mới Pipeline -->
+        <!-- Add New Pipeline -->
         <a href="index.php?parent=Settings&module=PipelineConfig&view=EditPipeline&block=9&fieldid=67"
             class="btn addButton btn-default module-buttons addPipelineBtn">
             <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;

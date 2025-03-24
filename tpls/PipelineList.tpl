@@ -53,7 +53,7 @@
                             {foreach from=$ROLES item=role}
                             <li class="owners-detail_owner">
                                 <a target="_blank"
-                                    href="index.php?module=Roles&parent=Settings&view=Detail&record={$role['roleid']}">
+                                    href="index.php?module=Roles&parent=Settings&view=Edit&record={$role['roleid']}">
                                     {$role['rolename']}
                                 </a>
                             </li>

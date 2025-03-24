@@ -144,7 +144,7 @@
 /* Column size */
 .tableListPipeline th:nth-child(1),
 .tableListPipeline td:nth-child(1) {
-  width: 200px !important;
+  width: 250px !important;
 }
 
 .tableListPipeline th:nth-child(2),
@@ -168,7 +168,7 @@
 }
 .tableListPipeline th:nth-child(6),
 .tableListPipeline td:nth-child(6) {
-  width: 250px;
+  width: 220px;
 }
 
 .tableListPipeline th:nth-child(7),

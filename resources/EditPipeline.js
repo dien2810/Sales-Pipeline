@@ -88,7 +88,7 @@ CustomView_BaseController_Js(
       newActionItem.innerHTML = `
             <i class="fal ${iconClass} ml-2 text-primary"></i>
             <p class="text-primary pt-3">${action["action_name"]}</p>
-            <i class="fal fa-times"></i>
+            <i class="fal fa-times removeAction"></i>
         `;
       if (action.frequency === "onceAction") {
         if (!actionTypeOnce) {
@@ -701,6 +701,7 @@ CustomView_BaseController_Js(
         self.renderStagesInfo(self.stagesList);
         self.registerAddActionSettingModal(form);
         self.registerAddCondition(form);
+        self.registerRemoveAction(form);
         self.registerRemoveCondition(form);
         //End Tran Dien
       });
@@ -1650,6 +1651,68 @@ CustomView_BaseController_Js(
         console.log("Show add action setting modal");
         self.showAddConditionModal(this);
       });
+    },
+
+    registerRemoveAction: function (form) {
+      var self = this;
+      form.on("click", ".removeAction", function (e) {
+        e.stopPropagation();
+
+        let actionItem = jQuery(this).closest(".action-item.btnAddAction");
+        let actionJson = actionItem.data("action");
+        let actionData = actionJson || null;
+    
+        if (!actionData) {
+          return;
+        }
+    
+        // Get stageid from closest action-box
+        let stageId = jQuery(this).closest(".action-box").data("stageid");
+        if (!stageId) {
+          return;
+        }
+        // Save action-type before removing action-item
+        let actionTypeContainer = jQuery(this).closest(".action-type");
+    
+        // Remove action item from ui
+        actionItem.remove();
+    
+        // delete action in stageList
+        self.removeActionFromStagesList(stageId, actionData);
+    
+        // Remove action if it doesn't exist in action-type element
+        if (actionTypeContainer.find(".action-item").length === 0) {
+          actionTypeContainer.remove();
+          console.log("Da xoa actionTypeContainer")
+        }
+    
+        console.log("StagesList after removal:", self.stagesList);
+        app.helper.showSuccessNotification({
+          message: app.vtranslate("JS_ACTION_REMOVED_SUCCESS"),
+        });
+      });
+    },
+
+    // Add by Dien Nguyen on 2025-03-24 to remove action in stageList
+    removeActionFromStagesList: function (stageId, actionData) {
+      let self = this;
+      let stage = self.stagesList.find((stage) => stage.id === stageId);
+      if (stage && stage.actions) {
+        // Preserve action which is different from actionData
+        stage.actions = stage.actions.filter((action) => {
+          return !(
+            action.action_type === actionData.action_type &&
+            action.action_name === actionData.action_name &&
+            action.frequency === actionData.frequency &&
+            action.time === actionData.time
+          );
+        });
+    
+        // If no actions left
+        if (stage.actions.length === 0) {
+          stage.actions = [];
+        }
+      }
     },
 
     registerRemoveCondition: function (form) {

@@ -23,6 +23,8 @@ CustomView_BaseController_Js(
     isFirstOpen: 1,
     stagesList: [],
     rolesList: [],
+    pickListDependency: [],
+
     getPicklistname: function () {
       switch (this.currentNameModule) {
         case "Potentials":
@@ -180,6 +182,7 @@ CustomView_BaseController_Js(
       this.registerTimeUnitChangeEvent();
       this.registerTimeValueChangeEvent();
       this.registerNextButtonClickEvent();
+      this.registerGetPickListDependency();
       this.registerGetRoleList();
       this.handleColumnVisibility();
       form.find(".btn-add-stage").on("click", function () {
@@ -199,6 +202,7 @@ CustomView_BaseController_Js(
         this.sortStagesBySuccessRate();
       }
       this.handleColumnVisibilityTimePipeline();
+
       jQuery(document).on("submit", "#delete-stage-pipeline", function (e) {
         e.preventDefault();
         let hiddenValue = jQuery('input[name="name_stage_delete_hidden"]')
@@ -444,6 +448,34 @@ CustomView_BaseController_Js(
       });
     },
     //Begin The Vi
+    registerGetPickListDependency: function () {
+      //Begin The Vi 24/3/2025
+      let params = {
+        module: "PipelineConfig",
+        parent: "Settings",
+        action: "EditorAjax",
+        mode: "getPickListDependencyPotential",
+        sourceModule: "Potentials",
+        sourcefield: "sales_stage",
+        targetfield: "probability",
+      };
+
+      app.request.post({ data: params }).then((err, response) => {
+        app.helper.hideProgress();
+        this.pickListDependency = response.data;
+        console.log("Picklist update", this.pickListDependency);
+        if (err) {
+          app.helper.showErrorNotification({
+            message: err.message,
+          });
+          return;
+        }
+        return;
+      });
+
+      //End by The Vi 24/3/2025
+    },
+
     handleColumnVisibility: function () {
       if (this.currentNameModule !== "Potentials") {
         $("#success-rate-column, #execution-time-column").hide();
@@ -943,6 +975,16 @@ CustomView_BaseController_Js(
                 formData.stage_id ||
                 Math.floor(Math.random() * 9000000) + 1000000;
               const pipelineId = form.find('[name="pipeline_id"]').val();
+
+              // Xác định success_rate từ pickListDependency
+              let successRate = 0;
+              const mappedValue = self.pickListDependency.MAPPED_VALUES.find(
+                (item) => item.sourcevalue === formData.value
+              );
+              if (mappedValue && mappedValue.targetvalues.length > 0) {
+                successRate = parseInt(mappedValue.targetvalues[0], 10) || 0;
+              }
+
               const stageData = {
                 stageid: newStageId,
                 pipelineid: pipelineId,
@@ -950,7 +992,7 @@ CustomView_BaseController_Js(
                 vnLabel: selectedOptionText,
                 enLabel: formData.en_label,
                 value: formData.value,
-                success_rate: formData.success_rate || 0,
+                success_rate: successRate,
                 time: formData.time || 0,
                 time_unit: formData.time_unit || "Day",
                 is_mandatory:
@@ -969,7 +1011,7 @@ CustomView_BaseController_Js(
                 id: newStageId,
                 sequence: self.stagesList.length + 1,
                 name: selectedOptionText,
-                success_rate: formData.success_rate || 0,
+                success_rate: successRate,
                 vnLabel: selectedOptionText,
                 enLabel: formData.en_label,
                 value: formData.value,
@@ -1110,6 +1152,21 @@ CustomView_BaseController_Js(
           }
         }
       }
+      // Lấy danh sách phần trăm từ pickListDependency
+      let successRateOptions = "";
+      const mappedValues = self.pickListDependency?.MAPPED_VALUES || [];
+      const matchedMapping = mappedValues.find(
+        (mapping) => mapping.sourcevalue === stageData.value
+      );
+      const successRates = matchedMapping ? matchedMapping.targetvalues : ["0"];
+
+      successRateOptions = successRates
+        .map((rate) => {
+          const isSelected = stageData.success_rate == rate ? "selected" : "";
+          return `<option value="${rate}" ${isSelected}>${rate}%</option>`;
+        })
+        .join("");
+
       const rowHtml = `
     <tr class="tr-height stageRow cursorPointer"      
          data-stage-id="${stageData.stageid}"
@@ -1141,22 +1198,7 @@ CustomView_BaseController_Js(
       <td class="fieldValue">
         <div class="col-center">
 <select class="inputElement select2 select2-offscreen success-rate-select textAlignCenter" tabindex="-1">
-  <option value="0" ${stageData.success_rate == 0 ? "selected" : ""}>0%</option>
-  <option value="10" ${
-    stageData.success_rate == 10 ? "selected" : ""
-  }>10%</option>
-  <option value="25" ${
-    stageData.success_rate == 25 ? "selected" : ""
-  }>25%</option>
-  <option value="50" ${
-    stageData.success_rate == 50 ? "selected" : ""
-  }>50%</option>
-  <option value="75" ${
-    stageData.success_rate == 75 ? "selected" : ""
-  }>75%</option>
-  <option value="100" ${
-    stageData.success_rate == 100 ? "selected" : ""
-  }>100%</option>
+   ${successRateOptions}
 </select>
         </div>
       </td>

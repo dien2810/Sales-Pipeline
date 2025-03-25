@@ -699,6 +699,7 @@ CustomView_BaseController_Js(
         self.renderStagesInfo(self.stagesList);
         self.registerAddActionSettingModal(form);
         self.registerAddCondition(form);
+        self.registerRemoveAction(form);
         self.registerRemoveCondition(form);
         //End Tran Dien
       });
@@ -1693,7 +1694,7 @@ CustomView_BaseController_Js(
       form.on("click", ".removeAction", function (e) {
         e.stopPropagation();
 
-        let actionItem = jQuery(this).closest(".action-item.btnAddAction");
+        let actionItem = jQuery(this).closest(".action-item");
         let actionJson = actionItem.data("action");
         let actionData = actionJson || null;
         if (!actionData) {

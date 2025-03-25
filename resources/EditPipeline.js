@@ -88,7 +88,7 @@ CustomView_BaseController_Js(
       newActionItem.innerHTML = `
             <i class="fal ${iconClass} ml-2 text-primary"></i>
             <p class="text-primary pt-3">${action["action_name"]}</p>
-            <i class="fal fa-times"></i>
+            <i class="fal fa-times removeAction"></i>
         `;
       if (action.frequency === "onceAction") {
         if (!actionTypeOnce) {

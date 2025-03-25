@@ -10,43 +10,79 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
     // Implemented by The Vi to retrieves a list of pipelines with optional filtering. 
     public static function getPipelineList($nameModule = null, $name = null, $roleId = null) {
         $db = PearDatabase::getInstance();
-        $query = 'SELECT vtiger_pipeline.* FROM vtiger_pipeline'; 
+        
+        // Main query with stage count and role permissions
+        $query = "SELECT 
+            vp.*,
+            COUNT(DISTINCT vs.stageid) AS stage_count,
+            GROUP_CONCAT(DISTINCT vrp.roleid) as role_permissions
+        FROM vtiger_pipeline vp
+        LEFT JOIN vtiger_stage vs ON vp.pipelineid = vs.pipelineid
+        LEFT JOIN vtiger_rolepipeline vrp ON vp.pipelineid = vrp.pipelineid";
+        
         $params = [];
         $whereClauses = [];
-        $joins = [];
     
-        // // Check and add JOIN if roleId is provided
-        // if (!empty($roleId)) {
-        //     $joins[] = 'INNER JOIN vtiger_rolepipeline ON vtiger_pipeline.pipelineid = vtiger_rolepipeline.pipelineid';
-        //     $whereClauses[] = 'vtiger_rolepipeline.roleid = ?';
-        //     $params[] = $roleId;
-        // }
-    
-        // Add condition for module filtering
+        // Filter by module
         if (!empty($nameModule)) {
-            $whereClauses[] = 'vtiger_pipeline.module = ?';
+            $whereClauses[] = 'vp.module = ?';
             $params[] = $nameModule;
         }
     
-        // Add condition for pipeline name search
+        // Filter by pipeline name
         if (!empty($name)) {
-            $whereClauses[] = 'vtiger_pipeline.name LIKE ?';
+            $whereClauses[] = 'vp.name LIKE ?';
             $params[] = '%' . $name . '%';
         }
     
-        // Combine JOINs into query
-        if (!empty($joins)) {
-            $query .= ' ' . implode(' ', $joins);
+        // Filter by role ID - Modified to use EXISTS subquery
+        if (!empty($roleId)) {
+            $whereClauses[] = 'EXISTS (
+                SELECT 1 FROM vtiger_rolepipeline vrp2 
+                WHERE vrp2.pipelineid = vp.pipelineid 
+                AND vrp2.roleid = ?
+            )';
+            $params[] = $roleId;
         }
     
-        // Combine WHERE conditions
+        // Add WHERE clauses if any
         if (!empty($whereClauses)) {
             $query .= ' WHERE ' . implode(' AND ', $whereClauses);
         }
     
-        $query .= ' ORDER BY vtiger_pipeline.pipelineid ASC';
+        // Group and order results
+        $query .= ' GROUP BY vp.pipelineid ORDER BY vp.pipelineid ASC';
+    
         $result = $db->pquery($query, $params);
-        return $result;
+        $pipelines = array();
+        
+        // Format results
+        while ($row = $db->fetch_array($result)) {
+            // Convert role permissions string to array and ensure unique values
+            $rolePermissions = !empty($row['role_permissions']) 
+                ? array_unique(explode(',', $row['role_permissions'])) 
+                : [];
+    
+            $pipeline = array(
+                'pipelineid' => $row['pipelineid'],
+                'module' => $row['module'],
+                'name' => $row['name'],
+                'stage' => $row['stage'],
+                'status' => $row['status'],
+                'auto_move' => $row['auto_move'],
+                'duration' => $row['duration'],
+                'time_unit' => $row['time_unit'],
+                'description' => $row['description'],
+                'is_default' => $row['is_default'],
+                'create_by' => $row['create_by'],
+                'created_at' => $row['created_at'],
+                'stage_count' => $row['stage_count'],
+                'permissions' => $rolePermissions
+            );
+            $pipelines[] = $pipeline;
+        }
+    
+        return $pipelines;
     }
     // Implemented by The Vi to retrieves active pipelines with optional filtering. 
 

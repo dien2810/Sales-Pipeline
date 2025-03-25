@@ -15,6 +15,7 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
 		$this->exposeMethod('getRoleList');
 		$this->exposeMethod('getPipelineStageInfo');
 		$this->exposeMethod('checkCondition');
+        $this->exposeMethod('getPickListDependencyPotential');
 
 	}
     public function checkPermission(Vtiger_Request $request) {
@@ -50,7 +51,27 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
         }
         $response->emit();
     }
-	public function getPipelineStageInfo(Vtiger_Request $request) {
+	public function getPickListDependencyPotential(Vtiger_Request $request) {
+        $response = new Vtiger_Response();
+        try {
+            // $recordId = $request->get('record');
+            $module = $request->get('sourceModule');
+            $sourceField = $request->get('sourcefield');
+            $targetField = $request->get('targetfield');
+            $recordModel = Settings_PickListDependency_Record_Model::getInstance($module, $sourceField, $targetField);
+            $valueMapping = $recordModel->getPickListDependency(); //Trả về
+            $response->setResult(array(
+                'success' => true,
+                'data' =>[
+                    "MAPPED_VALUES" => $valueMapping,
+                ]
+            ));
+        } catch(Exception $e) {
+            $response->setError($e->getMessage());
+        }
+        $response->emit();
+    }
+    public function getPipelineStageInfo(Vtiger_Request $request) {
         $response = new Vtiger_Response();
         try {
             $recordId = $request->get('record');
@@ -114,4 +135,34 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
         }
         $response->emit();
     }
+    public function getDependencyGraph(Vtiger_Request $request) {
+		$qualifiedName = $request->getModule(false);
+		$module = $request->get('sourceModule');
+		$sourceField = $request->get('sourcefield');
+		$targetField = $request->get('targetfield');
+		$recordModel = Settings_PickListDependency_Record_Model::getInstance($module, $sourceField, $targetField);
+		$valueMapping = $recordModel->getPickListDependency();
+		$sourcePicklistValues = $recordModel->getSourcePickListValues();
+		$safeHtmlSourcePicklistValues = array();
+		foreach($sourcePicklistValues as $key => $value) {
+			$safeHtmlSourcePicklistValues[$key] = Vtiger_Util_Helper::toSafeHTML($key);
+		}
+
+		$targetPicklistValues = $recordModel->getTargetPickListValues();
+		$safeHtmlTargetPicklistValues = array();
+		foreach($targetPicklistValues as $key => $value) {
+			$safeHtmlTargetPicklistValues[$key] = Vtiger_Util_Helper::toSafeHTML($key);
+		}
+
+		$viewer = $this->getViewer($request);
+		$viewer->assign('MAPPED_VALUES', $valueMapping);
+		$viewer->assign('SOURCE_PICKLIST_VALUES', $sourcePicklistValues);
+		$viewer->assign('SAFEHTML_SOURCE_PICKLIST_VALUES', $safeHtmlSourcePicklistValues);
+		$viewer->assign('TARGET_PICKLIST_VALUES', $targetPicklistValues);
+		$viewer->assign('SAFEHTML_TARGET_PICKLIST_VALUES', $safeHtmlTargetPicklistValues);
+		$viewer->assign('QUALIFIED_MODULE', $qualifiedName);
+		$viewer->assign('RECORD_MODEL', $recordModel);
+
+		return $viewer->view('DependencyGraph.tpl',$qualifiedName, true);
+	}
 }

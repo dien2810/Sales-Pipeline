@@ -119,27 +119,27 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$response = new Vtiger_Response();
 		try {
 			$result = Settings_PipelineConfig_Config_Model::getPipelineList($module, null, $roleId);
-			$db = PearDatabase::getInstance();
-			$pipelines = [];
-			while ($row = $db->fetchByAssoc($result)) {
-				$pipelines[] = [
-					'pipelineid' => $row['pipelineid'],
-					'module'     => $row['module'],
-					'name'       => $row['name'],
-					'stage'      => $row['stage'],
-					'status'     => $row['status'],
-					'auto_move'  => $row['auto_move'],
-					'duration'   => $row['duration'],
-					'time_unit'  => $row['time_unit'],
-					'description'=> $row['description'],
-					'is_default' => $row['is_default'],
-					'create_by'  => $row['create_by'],
-					'created_at' => $row['created_at']
-				];
-			}
+			// $db = PearDatabase::getInstance();
+			// $pipelines = [];
+			// while ($row = $db->fetchByAssoc($result)) {
+			// 	$pipelines[] = [
+			// 		'pipelineid' => $row['pipelineid'],
+			// 		'module'     => $row['module'],
+			// 		'name'       => $row['name'],
+			// 		'stage'      => $row['stage'],
+			// 		'status'     => $row['status'],
+			// 		'auto_move'  => $row['auto_move'],
+			// 		'duration'   => $row['duration'],
+			// 		'time_unit'  => $row['time_unit'],
+			// 		'description'=> $row['description'],
+			// 		'is_default' => $row['is_default'],
+			// 		'create_by'  => $row['create_by'],
+			// 		'created_at' => $row['created_at']
+			// 	];
+			// }
 			$response->setResult([
 				'success' => true,
-				'data'    => $pipelines
+				'data'    => $result,
 			]);
 		} catch (Exception $e) {
 			$response->setError('Lỗi: ' . $e->getMessage());
@@ -178,7 +178,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 				];
 			}
 			$response->setResult([
-				'success' => true,
+				'success' => "Hello",
 				'data'    => $pipelines
 			]);
 		} catch (Exception $e) {
@@ -243,39 +243,32 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 			$response->emit();
 			return;
 		}
-
-		$extraFields = [
-			'Potentials' => [
+	
+		if ($moduleName === 'Potentials') {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace'],
 				'sales_stage' => $editResult['data']['stageValueReplace'],
 				'probability' => $editResult['data']['successRate']
-			],
-			'Leads' => [
-				'leadstatus' => $editResult['data']['stageValueReplace']
-			],
-			'Project' => [
-				'projectstatus' => $editResult['data']['stageValueReplace']
-			],
-			'HelpDesk' => [
-				'ticketstatus' => $editResult['data']['stageValueReplace']
-			]
-		];
-
-		$requestData = [
-			'module' => $moduleName,
-			'record' => $idRecord,
-			'pipelineid' => $editResult['data']['idPipelineReplace'],
-			'pipelinename' => $editResult['data']['pipelineNameReplace'],
-			'stageid' => $editResult['data']['idStageReplace'],
-			'stagename' => $editResult['data']['stageNameReplace']
-		];
-
-		if (isset($extraFields[$moduleName])) {
-			$requestData = array_merge($requestData, $extraFields[$moduleName]);
+			]);
+		} else {
+			$requestData = new Vtiger_Request([
+				'module' => $moduleName,
+				'record' => $idRecord,
+				'pipelineid' => $editResult['data']['idPipelineReplace'],
+				'pipelinename' => $editResult['data']['pipelineNameReplace'],
+				'stageid' => $editResult['data']['idStageReplace'],
+				'stagename' => $editResult['data']['stageNameReplace']
+			]);
 		}
 	
 		ob_start();
 		$saveAction = new Potentials_SaveAjax_Action();
-		$saveAction->process(new Vtiger_Request($requestData));
+		$saveAction->process($requestData);
 		ob_end_clean();
 	
 		$response = new Vtiger_Response();

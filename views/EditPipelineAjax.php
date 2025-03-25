@@ -186,6 +186,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 	// Add by Minh Hoang on 2025-02-14
 	function getAddCallModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
+		$actionData = $request->get('actionData');
 		$allModules = getModulesTranslatedSingleLabel();
 
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
@@ -208,12 +209,14 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+		$viewer->assign('ACTION_DATA', $actionData);
 		// Modal send Update Data Field
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddCallModal.tpl');
 	}
 
 	function getAddMeetingModal(Vtiger_Request $request) {
 		$moduleName = $request->getModule(false);
+		$actionData = $request->get('actionData');
 		$allModules = getModulesTranslatedSingleLabel();
 		// Keep only specific modules
         $allowedModules = ['Potentials', 'Leads', 'Project', 'HelpDesk'];
@@ -236,6 +239,7 @@ class Settings_PipelineConfig_EditPipelineAjax_View extends CustomView_Base_View
 		$viewer->assign('DATETIME_FIELDS', $dateTimeFields);
 		$viewer->assign('RECORD_STRUCTURE_MODEL', $recordStructureInstance);
 		$viewer->assign('RECORD_STRUCTURE', $recordStructure);
+		$viewer->assign('ACTION_DATA', $actionData);
 		// Modal send Update Data Field
 		$viewer->display('modules/Settings/PipelineConfig/tpls/AddMeetingModal.tpl');
 	}

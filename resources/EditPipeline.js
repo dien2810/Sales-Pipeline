@@ -533,8 +533,6 @@ CustomView_BaseController_Js(
           stage["actions"] = JSON.stringify(stage["actions"]);
           stage["conditions"] = stage["conditions"] || {};
           stage["conditions"] = JSON.stringify(stage["conditions"]);
-          console.log(stage["conditions"]);
-          console.log(JSON.stringify(stage["conditions"]));
         });
         //End Tran Dien
         e.preventDefault();
@@ -1588,19 +1586,56 @@ CustomView_BaseController_Js(
     registerAddActionSettingModal: function (form) {
       var self = this;
       form.on("click", ".btnAddAction", function () {
-        console.log("Show add action setting modal");
         let actionJson = this.dataset.action;
         let actionData = actionJson ? JSON.parse(this.dataset.action) : null;
         console.log(actionData);
-        var addActionSettingModalController =
-          new Settings_PipelineConfig_AddActionSetting_Js();
-
-        addActionSettingModalController.showAddActionSettingModal(
-          this,
-          self,
-          actionData
-        );
+        if (actionData && actionData.action_type) {
+          self.redirectToEditModal(actionData.action_type, actionData, this);
+        } else {
+          var addActionSettingModalController = new Settings_PipelineConfig_AddActionSetting_Js();
+          addActionSettingModalController.showAddActionSettingModal(this, self, actionData);
+        }
       });
+    },
+
+    // Added by Dien Nguyen on 2025-03-24 to redirect to type of action modal
+    redirectToEditModal: function (actionType, actionData, targetBtn) {
+      var actionSettingController = new Settings_PipelineConfig_ActionSetting_Js();
+      switch (actionType) {
+        case "addCall":
+          actionSettingController.showAddCallModal(targetBtn, actionData, this)
+          break
+        case "addMeeting":
+          actionSettingController.showAddMeetingModal(targetBtn, actionData, this)
+          break
+        case "createNewTask":
+          actionSettingController.showCreateNewTaskModal(targetBtn, actionData)
+          break
+        case "createNewProjectTask":
+          actionSettingController.showCreateNewProjectTaskModal(targetBtn, actionData)
+          break;
+        case "createNewRecord":
+          actionSettingController.showCreateNewRecordModal(targetBtn, actionData);
+          break;
+        case "updateDataField":
+          actionSettingController.showDataFieldUpdateModal(targetBtn, actionData);
+          break;
+        case "sendSMS":
+          actionSettingController.showSendSMSModal(targetBtn, actionData);
+          break;
+        case "sendZNSMessage":
+          actionSettingController.showSendZNSModal(targetBtn, actionData);
+          break;
+        case "sendEmail":
+          actionSettingController.showSendEmailModal(targetBtn, actionData);
+          break;
+        case "notification":
+          actionSettingController.showNotificationModal(targetBtn, actionData);
+          break;
+        default:
+          console.log("Unknown actionType:", actionType);
+          break;
+      }
     },
 
     registerAddCondition: function (form) {
@@ -1611,6 +1646,7 @@ CustomView_BaseController_Js(
       });
     },
 
+    // Add by Dien Nguyen on 2025-03-24 to remove action
     registerRemoveAction: function (form) {
       var self = this;
       form.on("click", ".removeAction", function (e) {
@@ -1619,7 +1655,6 @@ CustomView_BaseController_Js(
         let actionItem = jQuery(this).closest(".action-item.btnAddAction");
         let actionJson = actionItem.data("action");
         let actionData = actionJson || null;
-    
         if (!actionData) {
           return;
         }
@@ -1629,6 +1664,7 @@ CustomView_BaseController_Js(
         if (!stageId) {
           return;
         }
+
         // Save action-type before removing action-item
         let actionTypeContainer = jQuery(this).closest(".action-type");
     
@@ -1641,17 +1677,11 @@ CustomView_BaseController_Js(
         // Remove action if it doesn't exist in action-type element
         if (actionTypeContainer.find(".action-item").length === 0) {
           actionTypeContainer.remove();
-          console.log("Da xoa actionTypeContainer")
         }
-    
-        console.log("StagesList after removal:", self.stagesList);
-        app.helper.showSuccessNotification({
-          message: app.vtranslate("JS_ACTION_REMOVED_SUCCESS"),
-        });
       });
     },
 
-    // Add by Dien Nguyen on 2025-03-24 to remove action in stageList
+    // Added by Dien Nguyen on 2025-03-24 to remove action in stageList
     removeActionFromStagesList: function (stageId, actionData) {
       let self = this;
       let stage = self.stagesList.find((stage) => stage.id === stageId);
@@ -2609,13 +2639,19 @@ CustomView_BaseController_Js(
     },
 
     registerToggleCheckboxEvent: function (form) {
-      form.find("#toggleCheckbox").on("change", function () {
-        if ($(this).is(":checked")) {
-          form.find("#toggleContent").removeClass("hide").show();
+      var toggleCheckbox = form.find("#toggleCheckbox");
+      var toggleContent = form.find("#toggleContent");
+    
+      // Hàm xử lý hiển thị/ẩn toggleContent dựa trên trạng thái checkbox
+      function updateToggleContent() {
+        if (toggleCheckbox.is(":checked")) {
+          toggleContent.removeClass("hide").show();
         } else {
-          form.find("#toggleContent").hide().addClass("hide");
+          toggleContent.hide().addClass("hide");
         }
-      });
+      }
+      updateToggleContent();
+      toggleCheckbox.on("change", updateToggleContent);
     },
 
     // Add by Minh Hoang on 2025-01-23 to set validation rules for SMS content field
@@ -2671,10 +2707,54 @@ CustomView_BaseController_Js(
       return values;
     },
 
+    // Added by Dien Nguyen on 2025-03-24
+    updateAction(actionData, targetController, targetBtn) {
+      var self=this
+      if (actionData) {
+        // Find stage
+        let stageIndex = targetController.stagesList.findIndex((stage) =>
+          stage.actions.some(
+            (actionItem) =>
+              actionItem.action_type === actionData["action_type"] &&
+              actionItem.action_name === actionData["action_name"]
+          )
+        );
+    
+        if (stageIndex !== -1) {
+          // Find action
+          let actionIndex = targetController.stagesList[stageIndex].actions.findIndex(
+            (actionItem) =>
+              actionItem.action_type === actionData["action_type"] &&
+              actionItem.action_name === actionData["action_name"]
+          );
+    
+          if (actionIndex !== -1) {
+            // Update action
+            targetController.stagesList[stageIndex].actions[actionIndex] = {
+              ...targetController.stagesList[stageIndex].actions[actionIndex],
+              ...self.action,
+            };
+          }
+        }
+    
+        // Update targetBtn
+        if (targetBtn) {
+          jQuery(targetBtn).attr("data-action", JSON.stringify(self.action));
+          let pTag = jQuery(targetBtn).find("p");
+          if (pTag.length) {
+            pTag.text(self.action["action_name"]);
+          }
+        }
+      } else {
+        // Push new action if no actionData
+        targetController.pushAction(self.action, isEdit);
+      }
+    },
+
     /**
      * Function to show modals
      */
-    showAddCallModal: function (targetBtn) {
+    showAddCallModal: function (targetBtn, actionData=null, targetController) {
       var self = this;
       app.helper.showProgress();
       // Request modal content
@@ -2683,6 +2763,7 @@ CustomView_BaseController_Js(
         parent: "Settings",
         view: "EditPipelineAjax",
         mode: "getAddCallModal",
+        actionData: actionData?actionData:null,
       };
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
@@ -2690,6 +2771,7 @@ CustomView_BaseController_Js(
           app.helper.showErrorNotification({ message: err.message });
           return;
         }
+
         // Show modal
         app.helper.showModal(res, {
           preShowCb: function (modal) {
@@ -2778,7 +2860,8 @@ CustomView_BaseController_Js(
                 self.action["time"] = self.action["time"]
                   ? parseInt(self.action["time"])
                   : null;
-                self.targetController.pushAction(self.action, self.isEdit);
+                // save action into stageList
+                self.updateAction(actionData, targetController, targetBtn)
                 app.helper.hideModal();
                 return false;
               },
@@ -2836,7 +2919,7 @@ CustomView_BaseController_Js(
       }
     },
 
-    showAddMeetingModal: function (targetBtn) {
+    showAddMeetingModal: function (targetBtn, actionData=null, targetController) {
       var self = this;
       app.helper.showProgress();
       // Request modal content
@@ -2845,6 +2928,7 @@ CustomView_BaseController_Js(
         parent: "Settings",
         view: "EditPipelineAjax",
         mode: "getAddMeetingModal",
+        actionData: actionData?actionData:null,
       };
       app.request.post({ data: params }).then((err, res) => {
         app.helper.hideProgress();
@@ -2925,6 +3009,7 @@ CustomView_BaseController_Js(
                   calendar_repeat_limit_date: self.convertDateFormat(
                     params.calendar_repeat_limit_date
                   ),
+                  location: params.location,
                   recurringcheck: params.recurringcheck,
                   recurringtype: params.recurringtype,
                   repeat_frequency: params.repeat_frequency
@@ -2942,7 +3027,8 @@ CustomView_BaseController_Js(
                 self.action["time"] = self.action["time"]
                   ? parseInt(self.action["time"])
                   : null;
-                self.targetController.pushAction(self.action, self.isEdit);
+                // save action into stageList
+                self.updateAction(actionData, targetController, targetBtn)
                 app.helper.hideModal();
                 return false;
               },

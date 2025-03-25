@@ -38,3 +38,7 @@ i.icon {
 .tr-height {
   height: 50px;
 }
+
+.custom-popover-wrapper .custom-popover-content {
+  display: none !important;
+}

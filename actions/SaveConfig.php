@@ -119,27 +119,27 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		$response = new Vtiger_Response();
 		try {
 			$result = Settings_PipelineConfig_Config_Model::getPipelineList($module, null, $roleId);
-			$db = PearDatabase::getInstance();
-			$pipelines = [];
-			while ($row = $db->fetchByAssoc($result)) {
-				$pipelines[] = [
-					'pipelineid' => $row['pipelineid'],
-					'module'     => $row['module'],
-					'name'       => $row['name'],
-					'stage'      => $row['stage'],
-					'status'     => $row['status'],
-					'auto_move'  => $row['auto_move'],
-					'duration'   => $row['duration'],
-					'time_unit'  => $row['time_unit'],
-					'description'=> $row['description'],
-					'is_default' => $row['is_default'],
-					'create_by'  => $row['create_by'],
-					'created_at' => $row['created_at']
-				];
-			}
+			// $db = PearDatabase::getInstance();
+			// $pipelines = [];
+			// while ($row = $db->fetchByAssoc($result)) {
+			// 	$pipelines[] = [
+			// 		'pipelineid' => $row['pipelineid'],
+			// 		'module'     => $row['module'],
+			// 		'name'       => $row['name'],
+			// 		'stage'      => $row['stage'],
+			// 		'status'     => $row['status'],
+			// 		'auto_move'  => $row['auto_move'],
+			// 		'duration'   => $row['duration'],
+			// 		'time_unit'  => $row['time_unit'],
+			// 		'description'=> $row['description'],
+			// 		'is_default' => $row['is_default'],
+			// 		'create_by'  => $row['create_by'],
+			// 		'created_at' => $row['created_at']
+			// 	];
+			// }
 			$response->setResult([
 				'success' => true,
-				'data'    => $pipelines
+				'data'    => $result,
 			]);
 		} catch (Exception $e) {
 			$response->setError('Lỗi: ' . $e->getMessage());
@@ -178,7 +178,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 				];
 			}
 			$response->setResult([
-				'success' => true,
+				'success' => "Hello",
 				'data'    => $pipelines
 			]);
 		} catch (Exception $e) {

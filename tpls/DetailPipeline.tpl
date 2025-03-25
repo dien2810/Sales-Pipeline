@@ -1,7 +1,9 @@
-{* Added by The Vi on 2025-03-05 *}
 {strip}
 <link rel="stylesheet" href="{vresource_url('modules/Settings/PipelineConfig/resources/DetailPipeline.css')}">
 </link>
+<link rel="stylesheet" href="{vresource_url('layouts/v7/resources/custom.css')}">
+</link>
+<script src="{vresource_url('resources/CustomPopover.js')}"></script>
 <div class="editViewBody">
     <div class="addPipeline">
         <div class="fieldBlockContainer">
@@ -21,7 +23,6 @@
                     <div class="tab-pane active" id="tab1">
                         <table class="table table-borderless">
                             <tbody>
-
                                 <tr>
                                     <td class="fieldLabel name alignMiddle">
                                         {vtranslate('LBL_PIPELINE_NAME', $MODULE_NAME)}&nbsp;<span
@@ -58,20 +59,47 @@
                                     </td>
                                 </tr>
 
-                                <tr>
+                                <tr class="listViewEntries">
                                     <td class="fieldLabel grant alignMiddle">
                                         {vtranslate('LBL_PERMISSIONS', $MODULE_NAME)}&nbsp;
                                     </td>
-                                    <td class="fieldValue grant">
-                                        <span>
-                                            {if $PIPELINE_DETAIL.rolesSelected|@count gt 0}
-                                            {foreach from=$PIPELINE_DETAIL.rolesSelected item=role name=roles}
-                                            <span style="margin-right: 10px;">{$role.role_name}</span>
-                                            {if not $smarty.foreach.roles.last} {/if}
-                                            {/foreach}
-                                            {else}
-                                            {vtranslate('LBL_ALL', $MODULE_NAME)}
-                                            {/if}
+                                    <td class="listViewEntryValue" data-name="assigned_user_id" data-field-type="owner">
+                                        <span class="fieldValue">
+                                            <span class="value">
+                                                <span class="owners custom-popover-wrapper">
+                                                    {assign var="ROLE_COUNT" value=$PIPELINE_DETAIL.rolesSelected|count}
+                                                    {if $ROLE_COUNT == 0}
+                                                    <a class="no-owner" href="javascript: void(0)"></a>
+                                                    {elseif $ROLE_COUNT == 1}
+                                                    <span class="stand-owner">
+                                                        <a
+                                                            href="index.php?module=Roles&parent=Settings&view=Edit&record={$PIPELINE_DETAIL.rolesSelected[0].role_id}">
+                                                            {$PIPELINE_DETAIL.rolesSelected[0].role_name}
+                                                        </a>
+                                                    </span>
+                                                    {else}
+                                                    <a class="stand-owner-plus custom-popover"
+                                                        title="{vtranslate('LBL_ROLE_PERMISSIONS', $MODULE_NAME)}"
+                                                        data-title="{vtranslate('Roles')}">
+                                                        <span
+                                                            class="stand-owner-plus-text">{$PIPELINE_DETAIL.rolesSelected[0].role_name}</span>
+                                                        <span class="stand-owner-plus-icon"> +{$ROLE_COUNT - 1}</span>
+                                                    </a>
+                                                    <div class="custom-popover-content" style="display: none">
+                                                        <ul class="owners-detail_owners">
+                                                            {foreach from=$PIPELINE_DETAIL.rolesSelected item=role}
+                                                            <li class="owners-detail_owner">
+                                                                <a target="_blank"
+                                                                    href="index.php?module=Roles&parent=Settings&view=Edit&record={$role.role_id}">
+                                                                    {$role.role_name}
+                                                                </a>
+                                                            </li>
+                                                            {/foreach}
+                                                        </ul>
+                                                    </div>
+                                                    {/if}
+                                                </span>
+                                            </span>
                                         </span>
                                     </td>
                                     <td class="fieldLabel description alignMiddle">{vtranslate('LBL_DESCRIPTION',
@@ -97,22 +125,28 @@
                             <table>
                                 <thead>
                                     <tr class="listViewHeaders">
-                                        <th style="width:20%" class="text-left">
+                                        <th style="width:{if $PIPELINE_DETAIL.module == 'Potentials'}20%{else}30%{/if}"
+                                            class="text-left">
                                             <span>{vtranslate('LBL_STAGE_NAME', $MODULE_NAME)}</span>
                                         </th>
+                                        {if $PIPELINE_DETAIL.module == 'Potentials'}
                                         <th style="width:15%" class="text-center">
                                             <span>{vtranslate('LBL_SUCCESS_RATE', $MODULE_NAME)}</span>
                                         </th>
                                         <th style="width:15%" class="text-center">
                                             <span>{vtranslate('LBL_EXECUTION_TIME', $MODULE_NAME)}</span>
                                         </th>
-                                        <th style="width:10%" class="text-center">
+                                        {/if}
+                                        <th style="width:{if $PIPELINE_DETAIL.module == 'Potentials'}10%{else}20%{/if}"
+                                            class="text-center">
                                             <span>{vtranslate('LBL_MANDATORY_STEP', $MODULE_NAME)}</span>
                                         </th>
-                                        <th style="width:25%" class="text-center">
+                                        <th style="width:{if $PIPELINE_DETAIL.module == 'Potentials'}25%{else}30%{/if}"
+                                            class="text-center">
                                             <span>{vtranslate('LBL_ALLOWED_TRANSITIONS', $MODULE_NAME)}</span>
                                         </th>
-                                        <th style="width:20%" class="text-center">
+                                        <th style="width:{if $PIPELINE_DETAIL.module == 'Potentials'}20%{else}20%{/if}"
+                                            class="text-center">
                                             <span>{vtranslate('LBL_ROLE_PERMISSIONS', $MODULE_NAME)}</span>
                                         </th>
                                     </tr>
@@ -123,6 +157,7 @@
                                         <td class="textOverflowEllipsis">
                                             <span>{$stage.name} (B{$stage.sequence})</span>
                                         </td>
+                                        {if $PIPELINE_DETAIL.module == 'Potentials'}
                                         <td class="fieldValue">
                                             <div class="col-center">
                                                 <span>{$stage.success_rate}%</span>
@@ -133,6 +168,7 @@
                                                 <span>{$stage.execution_time.value} {$stage.execution_time.unit}</span>
                                             </div>
                                         </td>
+                                        {/if}
                                         <td class="fieldValue">
                                             <div class="col-center">
                                                 <input type="hidden" value="{$stage.is_mandatory}">

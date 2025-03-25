@@ -51,7 +51,6 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
         }
         $response->emit();
     }
-  
 	public function getPickListDependencyPotential(Vtiger_Request $request) {
         $response = new Vtiger_Response();
         try {
@@ -66,6 +65,24 @@ class Settings_PipelineConfig_EditorAjax_Action extends Vtiger_Action_Controller
                 'data' =>[
                     "MAPPED_VALUES" => $valueMapping,
                 ]
+            ));
+        } catch(Exception $e) {
+            $response->setError($e->getMessage());
+        }
+        $response->emit();
+    }
+    public function getPipelineStageInfo(Vtiger_Request $request) {
+        $response = new Vtiger_Response();
+        try {
+            $recordId = $request->get('record');
+            $moduleName = $request->get('modulename');
+           
+            $pipelineStageInfo = PipelineAction::getPipelineStageInfo($recordId, $moduleName);
+            
+        
+            $response->setResult(array(
+                'success' => true,
+                'data' =>$pipelineStageInfo
             ));
         } catch(Exception $e) {
             $response->setError($e->getMessage());

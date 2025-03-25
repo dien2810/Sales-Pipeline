@@ -37,7 +37,7 @@
                     <a class="no-owner" href="javascript: void(0)"></a>
                     {elseif $ROLE_COUNT == 1}
                     <span class="stand-owner">
-                        <a href="index.php?module=Roles&parent=Settings&view=Detail&record={$ROLES[0]['roleid']}">
+                        <a href="index.php?module=Roles&parent=Settings&view=Edit&record={$ROLES[0]['roleid']}">
                             {$ROLES[0]['rolename']}
                         </a>
                     </span>
@@ -53,7 +53,7 @@
                             {foreach from=$ROLES item=role}
                             <li class="owners-detail_owner">
                                 <a target="_blank"
-                                    href="index.php?module=Roles&parent=Settings&view=Detail&record={$role['roleid']}">
+                                    href="index.php?module=Roles&parent=Settings&view=Edit&record={$role['roleid']}">
                                     {$role['rolename']}
                                 </a>
                             </li>
@@ -62,22 +62,6 @@
                     </div>
                     {/if}
                 </span>
-                <!-- <span class="owners custom-popover-wrapper"><a class="stand-owner-plus custom-popover" title=""
-                        data-title="Giao cho" data-original-title="Giao cho"><span
-                            class="stand-owner-plus-text">Administrator</span><span class="stand-owner-plus-icon">
-                            +1</span></a>
-                    <div class="custom-popover-content" style="display: none">
-                        <p class="owners-detail_title">Người dùng:</p>
-                        <ul class="owners-detail_owners">
-                            <li class="owners-detail_owner"><a target="_blank"
-                                    href="index.php?module=Users&amp;parent=Settings&amp;view=Detail&amp;record=1">Administrator</a>
-                            </li>
-                            <li class="owners-detail_owner"><a target="_blank"
-                                    href="index.php?module=Users&amp;parent=Settings&amp;view=Detail&amp;record=23">System
-                                    Admin</a></li>
-                        </ul>
-                    </div>
-                </span> -->
             </span>
         </span>
     </td>

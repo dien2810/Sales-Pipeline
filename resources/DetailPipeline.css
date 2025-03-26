@@ -42,3 +42,232 @@ i.icon {
 .custom-popover-wrapper .custom-popover-content {
   display: none !important;
 }
+
+/* Begin automation tab config */
+#editPipeline-page #tab2 .breadcrumb .crumbs li {
+  margin-right: 20px;
+  cursor: unset;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li.step.stepOdd {
+  cursor: unset;
+  background-color: #3399ff;
+  border-top-color: #3399ff;
+  border-bottom-color: #3399ff;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li.step.stepEven {
+  cursor: unset;
+  background-color: #ecececec;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li a {
+  cursor: unset !important;
+  width: 28rem;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li:before {
+  content: "\0000a0";
+  width: 0;
+  height: 0;
+  border-left: 40px solid white;
+  border-top: 25px solid #ecececec;
+  border-bottom: 25px solid #ecececec;
+  position: absolute;
+  top: -20px;
+  left: -20px;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li.step.stepOdd:before {
+  border-top-color: #3399ff;
+  border-bottom-color: #3399ff;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li:after {
+  top: -20px;
+  border-top: 26px solid white;
+  border-bottom: 26px solid white;
+  border-left: 40px solid #ecececec;
+  margin-right: 5px;
+  cursor: unset;
+}
+#editPipeline-page #tab2 .breadcrumb .crumbs li.step.stepOdd:after {
+  border-left-color: #3399ff;
+}
+#editPipeline-page #tab2 .breadcrumb .stepEven .stepNum {
+  color: #3399ff;
+}
+#editPipeline-page #tab2 .breadcrumb .step.stepOdd .stepNum {
+  color: #fff;
+}
+#editPipeline-page #tab2 .breadcrumb .stepEven .stepText {
+  color: #3399ff;
+}
+#editPipeline-page #tab2 .breadcrumb .step.stepOdd .stepText {
+  color: #fff !important;
+}
+.crumbs {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.step {
+  text-align: center;
+  padding: 5px;
+}
+.step a {
+  text-decoration: none;
+  color: inherit;
+}
+.stepInfo {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.stepItem {
+  display: flex;
+  flex-direction: column;
+}
+.action-box {
+  margin-top: 4rem;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+  width: 320px;
+  height: 40rem;
+}
+.action-type {
+  border: 1px solid #ccc;
+  padding: 5px;
+  width: 300px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+.action-item {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  width: 285px;
+  margin-bottom: 5px;
+}
+.action-item i {
+  margin-right: 7px;
+}
+.action-title {
+  text-align: left;
+}
+.condition-box {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 5px;
+  width: 320px;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
+}
+#addActionSettingModal {
+  display: absolute;
+  top: 20%;
+}
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+.form-check-input {
+  margin-right: 0.5rem !important;
+}
+.lblAfterMoving {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0;
+  padding-right: 0;
+}
+#time {
+  height: 3.2rem;
+}
+.actionTypeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: space-around;
+}
+.actionTypeRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.actionTypeItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #e2e2e2;
+  border-radius: 5px;
+  width: 25rem;
+  margin-bottom: 2rem;
+}
+.actionTypeItem:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.btnAddCondition:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.fa-times:hover {
+  cursor: pointer;
+  opacity: 0.7;
+  color: red;
+}
+#andConditionContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: start;
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+.andConditionRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.addConditionBtn {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+#orConditionContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: start;
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+.orConditionRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.fieldUiHolder {
+  padding-left: 0;
+  padding-right: 0;
+}
+.form-content {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.form-content::-webkit-scrollbar {
+  width: 5px;
+}
+.form-content::-webkit-scrollbar-thumb {
+  background-color: #abb0b4;
+  border-radius: 10px;
+}
+.form-content::-webkit-scrollbar-track {
+  background-color: #f8f9fa;
+}
+.fa-trash-alt:hover {
+  color: red;
+  cursor: pointer;
+  opacity: 0.7;
+}
+/* End */

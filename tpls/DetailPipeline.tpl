@@ -4,11 +4,11 @@
 <link rel="stylesheet" href="{vresource_url('layouts/v7/resources/custom.css')}">
 </link>
 <script src="{vresource_url('resources/CustomPopover.js')}"></script>
-<div class="editViewBody">
+<div id="editPipeline-page" class="editViewBody">
     <div class="addPipeline">
         <div class="fieldBlockContainer">
             <h4 class="fieldBlockHeader" style="margin-top:10px">{$PIPELINE_DETAIL.name}</h4>
-            <div class="contents tabbable" style="margin-top: 40px;">
+            <div class="contents tabbable" style="margin-top: 20px;">
                 <ul class="nav nav-tabs marginBottom10px">
                     <li class="tab1 active">
                         <a data-toggle="tab" href="#tab1"><strong>{vtranslate('LBL_PIPELINE_INFO',
@@ -22,6 +22,7 @@
                 <div class="tab-content overflowVisible">
                     <div class="tab-pane active" id="tab1">
                         <table class="table table-borderless">
+
                             <tbody>
                                 <tr>
                                     <td class="fieldLabel name alignMiddle">
@@ -165,7 +166,8 @@
                                         </td>
                                         <td class="fieldValue">
                                             <div class="col-center">
-                                                <span>{$stage.execution_time.value} {$stage.execution_time.unit}</span>
+                                                <span> {$stage.execution_time.value} &nbsp;
+                                                    {vtranslate($stage.execution_time.unit, $MODULE_NAME)}</span>
                                             </div>
                                         </td>
                                         {/if}
@@ -206,8 +208,113 @@
                         </div>
                     </div>
 
+                    {* Automatic Tab*}
                     <div class="tab-pane" id="tab2">
-
+                        <div id="breadcrumb" class="breadcrumb text-center">
+                            {if $MODE eq "EDIT"}
+                            {if $STAGE_LIST|@count > 0}
+                            <ul class="crumbs">
+                                {foreach from=$STAGE_LIST item=stage key=index}
+                                {assign var="stepClass" value="stepOdd"}
+                                {if $index % 2 == 0}
+                                {assign var="stepClass" value="stepEven"}
+                                {/if}
+                                <li class="step {$stepClass}" style="z-index:{$STAGE_LIST|@count - $index}">
+                                    <a href="javascript:void(0)">
+                                        <span class="stepNum">{$index + 1}</span>
+                                        <span class="stepText">{$stage.name}</span>
+                                    </a>
+                                </li>
+                                {/foreach}
+                            </ul>
+                            {/if}
+                            <div class="stepInfo">
+                                {if $STAGE_LIST|@count > 0}
+                                {foreach from=$STAGE_LIST item=stage}
+                                <div class="stepItem">
+                                    <div class="action-box">
+                                        {assign var="onceActions" value=[]}
+                                        {assign var="conditionalActions" value=[]}
+                                        {foreach from=$stage.actions item=action}
+                                        {if $action.action_time_type == 'Once'}
+                                        {assign var="onceActions" value=$onceActions|@array_merge:[$action]}
+                                        {/if}
+                                        {if $action.action_time_type == 'Conditional'}
+                                        {assign var="conditionalActions"
+                                        value=$conditionalActions|@array_merge:[$action]}
+                                        {/if}
+                                        {/foreach}
+                                        {if $onceActions|@count > 0}
+                                        <div class="action-type">
+                                            <h5 class="action-title">
+                                                {vtranslate('LBL_ONCE_ACTION', $MODULE_NAME)}
+                                            </h5>
+                                            {foreach from=$onceActions item=action}
+                                            <div class="action-item">
+                                                <i class="fal fa-phone ml-2"></i>
+                                                <p class="text-primary pt-3">{$action.action_name}</p>
+                                                <i class="fal fa-times"></i>
+                                            </div>
+                                            {/foreach}
+                                        </div>
+                                        {/if}
+                                        {if $conditionalActions|@count > 0}
+                                        <div class="action-type">
+                                            <h5 class="action-title">
+                                                {vtranslate('LBL_CONDITIONAL_ACTION', $MODULE_NAME)}
+                                            </h5>
+                                            {foreach from=$conditionalActions item=action}
+                                            <div class="action-item">
+                                                <i class="fal fa-envelope ml-2"></i>
+                                                <p class="text-primary pt-3">{$action.action_name}</p>
+                                                <i class="fal fa-times"></i>
+                                            </div>
+                                            {/foreach}
+                                        </div>
+                                        {/if}
+                                        <button type="button" class="btn text-primary btnAddAction"
+                                            data-stageid="{$stage.stageid}">
+                                            + {vtranslate('LBL_ADD_ACTION', $MODULE_NAME)}
+                                        </button>
+                                    </div>
+                                    <div class="condition-box">
+                                        {if $stage.conditions|@count > 0}
+                                        <div class="action-item btnAddCondition">
+                                            <i class="fal fa-cogs ml-2"></i>
+                                            <p class="text-primary pt-3">
+                                                {vtranslate('LBL_AUTO_TRANSITION_CONDITION', $MODULE_NAME)}
+                                            </p>
+                                            <i class="fal fa-times removeCondition"></i>
+                                        </div>
+                                        {else}
+                                        <button type="button" class="btn text-primary btnAddCondition"
+                                            data-stageid="{$stage.stageid}">
+                                            + {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}
+                                        </button>
+                                        {/if}
+                                    </div>
+                                </div>
+                                {/foreach}
+                                {else}
+                                <div class="stepItem">
+                                    <div class="action-box">
+                                        <button type="button" class="btn text-primary btnAddAction">
+                                            + {vtranslate('LBL_ADD_ACTION', $MODULE_NAME)}
+                                        </button>
+                                    </div>
+                                    <div class="condition-box">
+                                        <button type="button" class="btn text-primary btnAddCondition">
+                                            + {vtranslate('LBL_ADD_CONDITION', $MODULE_NAME)}
+                                        </button>
+                                    </div>
+                                </div>
+                                {/if}
+                            </div>
+                            {else}
+                            <div class="stepInfo">
+                            </div>
+                            {/if}
+                        </div>
                     </div>
                 </div>
             </div>

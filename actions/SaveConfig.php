@@ -274,7 +274,7 @@ class Settings_PipelineConfig_SaveConfig_Action extends Vtiger_Action_Controller
 		}
 	
 		ob_start();
-		$saveAction = new Potentials_SaveAjax_Action();
+		$saveAction = new Vtiger_SaveAjax_Action();
 		$saveAction->process(new Vtiger_Request($requestData));
 		ob_end_clean();
 	

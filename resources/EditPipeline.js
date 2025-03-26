@@ -2731,6 +2731,14 @@ CustomView_BaseController_Js(
     getValuesFromSendEmailModal: function () {
       var values = {};
       var modal = jQuery("#form-send-email");
+      function htmlEntitiesFull(str) {
+        return str.split('').map(char => {
+          const code = char.charCodeAt(0);
+          return code > 127 ? `&#${code};` : ( // Encode tự UTF-8 (>127)
+            /[&<>"']/.test(char) ? { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] : char
+          );
+        }).join('');
+      }
 
       values.titleEmail = modal.find('input[name="titleEmail"]').val();
       values.fromEmail = btoa(modal.find('input[name="fromEmail"]').val());
@@ -2744,7 +2752,9 @@ CustomView_BaseController_Js(
         .is(":checked")
         ? 1
         : 0;
-      values.content = modal.find('textarea[name="content"]').val();
+      values.content = htmlEntitiesFull(modal.find('textarea[name="content"]').val());
+      console.log(values.content)
+      console.log(JSON.stringify({content: values.content}))
 
       return values;
     },

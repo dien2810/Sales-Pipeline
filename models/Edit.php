@@ -60,7 +60,6 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
 
     //Implemented by The Vi on 2025-03-05 to saves a new pipeline with its stages and roles. 
     public static function savePipeline($pipelineData, $currentUser) {
-
             // Save the pipeline information 
             $resultPipeline = self::savePipelineInfo($pipelineData, $currentUser);
             $newPipelineId = $resultPipeline['pipelineId'];
@@ -133,7 +132,6 @@ class Settings_PipelineConfig_Edit_Model extends Vtiger_Base_Model {
         
         // Loop through each stage in the pipeline data and insert it into the database
         foreach ($pipelineData['stagesList'] as $stage) {
-          
             $isMandatory = ($stage['is_mandatory'] === true || $stage['is_mandatory'] === 'true') ? 1 : 0;
         
             $sqlStage = "INSERT INTO vtiger_stage (

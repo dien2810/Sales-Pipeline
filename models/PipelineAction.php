@@ -393,7 +393,7 @@ class PipelineAction
  		$createInfo = $action['sendEmailData'];
  		$subject = $createInfo['subject'];
  		$safeContent = isset($createInfo['safe_content']) ? $createInfo['safe_content'] : 0;
- 		$content = $createInfo['content'];
+ 		$content = html_entity_decode(json_decode($createInfo['content']), ENT_QUOTES, 'UTF-8');
  		$recepient = $createInfo['recepient'];
  		$emailcc = isset($createInfo['emailcc']) ? $createInfo['emailcc'] : "";
  		$emailbcc = isset($createInfo['emailbcc']) ? $createInfo['emailbcc'] : "";

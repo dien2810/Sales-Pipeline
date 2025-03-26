@@ -229,9 +229,8 @@ class Settings_PipelineConfig_Config_Model extends Vtiger_Base_Model {
         $deleteResult = self::deletePipelineById($idPipeline);
         return $deleteResult;
     }
-
-    //Implemented by Minh Hoang to replace pipeline in records.
-    public static function replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace) {
+     //Implemented by Minh Hoang to replace pipeline in records.
+     public static function replacePipelineAndStageInRecord($idRecord, $idPipelineReplace, $idStageReplace) {
         try {
             $db = PearDatabase::getInstance();
     
